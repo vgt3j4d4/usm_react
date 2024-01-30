@@ -1,6 +1,4 @@
-/********************/
-/* css reset */
-
+/********** css reset **********/
 * {
   box-sizing: border-box;
   position: relative;
@@ -20,34 +18,4 @@ h4 {
 
 p {
   text-wrap: pretty;
-}
-
-/********************/
-/* variables */
-:root {
-}
-
-/********************/
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  position: fixed;
-  width: 100dvw;
-  padding: 0.5rem;
-  background-color: #000;
-  line-height: 2rem;
-  color: #fff;
-  border-bottom: 1px solid #000;
-}
-
-.toolbar__left nav ol li {
-  display: inline-block;
-  list-style-type: none;
-}
-
-.toolbar__center {
-  display: flex;
 }

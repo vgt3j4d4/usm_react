@@ -1,12 +1,20 @@
 import './App.css';
-import { Toolbar } from './Toolbar';
+import { Toolbar } from './components/Toolbar/Toolbar';
+import { UserStoryMap } from './components/UserStoryMap/UserStoryMap';
+import { Iterations } from './components/Iterations/Iterations';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 function App() {
   return (
-    // TODO: Add routing
     <>
       <Toolbar></Toolbar>
-      <section>Main</section>
+      <main>
+        <Routes>
+          <Route path="/" element={<Navigate to="/mapping" />}></Route>
+          <Route path="/mapping" element={<UserStoryMap />}></Route>
+          <Route path="/iterations" element={<Iterations />}></Route>
+        </Routes>
+      </main>
     </>
   );
 }
