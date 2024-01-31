@@ -1,27 +1,31 @@
 import { useContext, useEffect, useState } from "react";
 import { NOTE_TYPE } from "../../const";
 import { SelectedNoteContext } from "../../context/SelectedNoteContext";
+import { getEpics } from "../../services/EpicService";
 import { getFeatures, getStories } from "../../utils/utils";
 import { Note } from "../Note/Note";
-import { getEpics } from "../../services/EpicService";
 
 export function UserStoryMap() {
   const [epics, setEpics] = useState([]);
+  const [features, setFeatures] = useState([]);
+  const [stories, setStories] = useState([]);
+
   const {
     selectedMappingNote: selectedNote,
     setSelectedMappingNote: setSelectedNote
   } = useContext(SelectedNoteContext);
 
   useEffect(() => {
-    const retrieveEpics = async () => {
+    const retrieveState = async () => {
       const data = await getEpics();
       setEpics(data);
+      const features = getFeatures(data);
+      setFeatures(getFeatures(data));
+      const stories = getStories(features);
+      setStories(stories);
     }
-    retrieveEpics();
+    retrieveState();
   }, []);
-
-  const features = getFeatures(epics);
-  const stories = getStories(features);
 
   return (
     <div role="grid" className="divide-y">
