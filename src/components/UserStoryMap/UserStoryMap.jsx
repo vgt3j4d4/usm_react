@@ -1,11 +1,21 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NOTE_TYPE } from "../../const";
-import { buildEpic, getFeatures, getStories } from "../../utils/utils";
+import { SelectedNoteContext } from "../../context/SelectedNoteContext";
+import { getFeatures, getStories } from "../../utils/utils";
 import { Note } from "../Note/Note";
+import { getEpics } from "../../services/EpicService";
 
 export function UserStoryMap() {
-  const [epics, setEpics] = useState([buildEpic()]);
-  const [selectedNote, setSelectedNote] = useState({});
+  const [epics, setEpics] = useState([]);
+  const { selectedMappingNote: selectedNote, setSelectedMappingNote: setSelectedNote } = useContext(SelectedNoteContext);
+
+  useEffect(() => {
+    const retrieveEpics = async () => {
+      const data = await getEpics();
+      setEpics(data);
+    }
+    retrieveEpics();
+  }, []);
 
   const features = getFeatures(epics);
   const stories = getStories(features);
