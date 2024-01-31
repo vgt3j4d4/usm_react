@@ -1,6 +1,6 @@
 import { NOTE_TYPE } from "../../const";
 
-export function Note({ noteId, title, type, active = false, activate, selected = false, isFirst }) {
+export function Note({ noteId, title, type, active = false, activate, isFirst }) {
   let className = 'note';
 
   switch (type) {

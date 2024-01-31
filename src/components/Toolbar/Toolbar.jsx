@@ -22,7 +22,6 @@ const TOOLBAR_BUTTONS = [
 ];
 
 export function Toolbar() {
-  const [activeNavIndex, setActiveNavIndex] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const location = useLocation();
   const { pathname } = location;

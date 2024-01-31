@@ -1,39 +1,30 @@
 import { DEFAULT_EPIC, DEFAULT_FEATURE, DEFAULT_STORY, NOTE_TYPE } from "../const";
+import { v4 as uuidv4 } from 'uuid';
 
 export function buildEpic() {
-  return { ...DEFAULT_EPIC, features: [buildFeature()] }
+  return { id: uuidv4(), ...DEFAULT_EPIC, features: [buildFeature()] }
 }
 
 export function buildFeature() {
-  return { ...DEFAULT_FEATURE, stories: [buildStory()] }
+  return { id: uuidv4(), ...DEFAULT_FEATURE, stories: [buildStory()] }
 }
 
 export function buildStory() {
-  return { ...DEFAULT_STORY };
+  return { id: uuidv4(), ...DEFAULT_STORY };
 }
 
-export function getAllFeatures(epics) {
-
-}
-
-export function getAllStories(epics) {
-
-}
-
-export function getNoteId(id, type) {
-  let noteId = '';
-  switch (type) {
-    case NOTE_TYPE.EPIC:
-      noteId = `epic-note-${id}`;
-      break;
-    case NOTE_TYPE.FEATURE:
-      noteId = `feature-note-${id}`;
-      break;
-    case NOTE_TYPE.STORY:
-      noteId = `story-note-${id}`;
-      break;
-    default:
-      break;
+export function getFeatures(epics = [], features = []) {
+  if (epics.length > 0) {
+    features = [...features, ...epics[0].features];
+    return getFeatures(epics.slice(1), features);
   }
-  return noteId;
+  return features;
+}
+
+export function getStories(features = [], stories = []) {
+  if (features.length > 0) {
+    stories = [...stories, ...features[0].stories];
+    return getFeatures(features.slice(1), stories);
+  }
+  return stories;
 }

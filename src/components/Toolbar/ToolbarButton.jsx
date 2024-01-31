@@ -23,7 +23,7 @@ export default function ToolbarButton({ id, icon, label, selected = false, navig
   return (
     <button type="button"
       id={`toolbar__button_${id}`}
-      className="flex flex-col items-center p-1"
+      className="flex flex-col items-center p-1 disabled:opacity-75"
       tabIndex={selected ? '0' : '-1'}
       onKeyDown={(e) => focusAnotherToolbarButton(e)}>
       <i className={`fa-solid ${icon}`}></i>

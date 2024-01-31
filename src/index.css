@@ -9,7 +9,6 @@
 
 .note {
   @apply min-h-28 min-w-36 max-w-min
-  border
   font-marker
   cursor-grab
   hover:border-none hover:shadow-md hover:shadow-black;

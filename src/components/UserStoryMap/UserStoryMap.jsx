@@ -1,44 +1,41 @@
-import { useEffect, useState } from "react";
-import { buildEpic, buildFeature, buildStory, getAllFeatures, getAllStories, getNoteId } from "../../utils/utils";
-import { Note } from "../Note/Note";
+import { useState } from "react";
 import { NOTE_TYPE } from "../../const";
-
-const INITIAL_EPIC = buildEpic();
+import { buildEpic, getFeatures, getStories } from "../../utils/utils";
+import { Note } from "../Note/Note";
 
 export function UserStoryMap() {
-  const [epics, setEpics] = useState([INITIAL_EPIC]);
-  const [activeNoteId, setActiveNoteId] = useState(null);
+  const [epics, setEpics] = useState([buildEpic()]);
+  const [activeNote, setActiveNote] = useState({});
 
-  // const features = getAllFeatures(epics);
-  const features = [buildFeature()];
-  // const stories = getAllStories(epics);
-  const stories = [buildStory()];
+  const features = getFeatures(epics);
+  const stories = getStories(features);
 
   return (
     <div role="grid" className="divide-y">
+
       {/* epics */}
-      <div className="p-4">
+      <div className="p-4 flex gap-4">
         {epics.map((e, index) => (
           <Note key={e.id}
-            id={getNoteId(e.id, NOTE_TYPE.EPIC)}
+            id={e.id}
             title={e.title}
             type={NOTE_TYPE.EPIC}
-            active={activeNoteId === getNoteId(e.id, NOTE_TYPE.EPIC)}
-            isFirst={activeNoteId === null && index === 0}
-            activate={() => setActiveNoteId(getNoteId(e.id, NOTE_TYPE.EPIC))}>
+            isFirst={activeNote === null && index === 0}
+            active={activeNote.id === e.id}
+            activate={() => setActiveNote({ id: e.id, type: NOTE_TYPE.EPIC })}>
           </Note>
         ))}
       </div>
 
       {/* features */}
-      <div className="p-4">
+      <div className="p-4 flex gap-4">
         {features.map(f => (
           <Note key={f.id}
-            id={getNoteId(f.id, NOTE_TYPE.FEATURE)}
+            id={f.id}
             title={f.title}
             type={NOTE_TYPE.FEATURE}
-            active={activeNoteId === getNoteId(f.id, NOTE_TYPE.FEATURE)}
-            activate={() => setActiveNoteId(getNoteId(f.id, NOTE_TYPE.FEATURE))}>
+            active={activeNote.id === f.id}
+            activate={() => setActiveNote({ id: f.id, type: NOTE_TYPE.FEATURE })}>
           </Note>
         ))}
       </div>
@@ -47,14 +44,15 @@ export function UserStoryMap() {
       <div className="p-4">
         {stories.map(s => (
           <Note key={s.id}
-            id={getNoteId(s.id, NOTE_TYPE.STORY)}
+            id={s.id}
             title={s.title}
             type={NOTE_TYPE.STORY}
-            active={activeNoteId === getNoteId(s.id, NOTE_TYPE.STORY)}
-            activate={() => setActiveNoteId(getNoteId(s.id, NOTE_TYPE.STORY))}>
+            active={activeNote.id === s.id}
+            activate={() => setActiveNote({ id: s.id, type: NOTE_TYPE.STORY })}>
           </Note>
         ))}
       </div>
+
     </div>
   )
 }
