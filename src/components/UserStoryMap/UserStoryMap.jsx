@@ -5,7 +5,7 @@ import { Note } from "../Note/Note";
 
 export function UserStoryMap() {
   const [epics, setEpics] = useState([buildEpic()]);
-  const [activeNote, setActiveNote] = useState({});
+  const [selectedNote, setSelectedNote] = useState({});
 
   const features = getFeatures(epics);
   const stories = getStories(features);
@@ -20,9 +20,9 @@ export function UserStoryMap() {
             id={e.id}
             title={e.title}
             type={NOTE_TYPE.EPIC}
-            isFirst={activeNote === null && index === 0}
-            active={activeNote.id === e.id}
-            activate={() => setActiveNote({ id: e.id, type: NOTE_TYPE.EPIC })}>
+            isFirst={Object.keys(selectedNote).length === 0 && index === 0}
+            selected={selectedNote.id === e.id}
+            select={() => setSelectedNote({ id: e.id, type: NOTE_TYPE.EPIC })}>
           </Note>
         ))}
       </div>
@@ -34,8 +34,8 @@ export function UserStoryMap() {
             id={f.id}
             title={f.title}
             type={NOTE_TYPE.FEATURE}
-            active={activeNote.id === f.id}
-            activate={() => setActiveNote({ id: f.id, type: NOTE_TYPE.FEATURE })}>
+            selected={selectedNote.id === f.id}
+            select={() => setSelectedNote({ id: f.id, type: NOTE_TYPE.FEATURE })}>
           </Note>
         ))}
       </div>
@@ -47,8 +47,8 @@ export function UserStoryMap() {
             id={s.id}
             title={s.title}
             type={NOTE_TYPE.STORY}
-            active={activeNote.id === s.id}
-            activate={() => setActiveNote({ id: s.id, type: NOTE_TYPE.STORY })}>
+            selected={selectedNote.id === s.id}
+            select={() => setSelectedNote({ id: s.id, type: NOTE_TYPE.STORY })}>
           </Note>
         ))}
       </div>
