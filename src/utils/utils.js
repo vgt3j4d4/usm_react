@@ -28,7 +28,7 @@ export function getFeatures(epics = [], features = []) {
 export function getStories(features = [], stories = []) {
   if (features.length > 0) {
     stories = [...stories, ...features[0].stories];
-    return getFeatures(features.slice(1), stories);
+    return getStories(features.slice(1), stories);
   }
   return stories;
 }
