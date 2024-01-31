@@ -1,33 +1,35 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import ToolbarButton from "./ToolbarButton";
 import ToolbarNavButton from "./ToolbarNavButton";
+import { SelectedNoteContext } from "../../context/SelectedNoteContext";
 
 export const BUTTON_NAVIGATION = Object.freeze({
   NEXT: 'next',
   PREV: 'prev',
   FIRST: 'first',
   LAST: 'last'
-})
+});
 
 const NAV_BUTTONS = [
   { id: 1, label: 'Map', iconCls: 'fa-map', route: '/mapping' },
   { id: 2, label: 'Iterations', iconCls: 'fa-stairs', route: '/iterations' }
-]
+];
 
 const TOOLBAR_BUTTONS = [
-  { id: 1, label: 'Select', iconCls: 'fa-arrow-pointer', action: '' },
-  { id: 2, label: 'New', iconCls: 'fa-file-circle-plus', action: '' },
-  { id: 3, label: 'Remove', iconCls: 'fa-trash-can', action: '' }
+  { id: 1, label: 'Select', iconCls: 'fa-arrow-pointer', action: 'focusSelected' },
+  { id: 2, label: 'New', iconCls: 'fa-file-circle-plus', action: 'addNew' },
+  { id: 3, label: 'Remove', iconCls: 'fa-trash-can', action: 'remove' }
 ];
 
 export function Toolbar() {
   const [activeIndex, setActiveIndex] = useState(0);
   const location = useLocation();
   const { pathname } = location;
+  const { focusMappingNote } = useContext(SelectedNoteContext);
 
   useEffect(() => {
-    const button = document.querySelector(`#toolbar__button_${activeIndex}`);
+    const button = document.getElementById(`toolbar__button_${activeIndex}`);
     if (button) button.focus();
   }, [activeIndex]);
 
@@ -56,6 +58,16 @@ export function Toolbar() {
     }
   }
 
+  function doButtonAction(action) {
+    switch (action) {
+      case 'focusSelected':
+        focusMappingNote();
+        break;
+      default:
+        break;
+    }
+  }
+
   return (
     <div role="toolbar" className="sticky w-full flex justify-between items-center gap-2 p-2 bg-black text-white">
 
@@ -81,7 +93,8 @@ export function Toolbar() {
             icon={b.iconCls}
             label={b.label}
             selected={activeIndex === index}
-            navigateToButton={navigateToButton} />
+            navigateToButton={navigateToButton}
+            doAction={() => { doButtonAction(b.action) }} />
         ))}
       </div>
 

@@ -1,6 +1,6 @@
 import { NOTE_TYPE } from "../../const";
 
-export function Note({ noteId, title, type, selected = false, select, isFirst }) {
+export function Note({ id, title, type, selected = false, select, isFirst }) {
   let className = 'note';
 
   switch (type) {
@@ -20,7 +20,8 @@ export function Note({ noteId, title, type, selected = false, select, isFirst })
   if (selected) className += ' border-2 border-black transition';
 
   return (
-    <div id={noteId}
+    <div
+      data-note-id={id}
       className={className}
       onFocus={select}
       onClick={select}

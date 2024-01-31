@@ -1,16 +1,20 @@
-import { DEFAULT_EPIC, DEFAULT_FEATURE, DEFAULT_STORY, NOTE_TYPE } from "../const";
 import { v4 as uuidv4 } from 'uuid';
+import { DEFAULT_EPIC, DEFAULT_FEATURE, DEFAULT_STORY } from "../const";
+
+function id() {
+  return uuidv4().split('-').join('');
+}
 
 export function buildEpic() {
-  return { id: uuidv4(), ...DEFAULT_EPIC, features: [buildFeature()] }
+  return { id: id(), ...DEFAULT_EPIC, features: [buildFeature()] }
 }
 
 export function buildFeature() {
-  return { id: uuidv4(), ...DEFAULT_FEATURE, stories: [buildStory()] }
+  return { id: id(), ...DEFAULT_FEATURE, stories: [buildStory()] }
 }
 
 export function buildStory() {
-  return { id: uuidv4(), ...DEFAULT_STORY };
+  return { id: id(), ...DEFAULT_STORY };
 }
 
 export function getFeatures(epics = [], features = []) {

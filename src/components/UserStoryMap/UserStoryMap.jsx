@@ -7,7 +7,10 @@ import { getEpics } from "../../services/EpicService";
 
 export function UserStoryMap() {
   const [epics, setEpics] = useState([]);
-  const { selectedMappingNote: selectedNote, setSelectedMappingNote: setSelectedNote } = useContext(SelectedNoteContext);
+  const {
+    selectedMappingNote: selectedNote,
+    setSelectedMappingNote: setSelectedNote
+  } = useContext(SelectedNoteContext);
 
   useEffect(() => {
     const retrieveEpics = async () => {
