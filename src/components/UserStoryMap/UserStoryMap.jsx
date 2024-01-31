@@ -1,35 +1,16 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { NOTE_TYPE } from "../../const";
-import { SelectedNoteContext } from "../../context/SelectedNoteContext";
-import { getEpics } from "../../services/EpicService";
-import { getFeatures, getStories } from "../../utils/utils";
+import { SelectionContext } from "../../context/SelectionContext";
 import { Note } from "../Note/Note";
+import { StoriesContext } from "../../context/StoriesContext";
 
 export function UserStoryMap() {
-  const [epics, setEpics] = useState([]);
-  const [features, setFeatures] = useState([]);
-  const [stories, setStories] = useState([]);
+  const { epics, features } = useContext(StoriesContext);
 
   const {
-    selectedMappingNote: selectedNote,
-    setSelectedMappingNote: setSelectedNote
-  } = useContext(SelectedNoteContext);
-
-  useEffect(() => {
-    if (epics.length != 0) return;
-
-    const retrieveState = async () => {
-      const epics = await getEpics();
-      const features = getFeatures(epics);
-      const stories = getStories(features);
-
-      setEpics(epics);
-      setFeatures(features);
-      setStories(stories);
-    }
-
-    retrieveState();
-  }, []);
+    selectedMapNote: selectedNote,
+    setSelectedMapNote: setSelectedNote
+  } = useContext(SelectionContext);
 
   return (
     <div role="grid" className="divide-y">
@@ -62,15 +43,19 @@ export function UserStoryMap() {
       </div>
 
       {/* stories */}
-      <div className="p-4">
-        {stories.map(s => (
-          <Note key={s.id}
-            id={s.id}
-            title={s.title}
-            type={NOTE_TYPE.STORY}
-            selected={selectedNote.id === s.id}
-            select={() => setSelectedNote({ id: s.id, type: NOTE_TYPE.STORY })}>
-          </Note>
+      <div className="p-4 flex gap-4">
+        {features.map(f => (
+          <div key={f.id} className="flex flex-col gap-4">
+            {f.stories.map(s => (
+              <Note key={s.id}
+                id={s.id}
+                title={s.title}
+                type={NOTE_TYPE.STORY}
+                selected={selectedNote.id === s.id}
+                select={() => setSelectedNote({ id: s.id, type: NOTE_TYPE.STORY })}>
+              </Note>
+            ))}
+          </div>
         ))}
       </div>
 

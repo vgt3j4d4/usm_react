@@ -1,8 +1,8 @@
+import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css';
+import { Iterations } from './components/Iterations/Iterations';
 import { Toolbar } from './components/Toolbar/Toolbar';
 import { UserStoryMap } from './components/UserStoryMap/UserStoryMap';
-import { Iterations } from './components/Iterations/Iterations';
-import { Navigate, Route, Routes } from 'react-router-dom';
 import { ROUTES } from "./routes";
 
 function App() {

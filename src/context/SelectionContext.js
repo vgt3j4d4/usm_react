@@ -1,14 +1,14 @@
 import { createContext, useState } from "react";
 
-export const SelectedNoteContext = createContext();
+export const SelectionContext = createContext();
 
-export default function SelectedNoteProvider({ children }) {
-  const [selectedMappingNote, setSelectedMappingNote] = useState({});
+export default function SelectionProvider({ children }) {
+  const [selectedMapNote, setSelectedMapNote] = useState({});
   const [selectedIterationNote, setSelectedIterationNote] = useState({});
 
   function focusMappingNote() {
-    if (selectedMappingNote.id) {
-      const note = document.querySelector(`[data-note-id="${selectedMappingNote.id}"]`);
+    if (selectedMapNote.id) {
+      const note = document.querySelector(`[data-note-id="${selectedMapNote.id}"]`);
       if (note) note.focus();
     }
   }
@@ -21,11 +21,11 @@ export default function SelectedNoteProvider({ children }) {
   }
 
   return (
-    <SelectedNoteContext.Provider value={{
-      selectedMappingNote, setSelectedMappingNote, focusMappingNote,
+    <SelectionContext.Provider value={{
+      selectedMapNote, setSelectedMapNote, focusMappingNote,
       selectedIterationNote, setSelectedIterationNote, focusIterationNote
     }}>
       {children}
-    </SelectedNoteContext.Provider>
+    </SelectionContext.Provider>
   )
 }
