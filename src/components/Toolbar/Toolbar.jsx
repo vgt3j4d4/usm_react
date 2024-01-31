@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import ToolbarButton from "./ToolbarButton";
 import ToolbarNavButton from "./ToolbarNavButton";
 import { SelectedNoteContext } from "../../context/SelectedNoteContext";
+import { ROUTES } from "../../routes";
 
 export const BUTTON_NAVIGATION = Object.freeze({
   NEXT: 'next',
@@ -12,26 +13,33 @@ export const BUTTON_NAVIGATION = Object.freeze({
 });
 
 const NAV_BUTTONS = [
-  { id: 1, label: 'Map', iconCls: 'fa-map', route: '/mapping' },
-  { id: 2, label: 'Iterations', iconCls: 'fa-stairs', route: '/iterations' }
+  { id: 1, label: 'Map', iconCls: 'fa-map', route: ROUTES.MAPPING },
+  { id: 2, label: 'Iterations', iconCls: 'fa-stairs', route: ROUTES.ITERATIONS }
 ];
 
 const TOOLBAR_BUTTONS = [
-  { id: 1, label: 'Select', iconCls: 'fa-arrow-pointer', action: 'focusSelected' },
-  { id: 2, label: 'New', iconCls: 'fa-file-circle-plus', action: 'addNew' },
-  { id: 3, label: 'Remove', iconCls: 'fa-trash-can', action: 'remove' }
+  { id: 1, label: 'Select', iconCls: 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
+  { id: 2, label: 'New', iconCls: 'fa-file-circle-plus', disabled: false, action: 'addNew' },
+  { id: 3, label: 'Remove', iconCls: 'fa-trash-can', disabled: false, action: 'remove' }
 ];
 
 export function Toolbar() {
   const [activeIndex, setActiveIndex] = useState(0);
   const location = useLocation();
   const { pathname } = location;
-  const { focusMappingNote } = useContext(SelectedNoteContext);
+  const {
+    selectedMappingNote, setSelectedMappingNote,
+    focusMappingNote,
+    selectedIterationNote, setSelectedIterationNote,
+    focusIterationNote
+  } = useContext(SelectedNoteContext);
 
   useEffect(() => {
     const button = document.getElementById(`toolbar__button_${activeIndex}`);
     if (button) button.focus();
   }, [activeIndex]);
+
+  const isMappingView = pathname === ROUTES.MAPPING;
 
   function navigateToButton(buttonNav) {
     switch (buttonNav) {
@@ -58,10 +66,15 @@ export function Toolbar() {
     }
   }
 
+  function focusNote() {
+    if (isMappingView) focusMappingNote()
+    else focusIterationNote();
+  }
+
   function doButtonAction(action) {
     switch (action) {
       case 'focusSelected':
-        focusMappingNote();
+        focusNote();
         break;
       default:
         break;

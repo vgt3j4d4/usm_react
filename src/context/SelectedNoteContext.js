@@ -13,10 +13,17 @@ export default function SelectedNoteProvider({ children }) {
     }
   }
 
+  function focusIterationNote() {
+    if (selectedIterationNote.id) {
+      const note = document.querySelector(`[data-note-id="${selectedIterationNote.id}"]`);
+      if (note) note.focus();
+    }
+  }
+
   return (
     <SelectedNoteContext.Provider value={{
       selectedMappingNote, setSelectedMappingNote, focusMappingNote,
-      selectedIterationNote, setSelectedIterationNote
+      selectedIterationNote, setSelectedIterationNote, focusIterationNote
     }}>
       {children}
     </SelectedNoteContext.Provider>

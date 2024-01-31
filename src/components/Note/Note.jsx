@@ -1,6 +1,6 @@
 import { NOTE_TYPE } from "../../const";
 
-export function Note({ id, title, type, selected = false, select, isFirst }) {
+export function Note({ id, title, type, selected = false, select, isFirst = false }) {
   let className = 'note';
 
   switch (type) {
@@ -20,12 +20,12 @@ export function Note({ id, title, type, selected = false, select, isFirst }) {
   if (selected) className += ' border-2 border-black transition';
 
   return (
-    <div
+    <div role="gridcell" tabIndex={isFirst || selected ? '0' : '-1'}
       data-note-id={id}
       className={className}
       onFocus={select}
       onClick={select}
-      tabIndex={isFirst || selected ? '0' : '-1'} aria-selected={selected}>
+      aria-selected={selected}>
       <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">{title}</span>
     </div>
   )

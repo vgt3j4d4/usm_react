@@ -16,14 +16,18 @@ export function UserStoryMap() {
   } = useContext(SelectedNoteContext);
 
   useEffect(() => {
+    if (epics.length != 0) return;
+
     const retrieveState = async () => {
-      const data = await getEpics();
-      setEpics(data);
-      const features = getFeatures(data);
-      setFeatures(getFeatures(data));
+      const epics = await getEpics();
+      const features = getFeatures(epics);
       const stories = getStories(features);
+
+      setEpics(epics);
+      setFeatures(features);
       setStories(stories);
     }
+
     retrieveState();
   }, []);
 
