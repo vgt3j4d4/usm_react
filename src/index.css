@@ -11,5 +11,6 @@
   @apply min-h-28 min-w-36 max-w-min
   font-marker
   cursor-grab
-  hover:shadow-md hover:shadow-black;
+  hover:shadow-md hover:shadow-black
+  focus:-rotate-2;
 }

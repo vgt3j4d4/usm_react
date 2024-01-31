@@ -17,7 +17,7 @@ export function Note({ noteId, title, type, selected = false, select, isFirst })
       break;
   }
 
-  if (selected) className += ' border-2 border-black transition -rotate-2';
+  if (selected) className += ' border-2 border-black transition';
 
   return (
     <div id={noteId}
