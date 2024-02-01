@@ -25,7 +25,7 @@ export function UserStoryMap() {
   } = useContext(SelectionContext);
 
   return (
-    <div role="grid" className="divide-y">
+    <div role="grid" className="min-w-max divide-y">
 
       {/* epics */}
       <div className="p-4 flex gap-4">
