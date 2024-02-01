@@ -4,6 +4,7 @@ import { BUTTON_NAVIGATION } from "./Toolbar";
 import { SelectionContext } from "../../context/SelectionContext";
 import { NOTE_TYPE } from "../../const";
 import { StoriesContext } from "../../context/StoriesContext";
+import { addFeature } from "../../services/StoriesService";
 
 const TOOLBAR_BUTTONS = [
   { id: 1, label: 'Select', iconCls: 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
@@ -17,7 +18,7 @@ export function ToolbarMapButtons() {
     selectedMapNote: selectedNote,
     focusMappingNote: focusNote
   } = useContext(SelectionContext);
-  const { addEpic } = useContext(StoriesContext);
+  const { addEpic, addFeature } = useContext(StoriesContext);
 
   useEffect(() => {
     const button = document.getElementById(`toolbar__button_${activeIndex}`);
@@ -60,6 +61,8 @@ export function ToolbarMapButtons() {
             addEpic();
             break;
           case NOTE_TYPE.FEATURE:
+            addFeature(selectedNote.parentId);
+            break;
           case NOTE_TYPE.STORY:
           default:
             break;

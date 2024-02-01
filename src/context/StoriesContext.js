@@ -12,7 +12,6 @@ export default function StoriesProvider({ children }) {
     const retrieveState = async () => {
       const epics = await storiesService.getEpics();
       const features = utils.getFeatures(epics);
-
       setEpics([...epics]);
       setFeatures(features);
     }
@@ -28,8 +27,14 @@ export default function StoriesProvider({ children }) {
     setFeatures(newFeatures);
   }
 
+  async function addFeature(epicId) {
+    const feature = await storiesService.addFeature(utils.buildFeature(epicId));
+    const epic = epics.find(e => e.id === epicId);
+    if (epic) setFeatures(utils.getFeatures(epics));
+  }
+
   return (
-    <StoriesContext.Provider value={{ epics, features, addEpic }}>
+    <StoriesContext.Provider value={{ epics, features, addEpic, addFeature }}>
       {children}
     </StoriesContext.Provider>
   )

@@ -7,6 +7,10 @@
   src: url(/public/fonts/PermanentMarker-Regular.ttf);
 }
 
+.empty-note {
+  @apply min-h-28 min-w-36 max-w-min;
+}
+
 .note {
   @apply min-h-28 min-w-36 max-w-min
   font-marker

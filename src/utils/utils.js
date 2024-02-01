@@ -6,15 +6,18 @@ function id() {
 }
 
 export function buildEpic() {
-  return { id: id(), ...DEFAULT_EPIC, features: [buildFeature()] }
+  const epicId = id();
+  return { id: epicId, ...DEFAULT_EPIC, features: [buildFeature(epicId)] }
 }
 
-export function buildFeature() {
-  return { id: id(), ...DEFAULT_FEATURE, stories: [buildStory()] }
+export function buildFeature(epicId) {
+  const featureId = id();
+  return { id: featureId, epicId, ...DEFAULT_FEATURE, stories: [buildStory(featureId)] }
 }
 
-export function buildStory() {
-  return { id: id(), ...DEFAULT_STORY };
+export function buildStory(featureId) {
+  const storyId = id();
+  return { id: storyId, featureId, ...DEFAULT_STORY };
 }
 
 export function getFeatures(epics = [], features = []) {

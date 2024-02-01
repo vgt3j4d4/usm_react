@@ -4,9 +4,21 @@ import { SelectionContext } from "../../context/SelectionContext";
 import { Note } from "../Note/Note";
 import { StoriesContext } from "../../context/StoriesContext";
 
+function EpicSpacer({ length }) {
+  if (length === 0) return null;
+  return (
+    Array
+      .from('_'.repeat(length))
+      .map((_, index) => (
+        <div key={index}
+          className="empty-note"
+          tabIndex="-1" aria-hidden="true">
+        </div>
+      )));
+}
+
 export function UserStoryMap() {
   const { epics, features } = useContext(StoriesContext);
-
   const {
     selectedMapNote: selectedNote,
     setSelectedMapNote: setSelectedNote
@@ -18,14 +30,18 @@ export function UserStoryMap() {
       {/* epics */}
       <div className="p-4 flex gap-4">
         {epics.map((e, index) => (
-          <Note key={e.id}
-            id={e.id}
-            title={e.title}
-            type={NOTE_TYPE.EPIC}
-            isFirst={Object.keys(selectedNote).length === 0 && index === 0}
-            selected={selectedNote.id === e.id}
-            select={() => setSelectedNote({ id: e.id, type: NOTE_TYPE.EPIC })}>
-          </Note>
+          <div key={e.id} className="flex gap-4">
+            <Note
+              id={e.id}
+              title={e.title}
+              type={NOTE_TYPE.EPIC}
+              isFirst={Object.keys(selectedNote).length === 0 && index === 0}
+              selected={selectedNote.id === e.id}
+              select={() => setSelectedNote({ id: e.id, type: NOTE_TYPE.EPIC })}>
+            </Note>
+            {/* to create some space between epics */}
+            <EpicSpacer length={e.features.length - 1} />
+          </div>
         ))}
       </div>
 
@@ -37,7 +53,11 @@ export function UserStoryMap() {
             title={f.title}
             type={NOTE_TYPE.FEATURE}
             selected={selectedNote.id === f.id}
-            select={() => setSelectedNote({ id: f.id, type: NOTE_TYPE.FEATURE })}>
+            select={() => setSelectedNote({
+              id: f.id,
+              type: NOTE_TYPE.FEATURE,
+              parentId: f.epicId
+            })}>
           </Note>
         ))}
       </div>
@@ -52,7 +72,11 @@ export function UserStoryMap() {
                 title={s.title}
                 type={NOTE_TYPE.STORY}
                 selected={selectedNote.id === s.id}
-                select={() => setSelectedNote({ id: s.id, type: NOTE_TYPE.STORY })}>
+                select={() => setSelectedNote({
+                  id: s.id,
+                  type: NOTE_TYPE.STORY,
+                  parentId: s.featureId
+                })}>
               </Note>
             ))}
           </div>
