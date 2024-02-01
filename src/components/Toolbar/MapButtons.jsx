@@ -12,7 +12,7 @@ const TOOLBAR_BUTTONS = [
   { id: 3, label: 'Remove', iconCls: 'fa-trash-can', disabled: false, action: 'remove' }
 ];
 
-export function ToolbarMapButtons() {
+export function MapButtons() {
   const [activeIndex, setActiveIndex] = useState(0);
   const {
     selectedMapNote: selectedNote,

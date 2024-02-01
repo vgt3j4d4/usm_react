@@ -9,7 +9,7 @@ function App() {
   return (
     <>
       <Toolbar></Toolbar>
-      <main>
+      <main className="mt-14">
         <Routes>
           <Route path="/" element={<Navigate to={ROUTES.MAPPING} />}></Route>
           <Route path={ROUTES.MAPPING} element={<UserStoryMap />}></Route>
