@@ -55,8 +55,8 @@ export function UserStoryMap() {
             selected={selectedNote.id === f.id}
             select={() => setSelectedNote({
               id: f.id,
-              type: NOTE_TYPE.FEATURE,
-              parentId: f.epicId
+              epicId: f.epicId,
+              type: NOTE_TYPE.FEATURE
             })}>
           </Note>
         ))}
@@ -74,8 +74,9 @@ export function UserStoryMap() {
                 selected={selectedNote.id === s.id}
                 select={() => setSelectedNote({
                   id: s.id,
-                  type: NOTE_TYPE.STORY,
-                  parentId: s.featureId
+                  epicId: f.epicId,
+                  featureId: s.featureId,
+                  type: NOTE_TYPE.STORY
                 })}>
               </Note>
             ))}

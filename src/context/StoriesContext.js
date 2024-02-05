@@ -2,6 +2,8 @@ import { createContext, useEffect, useState } from "react";
 import * as storiesService from "../services/StoriesService";
 import * as utils from "../utils/utils";
 
+const STORY_MAP_ID = null; // TODO
+
 export const StoriesContext = createContext();
 
 export default function StoriesProvider({ children }) {
@@ -10,17 +12,17 @@ export default function StoriesProvider({ children }) {
 
   useEffect(() => {
     const retrieveState = async () => {
-      const epics = await storiesService.getEpics();
-      const features = utils.getFeatures(epics);
-      setEpics([...epics]);
-      setFeatures(features);
+      const storyMap = await storiesService.getStoryMap(STORY_MAP_ID);
+      const epics = [...storyMap.epics];
+      setEpics(epics);
+      setFeatures(utils.getFeatures(epics));
     }
 
     retrieveState();
   }, []);
 
   async function addEpic() {
-    const epic = await storiesService.addEpic(utils.buildEpic());
+    const epic = await storiesService.addEpic(STORY_MAP_ID);
     const newEpics = [...epics, epic];
     const newFeatures = utils.getFeatures(newEpics);
     setEpics(newEpics);
@@ -28,13 +30,18 @@ export default function StoriesProvider({ children }) {
   }
 
   async function addFeature(epicId) {
-    const feature = await storiesService.addFeature(utils.buildFeature(epicId));
+    const feature = await storiesService.addFeature(STORY_MAP_ID, epicId);
     const epic = epics.find(e => e.id === epicId);
-    if (epic) setFeatures(utils.getFeatures(epics));
+    if (epic) setFeatures([...features, feature]);
+  }
+
+  async function addStory(epicId, featureId) {
+    const story = await storiesService.addStory(STORY_MAP_ID, epicId, featureId);
+    if (story) setFeatures([...features]);
   }
 
   return (
-    <StoriesContext.Provider value={{ epics, features, addEpic, addFeature }}>
+    <StoriesContext.Provider value={{ epics, features, addEpic, addFeature, addStory }}>
       {children}
     </StoriesContext.Provider>
   )

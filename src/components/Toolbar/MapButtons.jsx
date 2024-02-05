@@ -18,7 +18,7 @@ export function MapButtons() {
     selectedMapNote: selectedNote,
     focusMappingNote: focusNote
   } = useContext(SelectionContext);
-  const { addEpic, addFeature } = useContext(StoriesContext);
+  const { addEpic, addFeature, addStory } = useContext(StoriesContext);
 
   useEffect(() => {
     const button = document.getElementById(`toolbar__button_${activeIndex}`);
@@ -61,9 +61,10 @@ export function MapButtons() {
             addEpic();
             break;
           case NOTE_TYPE.FEATURE:
-            addFeature(selectedNote.parentId);
+            addFeature(selectedNote.epicId);
             break;
           case NOTE_TYPE.STORY:
+            addStory(selectedNote.epicId, selectedNote.featureId);
           default:
             break;
         }
