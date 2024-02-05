@@ -1,6 +1,39 @@
+import { useState } from "react";
 import { NOTE_TYPE } from "../../const";
+import { useRef } from "react";
+import { useEffect } from "react";
+import { selectText } from "../../utils/utils";
 
-export function Note({ id, title, type, selected = false, select, isFirst = false }) {
+export function Note({ id, title, type, selected = false, select, isFirst = false, updateTitle }) {
+  const [editing, setEditing] = useState(false);
+  const titleRef = useRef(null);
+
+  useEffect(() => {
+    if (editing) {
+      const noteEl = titleRef.current;
+      noteEl.focus();
+      selectText(noteEl);
+    }
+  }, [editing]);
+
+  function startEditing() {
+    setEditing(true);
+  }
+
+  function stopEditing() {
+    setEditing(false);
+    const editedTitle = titleRef.current.innerText;
+    if (editedTitle !== title) updateTitle(editedTitle);
+  }
+
+  function toggleEditing(e) {
+    if (e && e.key && e.key === 'Enter') {
+      e.preventDefault();
+      if (editing) stopEditing()
+      else startEditing();
+    }
+  }
+
   let className = 'note';
 
   switch (type) {
@@ -25,8 +58,17 @@ export function Note({ id, title, type, selected = false, select, isFirst = fals
       className={className}
       onFocus={select}
       onClick={select}
+      onDoubleClick={startEditing}
+      onKeyDown={toggleEditing}
       aria-selected={selected}>
-      <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">{title}</span>
+      <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+        <span className={editing ? 'ring-0 outline-none' : 'hidden'}
+          ref={titleRef}
+          contentEditable={editing} suppressContentEditableWarning={true}
+          onKeyDown={toggleEditing}
+          onBlur={stopEditing}>{title}</span>
+        <span className={editing ? 'hidden' : ''}>{title}</span>
+      </span>
     </div>
   )
 }

@@ -48,3 +48,18 @@ export function getStories(features = [], stories = []) {
   }
   return stories;
 }
+
+export function selectText(textEl) {
+  let range, selection;
+  if (document.body.createTextRange) {
+    range = document.body.createTextRange();
+    range.moveToElementText(textEl);
+    range.select();
+  } else if (window.getSelection) {
+    selection = window.getSelection();
+    range = document.createRange();
+    range.selectNodeContents(textEl);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+}

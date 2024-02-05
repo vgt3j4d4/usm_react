@@ -40,8 +40,44 @@ export default function StoriesProvider({ children }) {
     if (story) setFeatures([...features]);
   }
 
+  function updateEpicTitle(epicId, title) {
+    setEpics(epics.map(e => {
+      if (e.id === epicId) return { ...e, title }
+      return e;
+    }))
+  }
+
+  function updateFeatureTitle(featureId, title) {
+    setFeatures(features.map(f => {
+      if (f.id === featureId) return { ...f, title }
+      return f;
+    }))
+  }
+
+  function updateStoryTitle(featureId, storyId, title) {
+    setFeatures(features.map(f => {
+      if (f.id === featureId) {
+        const story = f.stories.find(s => s.id === storyId);
+        if (story) {
+          return {
+            ...f, stories: f.stories.map(s => {
+              if (s.id === storyId) return { ...s, title }
+              return s
+            })
+          }
+        }
+      }
+      return f;
+    }))
+  }
+
   return (
-    <StoriesContext.Provider value={{ epics, features, addEpic, addFeature, addStory }}>
+    <StoriesContext.Provider value={
+      {
+        epics, features,
+        addEpic, addFeature, addStory,
+        updateEpicTitle, updateFeatureTitle, updateStoryTitle
+      }}>
       {children}
     </StoriesContext.Provider>
   )

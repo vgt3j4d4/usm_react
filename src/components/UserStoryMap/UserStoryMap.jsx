@@ -18,10 +18,14 @@ function EpicSpacer({ length }) {
 }
 
 export function UserStoryMap() {
-  const { epics, features } = useContext(StoriesContext);
+  const {
+    epics, features,
+    updateEpicTitle, updateFeatureTitle, updateStoryTitle
+  } = useContext(StoriesContext);
   const {
     selectedMapNote: selectedNote,
-    setSelectedMapNote: setSelectedNote
+    setSelectedMapNote: setSelectedNote,
+    focusMappingNote: focusNote
   } = useContext(SelectionContext);
 
   return (
@@ -37,7 +41,11 @@ export function UserStoryMap() {
               type={NOTE_TYPE.EPIC}
               isFirst={Object.keys(selectedNote).length === 0 && index === 0}
               selected={selectedNote.id === e.id}
-              select={() => setSelectedNote({ id: e.id, type: NOTE_TYPE.EPIC })}>
+              select={() => setSelectedNote({ id: e.id, type: NOTE_TYPE.EPIC })}
+              updateTitle={(editedTitle) => {
+                updateEpicTitle(e.id, editedTitle);
+                focusNote();
+              }}>
             </Note>
             {/* to create some space between epics */}
             <EpicSpacer length={e.features.length - 1} />
@@ -57,7 +65,11 @@ export function UserStoryMap() {
               id: f.id,
               epicId: f.epicId,
               type: NOTE_TYPE.FEATURE
-            })}>
+            })}
+            updateTitle={(editedTitle) => {
+              updateFeatureTitle(f.id, editedTitle);
+              focusNote();
+            }}>
           </Note>
         ))}
       </div>
@@ -77,7 +89,11 @@ export function UserStoryMap() {
                   epicId: f.epicId,
                   featureId: s.featureId,
                   type: NOTE_TYPE.STORY
-                })}>
+                })}
+                updateTitle={(editedTitle) => {
+                  updateStoryTitle(f.id, s.id, editedTitle);
+                  focusNote();
+                }}>
               </Note>
             ))}
           </div>
