@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NOTE_TYPE } from "../../const";
 import { useRef } from "react";
 import { useEffect } from "react";
-import { selectText } from "../../utils/utils";
+import * as utils from "../../utils/utils";
 
 export function Note({ id, title, type, selected = false, select, isFirst = false, updateTitle }) {
   const [editing, setEditing] = useState(false);
@@ -12,7 +12,7 @@ export function Note({ id, title, type, selected = false, select, isFirst = fals
     if (editing) {
       const noteEl = titleRef.current;
       noteEl.focus();
-      selectText(noteEl);
+      utils.selectText(noteEl);
     }
   }, [editing]);
 
@@ -35,7 +35,6 @@ export function Note({ id, title, type, selected = false, select, isFirst = fals
   }
 
   let className = 'note';
-
   switch (type) {
     case NOTE_TYPE.EPIC:
       className += ' bg-orange-300';
