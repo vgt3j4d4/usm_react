@@ -2,7 +2,12 @@ import { buildEpic, buildFeature, buildStory } from "../utils/utils";
 
 const storyMap = {
   id: null,
-  epics: [buildEpic()]
+  epics: [buildEpic()],
+  count: {
+    epics: 1,
+    features: 1,
+    stories: 1
+  }
 };
 
 export async function getStoryMap(_storyMapId) {
@@ -11,8 +16,18 @@ export async function getStoryMap(_storyMapId) {
 
 export async function addEpic(_storyMapId) {
   const epic = buildEpic();
-  epic.title += ` ${storyMap.epics.length + 1}`;
-  storyMap.epics.push(epic);
+
+  const { epics, count } = storyMap;
+  count.epics += 1;
+  epic.title += ` ${count.epics}`;
+  count.features += 1;
+  const feature = epic.features[epic.features.length - 1];
+  feature.title += ` ${count.features}`;
+  count.stories += 1;
+  const story = feature.stories[feature.stories.length - 1];
+  story.title += ` ${count.stories}`;
+
+  epics.push(epic);
   return Promise.resolve(epic);
 }
 
@@ -20,7 +35,14 @@ export async function addFeature(_storyMapId, epicId) {
   const epic = storyMap.epics.find(e => e.id === epicId);
   if (epic) {
     const feature = buildFeature(epicId);
-    feature.title += ` ${epic.features.length + 1}`;
+
+    const { count } = storyMap;
+    count.features += 1;
+    feature.title += ` ${count.features}`;
+    count.stories += 1;
+    const story = feature.stories[feature.stories.length - 1];
+    story.title += ` ${count.stories}`;
+
     epic.features.push(feature);
     return Promise.resolve(feature);
   }
@@ -33,7 +55,11 @@ export async function addStory(_storyMapId, epicId, featureId) {
     const feature = epic.features.find(f => f.id === featureId);
     if (feature) {
       const story = buildStory(featureId);
-      story.title += ` ${feature.stories.length + 1}`;
+
+      const { count } = storyMap;
+      count.stories += 1;
+      story.title += ` ${count.stories}`;
+
       feature.stories.push(story);
       return Promise.resolve(story);
     }
