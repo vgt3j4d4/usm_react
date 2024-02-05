@@ -20,7 +20,8 @@ function EpicSpacer({ length }) {
 export function UserStoryMap() {
   const {
     epics, features,
-    updateEpicTitle, updateFeatureTitle, updateStoryTitle
+    updateEpicTitle, updateFeatureTitle, updateStoryTitle,
+    removeEpic
   } = useContext(StoriesContext);
   const {
     selectedMapNote: selectedNote,
@@ -45,7 +46,8 @@ export function UserStoryMap() {
               updateTitle={(editedTitle) => {
                 updateEpicTitle(e.id, editedTitle);
                 focusNote();
-              }}>
+              }}
+              remove={() => { removeEpic(e.id) }}>
             </Note>
             {/* to create some space between epics */}
             <EpicSpacer length={e.features.length - 1} />

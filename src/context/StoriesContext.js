@@ -40,6 +40,23 @@ export default function StoriesProvider({ children }) {
     if (story) setFeatures([...features]);
   }
 
+  async function removeEpic(epicId) {
+    const epic = epics.find(e => e.id === epicId);
+    if (epic) {
+      await storiesService.removeEpic(epicId);
+      setEpics(epics.filter(e => e.id !== epic.id));
+      setFeatures(features.filter(f => f.epicId !== epic.id));
+    }
+  }
+
+  async function removeFeature(epicId, featureId) {
+
+  }
+
+  async function removeStory(epicId, featureId, storyId) {
+
+  }
+
   function updateEpicTitle(epicId, title) {
     setEpics(epics.map(e => {
       if (e.id === epicId) return { ...e, title }
@@ -76,7 +93,8 @@ export default function StoriesProvider({ children }) {
       {
         epics, features,
         addEpic, addFeature, addStory,
-        updateEpicTitle, updateFeatureTitle, updateStoryTitle
+        updateEpicTitle, updateFeatureTitle, updateStoryTitle,
+        removeEpic
       }}>
       {children}
     </StoriesContext.Provider>

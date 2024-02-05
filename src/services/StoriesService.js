@@ -2,12 +2,12 @@ import { buildEpic, buildFeature, buildStory } from "../utils/utils";
 
 const storyMap = {
   id: null,
-  epics: [buildEpic()],
-  count: {
-    epics: 1,
-    features: 1,
-    stories: 1
-  }
+  epics: [buildEpic()]
+};
+const prefixes = {
+  epics: 0,
+  features: 0,
+  stories: 0
 };
 
 export async function getStoryMap(_storyMapId) {
@@ -17,15 +17,15 @@ export async function getStoryMap(_storyMapId) {
 export async function addEpic(_storyMapId) {
   const epic = buildEpic();
 
-  const { epics, count } = storyMap;
-  count.epics += 1;
-  epic.title += ` ${count.epics}`;
-  count.features += 1;
+  const { epics } = storyMap;
+  prefixes.epics += 1;
+  epic.title += ` ${prefixes.epics}`;
+  prefixes.features += 1;
   const feature = epic.features[epic.features.length - 1];
-  feature.title += ` ${count.features}`;
-  count.stories += 1;
+  feature.title += ` ${prefixes.features}`;
+  prefixes.stories += 1;
   const story = feature.stories[feature.stories.length - 1];
-  story.title += ` ${count.stories}`;
+  story.title += ` ${prefixes.stories}`;
 
   epics.push(epic);
   return Promise.resolve(epic);
@@ -36,12 +36,11 @@ export async function addFeature(_storyMapId, epicId) {
   if (epic) {
     const feature = buildFeature(epicId);
 
-    const { count } = storyMap;
-    count.features += 1;
-    feature.title += ` ${count.features}`;
-    count.stories += 1;
+    prefixes.features += 1;
+    feature.title += ` ${prefixes.features}`;
+    prefixes.stories += 1;
     const story = feature.stories[feature.stories.length - 1];
-    story.title += ` ${count.stories}`;
+    story.title += ` ${prefixes.stories}`;
 
     epic.features.push(feature);
     return Promise.resolve(feature);
@@ -56,13 +55,21 @@ export async function addStory(_storyMapId, epicId, featureId) {
     if (feature) {
       const story = buildStory(featureId);
 
-      const { count } = storyMap;
-      count.stories += 1;
-      story.title += ` ${count.stories}`;
+      prefixes.stories += 1;
+      story.title += ` ${prefixes.stories}`;
 
       feature.stories.push(story);
       return Promise.resolve(story);
     }
+  }
+  return Promise.resolve(null);
+}
+
+export async function removeEpic(epicId) {
+  const epic = storyMap.epics.find(e => e.id === epicId);
+  if (epic) {
+    storyMap.epics = storyMap.epics.filter(e => e.id != epicId);
+    return Promise.resolve(epic);
   }
   return Promise.resolve(null);
 }
