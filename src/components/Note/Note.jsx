@@ -6,7 +6,7 @@ import * as utils from "../../utils/utils";
 
 export function Note({
   id, title, type, selected = false, isFirst = false,
-  select, updateTitle, remove
+  toggleFocus, markAsSelected, updateTitle, remove
 }) {
   const [editing, setEditing] = useState(false);
   const titleRef = useRef(null);
@@ -19,23 +19,35 @@ export function Note({
     }
   }, [editing]);
 
-  function startEditing() {
-    setEditing(true);
+  function focusNote(e) {
+    toggleFocus(e.target !== titleRef.current);
+    markAsSelected();
   }
 
-  function stopEditing() {
+  function defocusNote() {
+    toggleFocus(false);
+  }
+
+  function startEditing(e) {
+    e.stopPropagation();
+    setEditing(true);
+    toggleFocus(false);
+  }
+
+  function stopEditing(e) {
+    e.stopPropagation();
     setEditing(false);
     const editedTitle = titleRef.current.innerText;
-    if (editedTitle !== title) updateTitle(editedTitle);
+    updateTitle(editedTitle);
   }
 
-  function doKeyboardAction(e) {
+  function maybeTriggerKeyboardAction(e) {
     if (!e || !e.key) return;
 
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (editing) stopEditing()
-      else startEditing();
+      if (editing) stopEditing(e)
+      else startEditing(e);
     }
     if (e.key === 'Delete') {
       if (!editing) remove();
@@ -70,17 +82,20 @@ export function Note({
     <div role="gridcell" tabIndex={isFirst || selected ? '0' : '-1'}
       data-note-id={id}
       className={className}
-      onFocus={select}
-      onClick={select}
+      onFocus={focusNote}
+      onBlur={defocusNote}
+      onClick={markAsSelected}
       onDoubleClick={startEditing}
-      onKeyDown={doKeyboardAction}
+      onKeyDown={maybeTriggerKeyboardAction}
       aria-selected={selected}>
       <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
         <span className={editing ? 'ring-0 outline-none' : 'hidden'}
           ref={titleRef}
           contentEditable={editing} suppressContentEditableWarning={true}
-          onKeyDown={doKeyboardAction}
-          onBlur={stopEditing}>{title}</span>
+          onKeyDown={maybeTriggerKeyboardAction}
+          onBlur={stopEditing}>
+          {title}
+        </span>
         <span className={editing ? 'hidden' : ''}>{title}</span>
       </span>
     </div>
