@@ -19,3 +19,10 @@ export const DEFAULT_EPIC = Object.freeze({
   title: 'New Epic',
   features: [{ ...DEFAULT_FEATURE }]
 });
+
+export const ARROW_KEYS = Object.freeze({
+  UP: 'ArrowUp',
+  DOWN: 'ArrowDown',
+  LEFT: 'ArrowLeft',
+  RIGHT: 'ArrowRight'
+});

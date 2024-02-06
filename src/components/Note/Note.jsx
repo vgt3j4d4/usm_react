@@ -3,10 +3,11 @@ import { NOTE_TYPE } from "../../const";
 import { useRef } from "react";
 import { useEffect } from "react";
 import * as utils from "../../utils/utils";
+import { ARROW_KEYS } from "../../const";
 
 export function Note({
   id, title, type, selected = false, isFirst = false,
-  toggleFocus, markAsSelected, updateTitle, remove
+  toggleFocus, markAsSelected, updateTitle, remove, navigate
 }) {
   const [editing, setEditing] = useState(false);
   const titleRef = useRef(null);
@@ -48,12 +49,21 @@ export function Note({
       e.preventDefault();
       if (editing) stopEditing(e)
       else startEditing(e);
+      return;
     }
     if (e.key === 'Escape') {
       if (editing) stopEditing(e);
+      return;
     }
     if (e.key === 'Delete') {
       if (!editing) remove();
+      return;
+    }
+
+    if (Object.values(ARROW_KEYS).includes(e.key)) {
+      e.preventDefault();
+      navigate(e.key);
+      return;
     }
   }
 
@@ -95,6 +105,7 @@ export function Note({
         <span className={editing ? 'ring-0 outline-none' : 'hidden'}
           ref={titleRef}
           contentEditable={editing} suppressContentEditableWarning={true}
+          tabIndex={editing ? "0" : "-1"}
           onKeyDown={maybeTriggerKeyboardAction}
           onBlur={stopEditing}>
           {title}
