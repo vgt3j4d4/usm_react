@@ -1,9 +1,15 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 export const MapSelectionContext = createContext();
 
 export default function MapSelectionProvider({ children }) {
   const [selectedNote, setSelectedNote] = useState({});
+
+  useEffect(() => {
+    if (!!selectedNote.id && !!selectedNote.focus) {
+      focusSelectedNote();
+    }
+  }, [selectedNote]);
 
   function focusSelectedNote() {
     if (selectedNote.id) {
