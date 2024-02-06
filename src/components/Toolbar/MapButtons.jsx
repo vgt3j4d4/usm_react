@@ -15,11 +15,13 @@ export function MapButtons() {
   const [activeIndex, setActiveIndex] = useState(0);
   const {
     selectedNote,
-    focusSelectedNote
+    focusSelectedNote,
+    clearSelection
   } = useContext(MapSelectionContext);
   const {
     epics, features,
-    addEpic, addFeature, addStory
+    addEpic, addFeature, addStory,
+    removeEpic, removeFeature, removeStory
   } = useContext(StoriesContext);
 
   useEffect(() => {
@@ -52,6 +54,21 @@ export function MapButtons() {
     }
   }
 
+  async function maybeRemoveEpic(epicId) {
+    const success = await removeEpic(epicId);
+    if (success) clearSelection();
+  }
+
+  async function maybeRemoveFeature(epicId, featureId) {
+    const success = await removeFeature(epicId, featureId);
+    if (success) clearSelection();
+  }
+
+  async function maybeRemoveStory(epicId, featureId, storyId) {
+    const success = await removeStory(epicId, featureId, storyId);
+    if (success) clearSelection();
+  }
+
   function doButtonAction(action) {
     switch (action) {
       case 'focusSelected':
@@ -67,10 +84,25 @@ export function MapButtons() {
             break;
           case NOTE_TYPE.STORY:
             addStory(selectedNote.epicId, selectedNote.featureId);
+            break;
           default:
             break;
         }
+        break;
       case 'remove':
+        switch (selectedNote.type) {
+          case NOTE_TYPE.EPIC:
+            maybeRemoveEpic(selectedNote.id);
+            break;
+          case NOTE_TYPE.FEATURE:
+            maybeRemoveFeature(selectedNote.epicId, selectedNote.id);
+            break;
+          case NOTE_TYPE.STORY:
+            maybeRemoveStory(selectedNote.epicId, selectedNote.featureId, selectedNote.id);
+            break;
+          default:
+            break;
+        }
         break;
       default:
         break;
