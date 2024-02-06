@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { NOTE_TYPE } from "../../const";
 import { useRef } from "react";
 import { useEffect } from "react";
@@ -40,22 +40,29 @@ export function Note({
     }
   }
 
-  let className = 'note';
-  switch (type) {
-    case NOTE_TYPE.EPIC:
-      className += ' bg-orange-300';
-      break;
-    case NOTE_TYPE.FEATURE:
-      className += ' bg-cyan-300';
-      break;
-    case NOTE_TYPE.STORY:
-      className += ' bg-yellow-300';
-      break;
-    default:
-      break;
+  function getClassName(type, selected) {
+    let className = 'note';
+
+    switch (type) {
+      case NOTE_TYPE.EPIC:
+        className += ' bg-orange-300';
+        break;
+      case NOTE_TYPE.FEATURE:
+        className += ' bg-cyan-300';
+        break;
+      case NOTE_TYPE.STORY:
+        className += ' bg-yellow-300';
+        break;
+      default:
+        break;
+    }
+
+    if (selected) className += ' border-2 border-black transition';
+
+    return className;
   }
 
-  if (selected) className += ' border-2 border-black transition';
+  const className = useMemo(() => getClassName(type, selected), [type, selected]);
 
   return (
     <div role="gridcell" tabIndex={isFirst || selected ? '0' : '-1'}

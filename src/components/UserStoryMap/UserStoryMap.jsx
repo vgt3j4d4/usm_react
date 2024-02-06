@@ -21,13 +21,35 @@ export function UserStoryMap() {
   const {
     epics, features,
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
-    removeEpic
+    removeEpic, removeFeature, removeStory
   } = useContext(StoriesContext);
   const {
     selectedMapNote: selectedNote,
     setSelectedMapNote: setSelectedNote,
     focusMappingNote: focusNote
   } = useContext(SelectionContext);
+
+  function maybeRemoveEpic(epicId) {
+    if (epics.length > 1) removeEpic(epicId);
+  }
+
+  function maybeRemoveFeature(epicId, featureId) {
+    const epic = epics.find(f => f.id === epicId);
+    if (epic && epic.features.length > 1) {
+      removeFeature(epicId, featureId);
+    }
+  }
+
+  function maybeRemoveStory(epicId, featureId, storyId) {
+    const epic = epics.find(f => f.id === epicId);
+    if (epic) {
+      const feature = epic.features.find(f => f.id === featureId);
+      if (feature && feature.stories.length > 1) {
+        const story = feature.stories.find(s => s.id === storyId);
+        if (story) removeStory(epicId, featureId, storyId);
+      }
+    }
+  }
 
   return (
     <div role="grid" className="min-w-max divide-y">
@@ -47,10 +69,10 @@ export function UserStoryMap() {
                 updateEpicTitle(e.id, editedTitle);
                 focusNote();
               }}
-              remove={() => { removeEpic(e.id) }}>
+              remove={() => { maybeRemoveEpic(e.id) }}>
             </Note>
             {/* to create some space between epics */}
-            <EpicSpacer length={e.features.length - 1} />
+            {e.features.length > 0 ? <EpicSpacer length={e.features.length - 1} /> : null}
           </div>
         ))}
       </div>
@@ -71,7 +93,8 @@ export function UserStoryMap() {
             updateTitle={(editedTitle) => {
               updateFeatureTitle(f.id, editedTitle);
               focusNote();
-            }}>
+            }}
+            remove={() => { maybeRemoveFeature(f.epicId, f.id) }}>
           </Note>
         ))}
       </div>
@@ -95,7 +118,8 @@ export function UserStoryMap() {
                 updateTitle={(editedTitle) => {
                   updateStoryTitle(f.id, s.id, editedTitle);
                   focusNote();
-                }}>
+                }}
+                remove={() => { maybeRemoveStory(f.epicId, f.id, s.id) }}>
               </Note>
             ))}
           </div>

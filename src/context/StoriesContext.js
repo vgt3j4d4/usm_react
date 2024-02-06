@@ -50,11 +50,33 @@ export default function StoriesProvider({ children }) {
   }
 
   async function removeFeature(epicId, featureId) {
-
+    const epic = epics.find(e => e.id === epicId);
+    if (epic) {
+      const feature = epic.features.find(f => f.id === featureId);
+      if (feature) {
+        await storiesService.removeFeature(epicId, featureId);
+        setFeatures(features.filter(f => f.id !== featureId));
+      }
+    }
   }
 
   async function removeStory(epicId, featureId, storyId) {
-
+    const epic = epics.find(e => e.id === epicId);
+    if (epic) {
+      const feature = epic.features.find(f => f.id === featureId);
+      if (feature) {
+        const story = feature.stories.find(s => s.id === storyId);
+        if (story) {
+          await storiesService.removeStory(epicId, featureId, storyId);
+          setFeatures(features.map(f => {
+            return {
+              ...f,
+              stories: f.stories.filter(s => s.id !== storyId)
+            }
+          }))
+        }
+      }
+    }
   }
 
   function updateEpicTitle(epicId, title) {
@@ -94,7 +116,7 @@ export default function StoriesProvider({ children }) {
         epics, features,
         addEpic, addFeature, addStory,
         updateEpicTitle, updateFeatureTitle, updateStoryTitle,
-        removeEpic
+        removeEpic, removeFeature, removeStory
       }}>
       {children}
     </StoriesContext.Provider>

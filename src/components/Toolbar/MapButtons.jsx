@@ -1,10 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import ToolbarButton from "./ToolbarButton";
-import { BUTTON_NAVIGATION } from "./Toolbar";
-import { SelectionContext } from "../../context/SelectionContext";
 import { NOTE_TYPE } from "../../const";
+import { SelectionContext } from "../../context/SelectionContext";
 import { StoriesContext } from "../../context/StoriesContext";
-import { addFeature } from "../../services/StoriesService";
+import { BUTTON_NAVIGATION } from "./Toolbar";
+import ToolbarButton from "./ToolbarButton";
 
 const TOOLBAR_BUTTONS = [
   { id: 1, label: 'Select', iconCls: 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },

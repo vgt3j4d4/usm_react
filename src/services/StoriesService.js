@@ -5,9 +5,9 @@ const storyMap = {
   epics: [buildEpic()]
 };
 const prefixes = {
-  epics: 0,
-  features: 0,
-  stories: 0
+  epics: 1,
+  features: 1,
+  stories: 1
 };
 
 export async function getStoryMap(_storyMapId) {
@@ -70,6 +70,33 @@ export async function removeEpic(epicId) {
   if (epic) {
     storyMap.epics = storyMap.epics.filter(e => e.id != epicId);
     return Promise.resolve(epic);
+  }
+  return Promise.resolve(null);
+}
+
+export async function removeFeature(epicId, featureId) {
+  const epic = storyMap.epics.find(e => e.id === epicId);
+  if (epic) {
+    const feature = epic.features.find(f => featureId);
+    if (feature) {
+      epic.features = epic.features.filter(f => f.id !== featureId);
+      return Promise.resolve(feature);
+    }
+  }
+  return Promise.resolve(null);
+}
+
+export async function removeStory(epicId, featureId, storyId) {
+  const epic = storyMap.epics.find(e => e.id === epicId);
+  if (epic) {
+    const feature = epic.features.find(f => featureId);
+    if (feature) {
+      const story = feature.stories.find(s => s.id === storyId);
+      if (story) {
+        feature.stories = feature.stories.filter(s => s.id !== storyId);
+        return Promise.resolve(story);
+      }
+    }
   }
   return Promise.resolve(null);
 }
