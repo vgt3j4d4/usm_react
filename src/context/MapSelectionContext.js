@@ -12,9 +12,13 @@ export default function MapSelectionProvider({ children }) {
     }
   }
 
+  function clearSelection() {
+    setSelectedNote({});
+  }
+
   return (
     <MapSelectionContext.Provider value={{
-      selectedNote, setSelectedNote, focusNote
+      selectedNote, setSelectedNote, focusNote, clearSelection
     }}>
       {children}
     </MapSelectionContext.Provider>

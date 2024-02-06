@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { NOTE_TYPE } from "../../const";
 import { MapSelectionContext } from "../../context/MapSelectionContext";
 import { StoriesContext } from "../../context/StoriesContext";
@@ -17,7 +17,10 @@ export function MapButtons() {
     selectedNote,
     focusNote
   } = useContext(MapSelectionContext);
-  const { addEpic, addFeature, addStory } = useContext(StoriesContext);
+  const {
+    epics, features,
+    addEpic, addFeature, addStory
+  } = useContext(StoriesContext);
 
   useEffect(() => {
     const button = document.getElementById(`toolbar__button_${activeIndex}`);
@@ -73,13 +76,48 @@ export function MapButtons() {
     }
   }
 
+  function getToolbarButtons() {
+    let epic, feature;
+    let selectedEpic, selectedFeature, selectedStory;
+
+    selectedEpic = epics.find(e => e.id === selectedNote.id);
+    selectedFeature = features.find(f => f.id === selectedNote.id);
+    if (selectedFeature) epic = epics.find(e => e.id === selectedFeature.epicId);
+    if (selectedNote.type === NOTE_TYPE.STORY) {
+      feature = features.find(f => f.id === selectedNote.featureId);
+      if (feature) selectedStory = feature.stories.find(s => s.id === selectedNote.id);
+    }
+    const noSelectedNote = selectedNote.id === undefined;
+
+    return TOOLBAR_BUTTONS.map(b => {
+      switch (b.id) {
+        case 1: // Select
+          return { ...b, disabled: noSelectedNote };
+        case 2: // New
+          return { ...b, disabled: noSelectedNote }
+        case 3: // Remove
+          let disabled = selectedNote.id === undefined;
+          disabled = disabled || (selectedEpic && epics.length === 1);
+          disabled = disabled || (selectedFeature && epic.features.length === 1);
+          disabled = disabled || (selectedStory && feature.stories.length === 1);
+          return { ...b, disabled };
+        default:
+          return b;
+      }
+
+    });
+  }
+
+  const buttons = useMemo(() => getToolbarButtons(), [selectedNote]);
+
   return (
-    TOOLBAR_BUTTONS.map((b, index) => (
+    buttons.map((b, index) => (
       <ToolbarButton key={b.id}
         id={index}
         icon={b.iconCls}
         label={b.label}
         selected={activeIndex === index}
+        disabled={b.disabled}
         navigateToButton={navigateToButton}
         doAction={() => { doButtonAction(b.action) }} />
     ))

@@ -1,7 +1,7 @@
 import * as constants from "../../const";
 import { BUTTON_NAVIGATION } from "./Toolbar";
 
-export default function ToolbarButton({ id, icon, label, selected = false, navigateToButton, doAction }) {
+export default function ToolbarButton({ id, icon, label, selected = false, disabled = false, navigateToButton, doAction }) {
   function focusAnotherToolbarButton(e) {
     if (!constants.NAVIGATION_KEYS.includes(e.key)) return;
 
@@ -23,7 +23,8 @@ export default function ToolbarButton({ id, icon, label, selected = false, navig
   return (
     <button type="button"
       id={`toolbar__button_${id}`}
-      className="flex flex-col items-center p-1 disabled:opacity-75"
+      className="flex flex-col items-center p-1 disabled:opacity-50"
+      disabled={disabled}
       tabIndex={selected ? '0' : '-1'}
       onKeyDown={(e) => focusAnotherToolbarButton(e)}
       onClick={doAction}>

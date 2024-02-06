@@ -1,8 +1,8 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { NOTE_TYPE } from "../../const";
 import { MapSelectionContext } from "../../context/MapSelectionContext";
-import { Note } from "../Note/Note";
 import { StoriesContext } from "../../context/StoriesContext";
+import { Note } from "../Note/Note";
 
 function EmptyNotes({ length }) {
   if (length === 0) return null;
@@ -35,18 +35,23 @@ export function UserStoryMap() {
   const {
     selectedNote,
     setSelectedNote,
-    focusNote
+    focusNote,
+    clearSelection
   } = useContext(MapSelectionContext);
   const [isNoteFocused, setIsNoteFocused] = useState(false);
 
   function maybeRemoveEpic(epicId) {
-    if (epics.length > 1) removeEpic(epicId);
+    if (epics.length > 1) {
+      removeEpic(epicId);
+      clearSelection();
+    }
   }
 
   function maybeRemoveFeature(epicId, featureId) {
     const epic = epics.find(f => f.id === epicId);
     if (epic && epic.features.length > 1) {
       removeFeature(epicId, featureId);
+      clearSelection();
     }
   }
 
@@ -56,7 +61,10 @@ export function UserStoryMap() {
       const feature = epic.features.find(f => f.id === featureId);
       if (feature && feature.stories.length > 1) {
         const story = feature.stories.find(s => s.id === storyId);
-        if (story) removeStory(epicId, featureId, storyId);
+        if (story) {
+          removeStory(epicId, featureId, storyId);
+          clearSelection();
+        }
       }
     }
   }
