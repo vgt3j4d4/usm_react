@@ -1,4 +1,4 @@
-import { buildEpic, buildFeature, buildStory } from "../utils/utils";
+import { buildEpic, buildFeature, buildStory, clone } from "../utils/utils";
 
 const storyMap = {
   id: null,
@@ -11,7 +11,7 @@ const prefixes = {
 };
 
 export async function getStoryMap(_storyMapId) {
-  return Promise.resolve(storyMap);
+  return Promise.resolve(clone(storyMap));
 }
 
 export async function addEpic(_storyMapId) {
@@ -28,7 +28,7 @@ export async function addEpic(_storyMapId) {
   story.title += ` ${prefixes.stories}`;
 
   epics.push(epic);
-  return Promise.resolve(epic);
+  return Promise.resolve(clone(epic));
 }
 
 export async function addFeature(_storyMapId, epicId) {
@@ -43,7 +43,7 @@ export async function addFeature(_storyMapId, epicId) {
     story.title += ` ${prefixes.stories}`;
 
     epic.features.push(feature);
-    return Promise.resolve(feature);
+    return Promise.resolve(clone(feature));
   }
   return Promise.resolve(null);
 }
@@ -59,7 +59,7 @@ export async function addStory(_storyMapId, epicId, featureId) {
       story.title += ` ${prefixes.stories}`;
 
       feature.stories.push(story);
-      return Promise.resolve(story);
+      return Promise.resolve(clone(story));
     }
   }
   return Promise.resolve(null);
@@ -68,7 +68,7 @@ export async function addStory(_storyMapId, epicId, featureId) {
 export async function removeEpic(epicId) {
   const epic = storyMap.epics.find(e => e.id === epicId);
   if (epic) {
-    storyMap.epics = storyMap.epics.filter(e => e.id != epicId);
+    storyMap.epics = storyMap.epics.filter(e => e.id !== epicId);
     return Promise.resolve(epic);
   }
   return Promise.resolve(null);

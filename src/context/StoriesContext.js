@@ -23,25 +23,29 @@ export default function StoriesProvider({ children }) {
 
   async function addEpic() {
     const epic = await storiesService.addEpic(STORY_MAP_ID);
-    const newEpics = [...epics, epic];
-    const newFeatures = utils.getFeatures(newEpics);
-    setEpics(newEpics);
-    setFeatures(newFeatures);
+    setEpics([...epics, epic]);
+    setFeatures([...features, ...epic.features]);
   }
 
   async function addFeature(epicId) {
     const feature = await storiesService.addFeature(STORY_MAP_ID, epicId);
-    const epic = epics.find(e => e.id === epicId);
-    if (epic) setFeatures([...features, feature]);
+    if (feature) {
+      setEpics(epics.map(e => e.id === feature.epicId ? { ...e, features: [...e.features, feature] } : e));
+      setFeatures([...features, feature]);
+    }
   }
 
   async function addStory(epicId, featureId) {
     const story = await storiesService.addStory(STORY_MAP_ID, epicId, featureId);
-    if (story) setFeatures([...features]);
+    if (story) {
+      setFeatures(features.map(f =>
+        f.id === featureId ? { ...f, stories: [...f.stories, story] } : f
+      ));
+    }
   }
 
   async function removeEpic(epicId) {
-    if (epics.length == 1) return false;
+    if (epics.length === 1) return false;
 
     const epic = epics.find(e => e.id === epicId);
     if (epic) {
@@ -55,64 +59,45 @@ export default function StoriesProvider({ children }) {
 
   async function removeFeature(epicId, featureId) {
     const epic = epics.find(e => e.id === epicId);
-    if (epic && epic.features.length > 1) {
-      const feature = epic.features.find(f => f.id === featureId);
-      if (feature) {
-        await storiesService.removeFeature(epicId, featureId);
-        setFeatures(features.filter(f => f.id !== featureId));
-        return true;
-      }
+    if (!epic || epic.features.length === 1) return false;
+
+    const feature = features.find(f => f.epicId === epicId);
+    if (feature) {
+      await storiesService.removeFeature(epicId, featureId);
+      setEpics(epics.map(e => e === epic ? { ...epic, features: epic.features.filter(f => f.id !== featureId) } : epic));
+      setFeatures(features.filter(f => f.id !== featureId));
+      return true;
     }
     return false;
   }
 
   async function removeStory(epicId, featureId, storyId) {
-    const epic = epics.find(e => e.id === epicId);
-    if (epic) {
-      const feature = epic.features.find(f => f.id === featureId);
-      if (feature && feature.stories.length > 1) {
-        const story = feature.stories.find(s => s.id === storyId);
-        if (story) {
-          await storiesService.removeStory(epicId, featureId, storyId);
-          setFeatures(features.map(f => {
-            return {
-              ...f,
-              stories: f.stories.filter(s => s.id !== storyId)
-            }
-          }));
-          return true;
-        }
-      }
+    const feature = features.find(f => f.id === featureId);
+    if (!feature || feature.stories.length === 1) return false;
+
+    const story = feature.stories.find(s => s.id === storyId);
+    if (story) {
+      await storiesService.removeStory(epicId, featureId, storyId);
+      setFeatures(features.map(f => f === feature ? { ...f, stories: f.stories.filter(s => s.id !== storyId) } : f));
+      return true;
     }
+
     return false;
   }
 
   function updateEpicTitle(epicId, title) {
-    setEpics(epics.map(e => {
-      if (e.id === epicId) return { ...e, title }
-      return e;
-    }))
+    setEpics(epics.map(e => e.id === epicId ? { ...e, title } : e));
   }
 
   function updateFeatureTitle(featureId, title) {
-    setFeatures(features.map(f => {
-      if (f.id === featureId) return { ...f, title }
-      return f;
-    }))
+    setFeatures(features.map(f => f.id === featureId ? { ...f, title } : f));
   }
 
   function updateStoryTitle(featureId, storyId, title) {
     setFeatures(features.map(f => {
       if (f.id === featureId) {
         const story = f.stories.find(s => s.id === storyId);
-        if (story) {
-          return {
-            ...f, stories: f.stories.map(s => {
-              if (s.id === storyId) return { ...s, title }
-              return s
-            })
-          }
-        }
+        if (story) return { ...f, stories: f.stories.map(s => s.id === storyId ? { ...s, title } : s) }
       }
       return f;
     }))

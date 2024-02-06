@@ -63,3 +63,7 @@ export function selectText(textEl) {
     selection.addRange(range);
   }
 }
+
+export function clone(object) {
+  return JSON.parse(JSON.stringify(object));
+}
