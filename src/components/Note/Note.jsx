@@ -49,6 +49,9 @@ export function Note({
       if (editing) stopEditing(e)
       else startEditing(e);
     }
+    if (e.key === 'Escape') {
+      if (editing) stopEditing(e);
+    }
     if (e.key === 'Delete') {
       if (!editing) remove();
     }
