@@ -42,17 +42,26 @@ export function UserStoryMap() {
 
   async function maybeRemoveEpic(epicId) {
     const success = await removeEpic(epicId);
-    if (success) clearSelection();
+    if (success) {
+      setIsNoteFocused(false);
+      clearSelection();
+    }
   }
 
   async function maybeRemoveFeature(epicId, featureId) {
     const success = await removeFeature(epicId, featureId);
-    if (success) clearSelection();
+    if (success) {
+      setIsNoteFocused(false);
+      clearSelection();
+    }
   }
 
   async function maybeRemoveStory(epicId, featureId, storyId) {
     const success = await removeStory(epicId, featureId, storyId);
-    if (success) clearSelection();
+    if (success) {
+      setIsNoteFocused(false);
+      clearSelection();
+    }
   }
 
   return (

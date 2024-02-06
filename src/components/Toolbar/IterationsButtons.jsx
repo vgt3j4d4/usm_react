@@ -1,5 +1,5 @@
 export function IterationsButtons() {
   return (
-    <div>Work in progres ...</div>
+    <div>Work in progress ...</div>
   )
 }

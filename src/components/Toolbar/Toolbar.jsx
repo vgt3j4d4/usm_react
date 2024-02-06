@@ -52,7 +52,7 @@ export function Toolbar() {
       </div>
 
       <div>
-        <button type="button" className="rounded-full min-w-10 min-h-10">
+        <button type="button" className="hidden rounded-full min-w-10 min-h-10">
           <i className="fa-solid fa-user"></i>
         </button>
       </div>
