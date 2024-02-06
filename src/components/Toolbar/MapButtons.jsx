@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { NOTE_TYPE } from "../../const";
-import { SelectionContext } from "../../context/SelectionContext";
+import { MapSelectionContext } from "../../context/MapSelectionContext";
 import { StoriesContext } from "../../context/StoriesContext";
 import { BUTTON_NAVIGATION } from "./Toolbar";
 import ToolbarButton from "./ToolbarButton";
@@ -14,9 +14,9 @@ const TOOLBAR_BUTTONS = [
 export function MapButtons() {
   const [activeIndex, setActiveIndex] = useState(0);
   const {
-    selectedMapNote: selectedNote,
-    focusMappingNote: focusNote
-  } = useContext(SelectionContext);
+    selectedNote,
+    focusNote
+  } = useContext(MapSelectionContext);
   const { addEpic, addFeature, addStory } = useContext(StoriesContext);
 
   useEffect(() => {

@@ -30,12 +30,14 @@ export function Note({
   }
 
   function doKeyboardAction(e) {
-    if (e && e.key && e.key === 'Enter') {
+    if (!e || !e.key) return;
+
+    if (e.key === 'Enter') {
       e.preventDefault();
       if (editing) stopEditing()
       else startEditing();
     }
-    if (e && e.key && e.key === 'Delete') {
+    if (e.key === 'Delete') {
       if (!editing) remove();
     }
   }

@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { NOTE_TYPE } from "../../const";
-import { SelectionContext } from "../../context/SelectionContext";
+import { MapSelectionContext } from "../../context/MapSelectionContext";
 import { Note } from "../Note/Note";
 import { StoriesContext } from "../../context/StoriesContext";
 
-function EpicSpacer({ length }) {
+function EmptyNotes({ length }) {
   if (length === 0) return null;
   return (
     Array
@@ -24,10 +24,10 @@ export function UserStoryMap() {
     removeEpic, removeFeature, removeStory
   } = useContext(StoriesContext);
   const {
-    selectedMapNote: selectedNote,
-    setSelectedMapNote: setSelectedNote,
-    focusMappingNote: focusNote
-  } = useContext(SelectionContext);
+    selectedNote,
+    setSelectedNote,
+    focusNote
+  } = useContext(MapSelectionContext);
 
   function maybeRemoveEpic(epicId) {
     if (epics.length > 1) removeEpic(epicId);
@@ -72,7 +72,7 @@ export function UserStoryMap() {
               remove={() => { maybeRemoveEpic(e.id) }}>
             </Note>
             {/* to create some space between epics */}
-            {e.features.length > 0 ? <EpicSpacer length={e.features.length - 1} /> : null}
+            {e.features.length > 0 ? <EmptyNotes length={e.features.length - 1} /> : null}
           </div>
         ))}
       </div>
@@ -125,6 +125,8 @@ export function UserStoryMap() {
           </div>
         ))}
       </div>
+
+      {selectedNote.id ? <div>Holi</div> : null}
 
     </div>
   )
