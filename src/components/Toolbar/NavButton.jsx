@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function ToolbarNavButton({ active, position, label, icon, route }) {
+export default function NavButton({ active, position, label, icon, route }) {
   const className = [
     'px-4 py-2 text-sm font-medium focus:ring-2',
     active ? 'bg-white text-black' : 'border border-gray-500 hover:bg-gray-300 hover:text-gray-900',

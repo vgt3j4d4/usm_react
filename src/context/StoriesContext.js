@@ -41,30 +41,36 @@ export default function StoriesProvider({ children }) {
   }
 
   async function removeEpic(epicId) {
+    if (epics.length == 1) return false;
+
     const epic = epics.find(e => e.id === epicId);
     if (epic) {
       await storiesService.removeEpic(epicId);
       setEpics(epics.filter(e => e.id !== epic.id));
       setFeatures(features.filter(f => f.epicId !== epic.id));
+      return true;
     }
+    return false;
   }
 
   async function removeFeature(epicId, featureId) {
     const epic = epics.find(e => e.id === epicId);
-    if (epic) {
+    if (epic && epic.features.length > 1) {
       const feature = epic.features.find(f => f.id === featureId);
       if (feature) {
         await storiesService.removeFeature(epicId, featureId);
         setFeatures(features.filter(f => f.id !== featureId));
+        return true;
       }
     }
+    return false;
   }
 
   async function removeStory(epicId, featureId, storyId) {
     const epic = epics.find(e => e.id === epicId);
     if (epic) {
       const feature = epic.features.find(f => f.id === featureId);
-      if (feature) {
+      if (feature && feature.stories.length > 1) {
         const story = feature.stories.find(s => s.id === storyId);
         if (story) {
           await storiesService.removeStory(epicId, featureId, storyId);
@@ -73,10 +79,12 @@ export default function StoriesProvider({ children }) {
               ...f,
               stories: f.stories.filter(s => s.id !== storyId)
             }
-          }))
+          }));
+          return true;
         }
       }
     }
+    return false;
   }
 
   function updateEpicTitle(epicId, title) {

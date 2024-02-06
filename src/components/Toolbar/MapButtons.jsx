@@ -3,7 +3,7 @@ import { NOTE_TYPE } from "../../const";
 import { MapSelectionContext } from "../../context/MapSelectionContext";
 import { StoriesContext } from "../../context/StoriesContext";
 import { BUTTON_NAVIGATION } from "./Toolbar";
-import ToolbarButton from "./ToolbarButton";
+import ActionButton from "./ActionButton";
 
 const TOOLBAR_BUTTONS = [
   { id: 1, label: 'Select', iconCls: 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
@@ -15,7 +15,7 @@ export function MapButtons() {
   const [activeIndex, setActiveIndex] = useState(0);
   const {
     selectedNote,
-    focusNote
+    focusSelectedNote
   } = useContext(MapSelectionContext);
   const {
     epics, features,
@@ -55,7 +55,7 @@ export function MapButtons() {
   function doButtonAction(action) {
     switch (action) {
       case 'focusSelected':
-        focusNote();
+        focusSelectedNote();
         break;
       case 'addNew':
         switch (selectedNote.type) {
@@ -70,6 +70,7 @@ export function MapButtons() {
           default:
             break;
         }
+      case 'remove':
         break;
       default:
         break;
@@ -112,7 +113,7 @@ export function MapButtons() {
 
   return (
     buttons.map((b, index) => (
-      <ToolbarButton key={b.id}
+      <ActionButton key={b.id}
         id={index}
         icon={b.iconCls}
         label={b.label}

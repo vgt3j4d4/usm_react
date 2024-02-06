@@ -1,7 +1,7 @@
 import * as constants from "../../const";
 import { BUTTON_NAVIGATION } from "./Toolbar";
 
-export default function ToolbarButton({ id, icon, label, selected = false, disabled = false, navigateToButton, doAction }) {
+export default function ActionButton({ id, icon, label, selected = false, disabled = false, navigateToButton, doAction }) {
   function focusAnotherToolbarButton(e) {
     if (!constants.NAVIGATION_KEYS.includes(e.key)) return;
 

@@ -17,7 +17,7 @@ function EmptyNotes({ length }) {
       )));
 }
 
-function ArrowKeys() {
+function VisualArrowKeys() {
   // TODO: just render this on desktop
   return (
     <div className="fixed bottom-0 left-0 max-w-24 max-h-24 z-10">
@@ -35,38 +35,24 @@ export function UserStoryMap() {
   const {
     selectedNote,
     setSelectedNote,
-    focusNote,
+    focusSelectedNote,
     clearSelection
   } = useContext(MapSelectionContext);
   const [isNoteFocused, setIsNoteFocused] = useState(false);
 
-  function maybeRemoveEpic(epicId) {
-    if (epics.length > 1) {
-      removeEpic(epicId);
-      clearSelection();
-    }
+  async function maybeRemoveEpic(epicId) {
+    const success = await removeEpic(epicId);
+    if (success) clearSelection();
   }
 
-  function maybeRemoveFeature(epicId, featureId) {
-    const epic = epics.find(f => f.id === epicId);
-    if (epic && epic.features.length > 1) {
-      removeFeature(epicId, featureId);
-      clearSelection();
-    }
+  async function maybeRemoveFeature(epicId, featureId) {
+    const success = await removeFeature(epicId, featureId);
+    if (success) clearSelection();
   }
 
-  function maybeRemoveStory(epicId, featureId, storyId) {
-    const epic = epics.find(f => f.id === epicId);
-    if (epic) {
-      const feature = epic.features.find(f => f.id === featureId);
-      if (feature && feature.stories.length > 1) {
-        const story = feature.stories.find(s => s.id === storyId);
-        if (story) {
-          removeStory(epicId, featureId, storyId);
-          clearSelection();
-        }
-      }
-    }
+  async function maybeRemoveStory(epicId, featureId, storyId) {
+    const success = await removeStory(epicId, featureId, storyId);
+    if (success) clearSelection();
   }
 
   return (
@@ -91,7 +77,7 @@ export function UserStoryMap() {
                   if (editedTitle && editedTitle !== e.title) {
                     updateEpicTitle(e.id, editedTitle);
                   }
-                  focusNote();
+                  focusSelectedNote();
                 }}
                 remove={() => { maybeRemoveEpic(e.id) }}>
               </Note>
@@ -121,7 +107,7 @@ export function UserStoryMap() {
                 if (editedTitle && editedTitle !== f.title) {
                   updateFeatureTitle(f.id, editedTitle);
                 }
-                focusNote();
+                focusSelectedNote();
               }}
               remove={() => { maybeRemoveFeature(f.epicId, f.id) }}>
             </Note>
@@ -151,7 +137,7 @@ export function UserStoryMap() {
                     if (editedTitle && editedTitle !== s.title) {
                       updateStoryTitle(f.id, s.id, editedTitle);
                     }
-                    focusNote();
+                    focusSelectedNote();
                   }}
                   remove={() => { maybeRemoveStory(f.epicId, f.id, s.id) }}>
                 </Note>
@@ -162,7 +148,7 @@ export function UserStoryMap() {
 
       </div >
 
-      {isNoteFocused ? <ArrowKeys /> : null}
+      {isNoteFocused ? <VisualArrowKeys /> : null}
     </>
   )
 }

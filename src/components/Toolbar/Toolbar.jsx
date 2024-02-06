@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ROUTES } from "../../routes";
 import { MapButtons } from "./MapButtons";
-import ToolbarNavButton from "./ToolbarNavButton";
+import NavButton from "./NavButton";
 import { IterationsButtons } from "./IterationsButtons";
 
 export const BUTTON_NAVIGATION = Object.freeze({
@@ -36,7 +36,7 @@ export function Toolbar() {
         <ol className="m-0 p-0">
           {NAV_BUTTONS.map((b, index) => (
             <li className="inline" key={b.id}>
-              <ToolbarNavButton
+              <NavButton
                 active={pathname === b.route}
                 label={b.label}
                 icon={b.iconCls}

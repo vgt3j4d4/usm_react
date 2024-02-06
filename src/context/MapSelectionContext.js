@@ -5,7 +5,7 @@ export const MapSelectionContext = createContext();
 export default function MapSelectionProvider({ children }) {
   const [selectedNote, setSelectedNote] = useState({});
 
-  function focusNote() {
+  function focusSelectedNote() {
     if (selectedNote.id) {
       const note = document.querySelector(`[data-note-id="${selectedNote.id}"]`);
       if (note) note.focus();
@@ -18,7 +18,7 @@ export default function MapSelectionProvider({ children }) {
 
   return (
     <MapSelectionContext.Provider value={{
-      selectedNote, setSelectedNote, focusNote, clearSelection
+      selectedNote, setSelectedNote, focusSelectedNote, clearSelection
     }}>
       {children}
     </MapSelectionContext.Provider>
