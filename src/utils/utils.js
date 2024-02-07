@@ -67,3 +67,8 @@ export function selectText(textEl) {
 export function clone(object) {
   return JSON.parse(JSON.stringify(object));
 }
+
+export function addItemAtIndex(array = [], item, index = 0) {
+  array.splice(index, 0, item);
+  return array;
+}

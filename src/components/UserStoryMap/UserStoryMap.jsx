@@ -21,7 +21,7 @@ function VisualArrowKeys() {
   // TODO: just render this on desktop
   return (
     <div className="fixed bottom-0 left-0 max-w-24 max-h-24 z-10">
-      <img src="/images/black_keys.png"></img>
+      <img src="/images/black_keys.png" alt="keyboard arrow keys"></img>
     </div>
   )
 }
@@ -105,6 +105,9 @@ export function UserStoryMap() {
               focus: true
             });
             break;
+          default:
+            // no-op
+            break;
         }
         break;
       case NOTE_TYPE.FEATURE:
@@ -157,6 +160,9 @@ export function UserStoryMap() {
               type: NOTE_TYPE.FEATURE,
               focus: true
             });
+            break;
+          default:
+            // no-op
             break;
         }
         break;
@@ -226,7 +232,13 @@ export function UserStoryMap() {
               focus: true
             });
             break;
+          default:
+            // no-op
+            break;
         }
+        break;
+      default:
+        // no-op
         break;
     }
   }

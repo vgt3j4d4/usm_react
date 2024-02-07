@@ -77,13 +77,13 @@ export function MapButtons() {
       case 'addNew':
         switch (selectedNote.type) {
           case NOTE_TYPE.EPIC:
-            addEpic();
+            addEpic(selectedNote.id);
             break;
           case NOTE_TYPE.FEATURE:
-            addFeature(selectedNote.epicId);
+            addFeature(selectedNote.epicId, selectedNote.id);
             break;
           case NOTE_TYPE.STORY:
-            addStory(selectedNote.epicId, selectedNote.featureId);
+            addStory(selectedNote.epicId, selectedNote.featureId, selectedNote.id);
             break;
           default:
             break;

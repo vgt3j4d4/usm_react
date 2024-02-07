@@ -21,26 +21,66 @@ export default function StoriesProvider({ children }) {
     retrieveState();
   }, []);
 
-  async function addEpic() {
+  async function addEpic(originEpicId) {
     const epic = await storiesService.addEpic(STORY_MAP_ID);
-    setEpics([...epics, epic]);
-    setFeatures([...features, ...epic.features]);
+    if (!epic) return;
+
+    let newEpics, newFeatures;
+    const originEpic = originEpicId ? epics.find(e => e.id === originEpicId) : null;
+    if (originEpic && epics.length > 1) { // add the new epic at next to the originEpic
+      const originEpicIndex = epics.indexOf(originEpic);
+      newEpics = utils.addItemAtIndex([...epics], epic, originEpicIndex + 1);
+      const epicFeatures = features.filter(f => f.epicId === originEpic.id);
+      const lastFeatureIndex = features.indexOf(epicFeatures[epicFeatures.length - 1]);
+      newFeatures = utils.addItemAtIndex([...features], epic.features[0], lastFeatureIndex + 1);
+      setEpics(newEpics);
+      setFeatures(newFeatures);
+    } else { // add epic at the end of the epics array
+      newEpics = [...epics, epic];
+      newFeatures = [...features, ...epic.features];
+    }
+
+    setEpics(newEpics);
+    setFeatures(newFeatures);
   }
 
-  async function addFeature(epicId) {
+  async function addFeature(epicId, originFeatureId) {
     const feature = await storiesService.addFeature(STORY_MAP_ID, epicId);
+
     if (feature) {
+      let newFeatures;
+      const originFeature = originFeatureId ? features.find(f => f.id === originFeatureId) : null;
+      if (originFeature && features.length > 1) {
+        const index = features.indexOf(originFeature);
+        newFeatures = utils.addItemAtIndex([...features], feature, index + 1);
+      } else {
+        newFeatures = [...features, feature];
+      }
+
       setEpics(epics.map(e => e.id === feature.epicId ? { ...e, features: [...e.features, feature] } : e));
-      setFeatures([...features, feature]);
+      setFeatures(newFeatures);
     }
   }
 
-  async function addStory(epicId, featureId) {
+  async function addStory(epicId, featureId, originStoryId) {
     const story = await storiesService.addStory(STORY_MAP_ID, epicId, featureId);
+
     if (story) {
-      setFeatures(features.map(f =>
-        f.id === featureId ? { ...f, stories: [...f.stories, story] } : f
-      ));
+      let newFeatures;
+      const feature = features.find(f => f.id === featureId);
+      if (originStoryId && feature.stories.length > 1) {
+        const originStory = feature.stories.find(s => s.id === originStoryId);
+        const index = feature.stories.indexOf(originStory);
+        newFeatures = features.map(f =>
+          f.id === featureId ? { ...f, stories: utils.addItemAtIndex([...f.stories], story, index + 1) } : f
+        );
+      } else {
+        newFeatures = features.map(f =>
+          f.id === featureId ? { ...f, stories: [...f.stories, story] } : f
+        );
+      }
+
+      setFeatures(newFeatures);
     }
   }
 
