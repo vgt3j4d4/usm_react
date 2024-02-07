@@ -64,7 +64,7 @@ export default function StoriesProvider({ children }) {
     const feature = features.find(f => f.epicId === epicId);
     if (feature) {
       await storiesService.removeFeature(epicId, featureId);
-      setEpics(epics.map(e => e === epic ? { ...epic, features: epic.features.filter(f => f.id !== featureId) } : epic));
+      setEpics(epics.map(e => e.id === epic.id ? { ...e, features: e.features.filter(f => f.id !== featureId) } : e));
       setFeatures(features.filter(f => f.id !== featureId));
       return true;
     }

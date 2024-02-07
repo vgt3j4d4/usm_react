@@ -43,24 +43,24 @@ export function UserStoryMap() {
   async function maybeRemoveEpic(epicId) {
     const success = await removeEpic(epicId);
     if (success) {
-      setIsNoteFocused(false);
       clearSelection();
+      setIsNoteFocused(false);
     }
   }
 
   async function maybeRemoveFeature(epicId, featureId) {
     const success = await removeFeature(epicId, featureId);
     if (success) {
-      setIsNoteFocused(false);
       clearSelection();
+      setIsNoteFocused(false);
     }
   }
 
   async function maybeRemoveStory(epicId, featureId, storyId) {
     const success = await removeStory(epicId, featureId, storyId);
     if (success) {
-      setIsNoteFocused(false);
       clearSelection();
+      setIsNoteFocused(false);
     }
   }
 
@@ -236,7 +236,7 @@ export function UserStoryMap() {
       <div role="grid" className="min-w-max divide-y">
 
         {/* epics */}
-        <div className="p-4 flex gap-4">
+        <div role="row" className="p-4 flex gap-4">
           {epics.map((e, index) => (
             <div key={e.id} className="flex gap-4">
               <Note
@@ -265,7 +265,7 @@ export function UserStoryMap() {
         </div>
 
         {/* features */}
-        <div className="p-4 flex gap-4">
+        <div role="row" className="p-4 flex gap-4">
           {features.map(f => (
             <Note key={f.id}
               id={f.id}
@@ -293,7 +293,7 @@ export function UserStoryMap() {
         </div>
 
         {/* stories */}
-        <div className="p-4 flex gap-4">
+        <div role="row" className="p-4 flex gap-4">
           {features.map(f => (
             <div key={f.id} className="flex flex-col gap-4">
               {f.stories.map(s => (
