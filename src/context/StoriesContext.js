@@ -85,8 +85,6 @@ export default function StoriesProvider({ children }) {
   }
 
   async function removeEpic(epicId) {
-    if (epics.length === 1) return false;
-
     const epic = epics.find(e => e.id === epicId);
     if (epic) {
       await storiesService.removeEpic(epicId);
@@ -98,13 +96,10 @@ export default function StoriesProvider({ children }) {
   }
 
   async function removeFeature(epicId, featureId) {
-    const epic = epics.find(e => e.id === epicId);
-    if (!epic || epic.features.length === 1) return false;
-
     const feature = features.find(f => f.epicId === epicId);
     if (feature) {
       await storiesService.removeFeature(epicId, featureId);
-      setEpics(epics.map(e => e.id === epic.id ? { ...e, features: e.features.filter(f => f.id !== featureId) } : e));
+      setEpics(epics.map(e => e.id === epicId ? { ...e, features: e.features.filter(f => f.id !== featureId) } : e));
       setFeatures(features.filter(f => f.id !== featureId));
       return true;
     }
@@ -112,13 +107,11 @@ export default function StoriesProvider({ children }) {
   }
 
   async function removeStory(epicId, featureId, storyId) {
-    const feature = features.find(f => f.id === featureId);
-    if (!feature || feature.stories.length === 1) return false;
-
+    const feature = features.find(f => f.id === feature);
     const story = feature.stories.find(s => s.id === storyId);
     if (story) {
       await storiesService.removeStory(epicId, featureId, storyId);
-      setFeatures(features.map(f => f === feature ? { ...f, stories: f.stories.filter(s => s.id !== storyId) } : f));
+      setFeatures(features.map(f => f.id === featureId ? { ...f, stories: f.stories.filter(s => s.id !== storyId) } : f));
       return true;
     }
 

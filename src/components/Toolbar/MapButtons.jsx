@@ -7,16 +7,16 @@ import ActionButton from "./ActionButton";
 import { BUTTON_NAVIGATION } from "./Toolbar";
 
 const TOOLBAR_BUTTONS = [
-  { id: 1, label: 'Select', iconCls: 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
-  { id: 2, label: 'New', iconCls: 'fa-file-circle-plus', disabled: false, action: 'addNew' },
-  { id: 3, label: 'Remove', iconCls: 'fa-trash-can', disabled: false, action: 'remove' }
+  { id: 1, label: 'Select', title: 'Select', iconCls: 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
+  { id: 2, label: 'New', title: 'New (+)', iconCls: 'fa-file-circle-plus', disabled: false, action: 'addNew' },
+  { id: 3, label: 'Remove', title: 'Remove (Del)', iconCls: 'fa-trash-can', disabled: false, action: 'remove' }
 ];
 
 export function MapButtons() {
   const {
     epics, features,
     addEpic, addFeature, addStory,
-    selectedNote, focus,
+    selected, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory
   } = useStoryMap({
     ...useContext(StoriesContext), ...useContext(MapSelectionContext)
@@ -59,30 +59,30 @@ export function MapButtons() {
         focus();
         break;
       case 'addNew':
-        switch (selectedNote.type) {
+        switch (selected.type) {
           case NOTE_TYPE.EPIC:
-            addEpic(selectedNote.id);
+            addEpic(selected.id);
             break;
           case NOTE_TYPE.FEATURE:
-            addFeature(selectedNote.epicId, selectedNote.id);
+            addFeature(selected.epicId, selected.id);
             break;
           case NOTE_TYPE.STORY:
-            addStory(selectedNote.epicId, selectedNote.featureId, selectedNote.id);
+            addStory(selected.epicId, selected.featureId, selected.id);
             break;
           default:
             break;
         }
         break;
       case 'remove':
-        switch (selectedNote.type) {
+        switch (selected.type) {
           case NOTE_TYPE.EPIC:
-            maybeRemoveEpic(selectedNote.id);
+            maybeRemoveEpic(selected.id);
             break;
           case NOTE_TYPE.FEATURE:
-            maybeRemoveFeature(selectedNote.epicId, selectedNote.id);
+            maybeRemoveFeature(selected.epicId, selected.id);
             break;
           case NOTE_TYPE.STORY:
-            maybeRemoveStory(selectedNote.epicId, selectedNote.featureId, selectedNote.id);
+            maybeRemoveStory(selected.epicId, selected.featureId, selected.id);
             break;
           default:
             break;
@@ -97,23 +97,23 @@ export function MapButtons() {
     let epic, feature;
     let selectedEpic, selectedFeature, selectedStory;
 
-    selectedEpic = epics.find(e => e.id === selectedNote.id);
-    selectedFeature = features.find(f => f.id === selectedNote.id);
+    selectedEpic = epics.find(e => e.id === selected.id);
+    selectedFeature = features.find(f => f.id === selected.id);
     if (selectedFeature) epic = epics.find(e => e.id === selectedFeature.epicId);
-    if (selectedNote.type === NOTE_TYPE.STORY) {
-      feature = features.find(f => f.id === selectedNote.featureId);
-      if (feature) selectedStory = feature.stories.find(s => s.id === selectedNote.id);
+    if (selected.type === NOTE_TYPE.STORY) {
+      feature = features.find(f => f.id === selected.featureId);
+      if (feature) selectedStory = feature.stories.find(s => s.id === selected.id);
     }
-    const noSelectedNote = selectedNote.id === undefined;
+    const noSelection = selected.id === undefined;
 
     return TOOLBAR_BUTTONS.map(b => {
       switch (b.id) {
         case 1: // Select
-          return { ...b, disabled: noSelectedNote };
+          return { ...b, disabled: noSelection };
         case 2: // New
-          return { ...b, disabled: noSelectedNote }
+          return { ...b, disabled: noSelection }
         case 3: // Remove
-          let disabled = selectedNote.id === undefined;
+          let disabled = selected.id === undefined;
           disabled = disabled || (selectedEpic && epics.length === 1);
           disabled = disabled || (selectedFeature && epic.features.length === 1);
           disabled = disabled || (selectedStory && feature.stories.length === 1);
@@ -133,6 +133,7 @@ export function MapButtons() {
         id={index}
         icon={b.iconCls}
         label={b.label}
+        title={b.title}
         selected={activeIndex === index}
         disabled={b.disabled}
         navigateToButton={navigateToButton}

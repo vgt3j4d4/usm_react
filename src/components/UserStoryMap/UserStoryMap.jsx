@@ -32,7 +32,7 @@ export function UserStoryMap() {
     epics, features,
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
     addEpic, addFeature, addStory,
-    selectedNote, setSelectedNote, focus,
+    selected, setSelected, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
     maybeNavigate,
     isNoteFocused, setIsNoteFocused
@@ -52,10 +52,10 @@ export function UserStoryMap() {
                 id={e.id}
                 title={e.title}
                 type={NOTE_TYPE.EPIC}
-                isFirst={Object.keys(selectedNote).length === 0 && index === 0}
-                selected={selectedNote.id === e.id}
+                isFirst={Object.keys(selected).length === 0 && index === 0}
+                selected={selected.id === e.id}
                 toggleFocus={(isFocused) => { setIsNoteFocused(isFocused) }}
-                markAsSelected={() => setSelectedNote({ id: e.id, type: NOTE_TYPE.EPIC })}
+                markAsSelected={() => setSelected({ id: e.id, type: NOTE_TYPE.EPIC })}
                 updateTitle={(editedTitle) => {
                   if (editedTitle && editedTitle !== e.title) updateEpicTitle(e.id, editedTitle);
                   focus();
@@ -77,9 +77,9 @@ export function UserStoryMap() {
               id={f.id}
               title={f.title}
               type={NOTE_TYPE.FEATURE}
-              selected={selectedNote.id === f.id}
+              selected={selected.id === f.id}
               toggleFocus={(isFocused) => { setIsNoteFocused(isFocused) }}
-              markAsSelected={() => setSelectedNote({ id: f.id, epicId: f.epicId, type: NOTE_TYPE.FEATURE })}
+              markAsSelected={() => setSelected({ id: f.id, epicId: f.epicId, type: NOTE_TYPE.FEATURE })}
               updateTitle={(editedTitle) => {
                 if (editedTitle && editedTitle !== f.title) updateFeatureTitle(f.id, editedTitle);
                 focus();
@@ -100,10 +100,10 @@ export function UserStoryMap() {
                   id={s.id}
                   title={s.title}
                   type={NOTE_TYPE.STORY}
-                  selected={selectedNote.id === s.id}
+                  selected={selected.id === s.id}
                   toggleFocus={(isFocused) => { setIsNoteFocused(isFocused) }}
                   markAsSelected={() =>
-                    setSelectedNote({
+                    setSelected({
                       id: s.id, epicId: f.epicId, featureId: s.featureId, type: NOTE_TYPE.STORY
                     })
                   }
