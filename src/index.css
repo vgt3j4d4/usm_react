@@ -16,5 +16,5 @@
   font-marker
   cursor-grab
   hover:shadow-md hover:shadow-black
-  focus:-rotate-2;
+  focus:ring-4 focus:ring-offset-4;
 }
