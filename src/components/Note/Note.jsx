@@ -104,7 +104,6 @@ export function Note({
       onFocus={focusNote}
       onBlur={defocusNote}
       onClick={markAsSelected}
-      onDoubleClick={startEditing}
       onKeyDown={maybeTriggerKeyboardAction}
       aria-selected={selected}>
       <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
@@ -116,7 +115,7 @@ export function Note({
           onBlur={stopEditing}>
           {title}
         </span>
-        <span className={editing ? 'hidden' : ''}>{title}</span>
+        <span className={editing ? 'hidden' : 'hover:cursor-text'} onClick={startEditing}>{title}</span>
       </span>
     </div>
   )
