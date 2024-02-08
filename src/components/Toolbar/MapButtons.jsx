@@ -1,9 +1,9 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NOTE_TYPE } from "../../const";
 import { MapSelectionContext } from "../../context/MapSelectionContext";
 import { StoriesContext } from "../../context/StoriesContext";
-import { BUTTON_NAVIGATION } from "./Toolbar";
 import ActionButton from "./ActionButton";
+import { BUTTON_NAVIGATION } from "./Toolbar";
 
 const TOOLBAR_BUTTONS = [
   { id: 1, label: 'Select', iconCls: 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
@@ -141,7 +141,7 @@ export function MapButtons() {
     });
   }
 
-  const buttons = useMemo(() => getToolbarButtons(), [selectedNote]);
+  const buttons = getToolbarButtons(); // TODO: useMemo?
 
   return (
     buttons.map((b, index) => (

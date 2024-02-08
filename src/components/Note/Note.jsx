@@ -1,9 +1,6 @@
-import { useMemo, useState } from "react";
-import { NOTE_TYPE } from "../../const";
-import { useRef } from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ARROW_KEYS, NOTE_TYPE } from "../../const";
 import * as utils from "../../utils/utils";
-import { ARROW_KEYS } from "../../const";
 
 export function Note({
   id, title, type, selected = false, isFirst = false,
@@ -57,6 +54,12 @@ export function Note({
     }
     if (e.key === 'Delete') {
       if (!editing) remove();
+      return;
+    }
+
+    if (Object.values(ARROW_KEYS).includes(e.key)) {
+      e.preventDefault();
+      navigate(e.key);
       return;
     }
 
