@@ -13,11 +13,7 @@ const TOOLBAR_BUTTONS = [
 
 export function MapButtons() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const {
-    selectedNote,
-    focusSelectedNote,
-    clearSelection
-  } = useContext(MapSelectionContext);
+  const { selectedNote, focus, clear } = useContext(MapSelectionContext);
   const {
     epics, features,
     addEpic, addFeature, addStory,
@@ -56,23 +52,23 @@ export function MapButtons() {
 
   async function maybeRemoveEpic(epicId) {
     const success = await removeEpic(epicId);
-    if (success) clearSelection();
+    if (success) clear();
   }
 
   async function maybeRemoveFeature(epicId, featureId) {
     const success = await removeFeature(epicId, featureId);
-    if (success) clearSelection();
+    if (success) clear();
   }
 
   async function maybeRemoveStory(epicId, featureId, storyId) {
     const success = await removeStory(epicId, featureId, storyId);
-    if (success) clearSelection();
+    if (success) clear();
   }
 
   function doButtonAction(action) {
     switch (action) {
       case 'focusSelected':
-        focusSelectedNote();
+        focus();
         break;
       case 'addNew':
         switch (selectedNote.type) {

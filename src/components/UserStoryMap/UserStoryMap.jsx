@@ -32,18 +32,13 @@ export function UserStoryMap() {
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
     removeEpic, removeFeature, removeStory
   } = useContext(StoriesContext);
-  const {
-    selectedNote,
-    setSelectedNote,
-    focusSelectedNote,
-    clearSelection
-  } = useContext(MapSelectionContext);
+  const { selectedNote, setSelectedNote, focus, clear } = useContext(MapSelectionContext);
   const [isNoteFocused, setIsNoteFocused] = useState(false);
 
   async function maybeRemoveEpic(epicId) {
     const success = await removeEpic(epicId);
     if (success) {
-      clearSelection();
+      clear();
       setIsNoteFocused(false);
     }
   }
@@ -51,7 +46,7 @@ export function UserStoryMap() {
   async function maybeRemoveFeature(epicId, featureId) {
     const success = await removeFeature(epicId, featureId);
     if (success) {
-      clearSelection();
+      clear();
       setIsNoteFocused(false);
     }
   }
@@ -59,7 +54,7 @@ export function UserStoryMap() {
   async function maybeRemoveStory(epicId, featureId, storyId) {
     const success = await removeStory(epicId, featureId, storyId);
     if (success) {
-      clearSelection();
+      clear();
       setIsNoteFocused(false);
     }
   }
@@ -76,34 +71,21 @@ export function UserStoryMap() {
         switch (arrowKey) {
           case ARROW_KEYS.DOWN:
             feature = epic.features[0];
-            setSelectedNote({
-              id: feature.id,
-              epicId: epic.id,
-              type: NOTE_TYPE.FEATURE,
-              focus: true
-            });
+            setSelectedNote({ id: feature.id, epicId: epic.id, type: NOTE_TYPE.FEATURE, focus: true });
             break;
           case ARROW_KEYS.LEFT:
             index = epics.indexOf(epic);
             if (index === 0) return;
 
             toFocus = epics[index - 1];
-            setSelectedNote({
-              id: toFocus.id,
-              type: NOTE_TYPE.EPIC,
-              focus: true
-            });
+            setSelectedNote({ id: toFocus.id, type: NOTE_TYPE.EPIC, focus: true });
             break;
           case ARROW_KEYS.RIGHT:
             index = epics.indexOf(epic);
             if (index === (epics.length - 1)) return;
 
             toFocus = epics[index + 1];
-            setSelectedNote({
-              id: toFocus.id,
-              type: NOTE_TYPE.EPIC,
-              focus: true
-            });
+            setSelectedNote({ id: toFocus.id, type: NOTE_TYPE.EPIC, focus: true });
             break;
           default:
             // no-op
@@ -119,20 +101,12 @@ export function UserStoryMap() {
         switch (arrowKey) {
           case ARROW_KEYS.UP:
             toFocus = epic;
-            setSelectedNote({
-              id: toFocus.id,
-              type: NOTE_TYPE.EPIC,
-              focus: true
-            });
+            setSelectedNote({ id: toFocus.id, type: NOTE_TYPE.EPIC, focus: true });
             break;
           case ARROW_KEYS.DOWN:
             toFocus = feature.stories[0];
             setSelectedNote({
-              id: toFocus.id,
-              featureId: feature.id,
-              epicId: feature.epicId,
-              type: NOTE_TYPE.STORY,
-              focus: true
+              id: toFocus.id, featureId: feature.id, epicId: feature.epicId, type: NOTE_TYPE.STORY, focus: true
             });
             break;
           case ARROW_KEYS.LEFT:
@@ -141,12 +115,7 @@ export function UserStoryMap() {
             if (index === 0) return;
 
             toFocus = features[index - 1];
-            setSelectedNote({
-              id: toFocus.id,
-              epicId: epic.id,
-              type: NOTE_TYPE.FEATURE,
-              focus: true
-            });
+            setSelectedNote({ id: toFocus.id, epicId: epic.id, type: NOTE_TYPE.FEATURE, focus: true });
             break;
           case ARROW_KEYS.RIGHT:
             if (features.length === 1) return;
@@ -154,12 +123,7 @@ export function UserStoryMap() {
             if (index === (features.length - 1)) return;
 
             toFocus = features[index + 1];
-            setSelectedNote({
-              id: toFocus.id,
-              epicId: epic.id,
-              type: NOTE_TYPE.FEATURE,
-              focus: true
-            });
+            setSelectedNote({ id: toFocus.id, epicId: epic.id, type: NOTE_TYPE.FEATURE, focus: true });
             break;
           default:
             // no-op
@@ -176,22 +140,13 @@ export function UserStoryMap() {
         switch (arrowKey) {
           case ARROW_KEYS.UP:
             toFocus = index === 0 ? feature : feature.stories[index - 1];
-            setSelectedNote({
-              id: toFocus.id,
-              epicId: toFocus.epicId,
-              type: NOTE_TYPE.FEATURE,
-              focus: true
-            });
+            setSelectedNote({ id: toFocus.id, epicId: toFocus.epicId, type: NOTE_TYPE.FEATURE, focus: true });
             break;
           case ARROW_KEYS.DOWN:
             if (index === (feature.stories.length - 1)) return;
             toFocus = feature.stories[index + 1];
             setSelectedNote({
-              id: toFocus.id,
-              featureId: toFocus.featureId,
-              epicId: feature.epicId,
-              type: NOTE_TYPE.STORY,
-              focus: true
+              id: toFocus.id, featureId: toFocus.featureId, epicId: feature.epicId, type: NOTE_TYPE.STORY, focus: true
             });
             break;
           case ARROW_KEYS.LEFT:
@@ -200,17 +155,11 @@ export function UserStoryMap() {
 
             const previousFeature = features[index - 1];
             index = feature.stories.indexOf(story);
-            if (index <= (previousFeature.stories.length - 1)) {
-              toFocus = previousFeature.stories[index];
-            } else {
-              toFocus = previousFeature.stories[previousFeature.stories.length - 1];
-            }
+            if (index <= (previousFeature.stories.length - 1)) toFocus = previousFeature.stories[index];
+            else toFocus = previousFeature.stories[previousFeature.stories.length - 1];
+
             setSelectedNote({
-              id: toFocus.id,
-              featureId: feature.id,
-              epicId: feature.epicId,
-              type: NOTE_TYPE.STORY,
-              focus: true
+              id: toFocus.id, featureId: feature.id, epicId: feature.epicId, type: NOTE_TYPE.STORY, focus: true
             });
             break;
           case ARROW_KEYS.RIGHT:
@@ -219,17 +168,11 @@ export function UserStoryMap() {
 
             const nextFeature = features[index + 1];
             index = feature.stories.indexOf(story);
-            if (index <= (nextFeature.stories.length - 1)) {
-              toFocus = nextFeature.stories[index];
-            } else {
-              toFocus = nextFeature.stories[nextFeature.stories.length - 1];
-            }
+            if (index <= (nextFeature.stories.length - 1)) toFocus = nextFeature.stories[index];
+            else toFocus = nextFeature.stories[nextFeature.stories.length - 1];
+
             setSelectedNote({
-              id: toFocus.id,
-              featureId: feature.id,
-              epicId: feature.epicId,
-              type: NOTE_TYPE.STORY,
-              focus: true
+              id: toFocus.id, featureId: feature.id, epicId: feature.epicId, type: NOTE_TYPE.STORY, focus: true
             });
             break;
           default:
@@ -258,14 +201,10 @@ export function UserStoryMap() {
                 isFirst={Object.keys(selectedNote).length === 0 && index === 0}
                 selected={selectedNote.id === e.id}
                 toggleFocus={(isFocused) => { setIsNoteFocused(isFocused) }}
-                markAsSelected={() =>
-                  setSelectedNote({ id: e.id, type: NOTE_TYPE.EPIC })
-                }
+                markAsSelected={() => setSelectedNote({ id: e.id, type: NOTE_TYPE.EPIC })}
                 updateTitle={(editedTitle) => {
-                  if (editedTitle && editedTitle !== e.title) {
-                    updateEpicTitle(e.id, editedTitle);
-                  }
-                  focusSelectedNote();
+                  if (editedTitle && editedTitle !== e.title) updateEpicTitle(e.id, editedTitle);
+                  focus();
                 }}
                 remove={() => { maybeRemoveEpic(e.id) }}
                 navigate={maybeNavigate}>
@@ -285,18 +224,10 @@ export function UserStoryMap() {
               type={NOTE_TYPE.FEATURE}
               selected={selectedNote.id === f.id}
               toggleFocus={(isFocused) => { setIsNoteFocused(isFocused) }}
-              markAsSelected={() =>
-                setSelectedNote({
-                  id: f.id,
-                  epicId: f.epicId,
-                  type: NOTE_TYPE.FEATURE
-                })
-              }
+              markAsSelected={() => setSelectedNote({ id: f.id, epicId: f.epicId, type: NOTE_TYPE.FEATURE })}
               updateTitle={(editedTitle) => {
-                if (editedTitle && editedTitle !== f.title) {
-                  updateFeatureTitle(f.id, editedTitle);
-                }
-                focusSelectedNote();
+                if (editedTitle && editedTitle !== f.title) updateFeatureTitle(f.id, editedTitle);
+                focus();
               }}
               remove={() => { maybeRemoveFeature(f.epicId, f.id) }}
               navigate={maybeNavigate}>
@@ -317,17 +248,12 @@ export function UserStoryMap() {
                   toggleFocus={(isFocused) => { setIsNoteFocused(isFocused) }}
                   markAsSelected={() =>
                     setSelectedNote({
-                      id: s.id,
-                      epicId: f.epicId,
-                      featureId: s.featureId,
-                      type: NOTE_TYPE.STORY
+                      id: s.id, epicId: f.epicId, featureId: s.featureId, type: NOTE_TYPE.STORY
                     })
                   }
                   updateTitle={(editedTitle) => {
-                    if (editedTitle && editedTitle !== s.title) {
-                      updateStoryTitle(f.id, s.id, editedTitle);
-                    }
-                    focusSelectedNote();
+                    if (editedTitle && editedTitle !== s.title) updateStoryTitle(f.id, s.id, editedTitle);
+                    focus();
                   }}
                   remove={() => { maybeRemoveStory(f.epicId, f.id, s.id) }}
                   navigate={maybeNavigate}>
