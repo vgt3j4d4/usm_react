@@ -18,9 +18,7 @@ export default function MapSelectionProvider({ children }) {
     if (note) note.focus();
   }
 
-  function clear() {
-    setSelected({});
-  }
+  function clear() { setSelected({}); }
 
   return (
     <MapSelectionContext.Provider value={{

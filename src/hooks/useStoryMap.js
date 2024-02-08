@@ -6,7 +6,7 @@ export function useStoryMap({
   updateEpicTitle, updateFeatureTitle, updateStoryTitle,
   addEpic, addFeature, addStory,
   removeEpic, removeFeature, removeStory,
-  selected, setSelected, focus, clear
+  selected, setSelected, focus
 }) {
   const [isNoteFocused, setIsNoteFocused] = useState(false);
 
@@ -15,8 +15,11 @@ export function useStoryMap({
 
     const success = await removeEpic(epicId);
     if (success) {
-      clear();
-      setIsNoteFocused(false);
+      const index = epics.indexOf(epics.find(e => e.id === epicId));
+      let epicToFocus;
+      if (index === 0) epicToFocus = epics[index + 1];
+      else epicToFocus = epics[index - 1];
+      setSelected({ id: epicToFocus.id, type: NOTE_TYPE.EPIC, focus: true });
     }
   }
 
@@ -26,8 +29,11 @@ export function useStoryMap({
 
     const success = await removeFeature(epicId, featureId);
     if (success) {
-      clear();
-      setIsNoteFocused(false);
+      const feature = features.find(f => f.id === featureId);
+      const index = features.indexOf(feature);
+      const featureToFocus = features[index + (index === 0 ? 1 : -1)];
+      // TODO(bugfix): if feature === epic.features[0] then focus the next epic's feature if any
+      setSelected({ id: featureToFocus.id, epicId, type: NOTE_TYPE.FEATURE, focus: true });
     }
   }
 
@@ -37,8 +43,11 @@ export function useStoryMap({
 
     const success = await removeStory(epicId, featureId, storyId);
     if (success) {
-      clear();
-      setIsNoteFocused(false);
+      const feature = features.find(f => f.id === featureId);
+      const story = feature.stories.find(s => s.id === storyId);
+      const index = feature.stories.indexOf(story);
+      const storyToFocus = feature.stories[index + (index === 0 ? +1 : -1)];
+      setSelected({ id: storyToFocus.id, featureId, epicId, type: NOTE_TYPE.STORY, focus: true });
     }
   }
 

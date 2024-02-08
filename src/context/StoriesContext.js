@@ -27,7 +27,7 @@ export default function StoriesProvider({ children }) {
 
     let newEpics, newFeatures;
     const originEpic = originEpicId ? epics.find(e => e.id === originEpicId) : null;
-    if (originEpic && epics.length > 1) { // add the new epic at next to the originEpic
+    if (originEpic && epics.length > 1) { // add the new epic at next to originEpic
       const originEpicIndex = epics.indexOf(originEpic);
       newEpics = utils.addItemAtIndex([...epics], epic, originEpicIndex + 1);
       const epicFeatures = features.filter(f => f.epicId === originEpic.id);
@@ -107,7 +107,7 @@ export default function StoriesProvider({ children }) {
   }
 
   async function removeStory(epicId, featureId, storyId) {
-    const feature = features.find(f => f.id === feature);
+    const feature = features.find(f => f.id === featureId);
     const story = feature.stories.find(s => s.id === storyId);
     if (story) {
       await storiesService.removeStory(epicId, featureId, storyId);
@@ -137,13 +137,12 @@ export default function StoriesProvider({ children }) {
   }
 
   return (
-    <StoriesContext.Provider value={
-      {
-        epics, features,
-        addEpic, addFeature, addStory,
-        updateEpicTitle, updateFeatureTitle, updateStoryTitle,
-        removeEpic, removeFeature, removeStory
-      }}>
+    <StoriesContext.Provider value={{
+      epics, features,
+      addEpic, addFeature, addStory,
+      updateEpicTitle, updateFeatureTitle, updateStoryTitle,
+      removeEpic, removeFeature, removeStory
+    }}>
       {children}
     </StoriesContext.Provider>
   )
