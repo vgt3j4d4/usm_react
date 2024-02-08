@@ -4,7 +4,7 @@ import * as utils from "../../utils/utils";
 
 export function Note({
   id, title, type, selected = false, isFirst = false,
-  toggleFocus, markAsSelected, updateTitle, remove, navigate
+  toggleFocus, markAsSelected, updateTitle, add, remove, navigate
 }) {
   const [editing, setEditing] = useState(false);
   const titleRef = useRef(null);
@@ -50,6 +50,10 @@ export function Note({
     }
     if (e.key === 'Escape') {
       if (editing) stopEditing(e);
+      return;
+    }
+    if (e.key === '+') {
+      if (!editing) add();
       return;
     }
     if (e.key === 'Delete') {

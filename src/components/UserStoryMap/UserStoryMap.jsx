@@ -30,6 +30,7 @@ export function UserStoryMap() {
   const {
     epics, features,
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
+    addEpic, addFeature, addStory,
     removeEpic, removeFeature, removeStory
   } = useContext(StoriesContext);
   const { selectedNote, setSelectedNote, focus, clear } = useContext(MapSelectionContext);
@@ -206,6 +207,7 @@ export function UserStoryMap() {
                   if (editedTitle && editedTitle !== e.title) updateEpicTitle(e.id, editedTitle);
                   focus();
                 }}
+                add={() => { addEpic(e.id) }}
                 remove={() => { maybeRemoveEpic(e.id) }}
                 navigate={maybeNavigate}>
               </Note>
@@ -229,6 +231,7 @@ export function UserStoryMap() {
                 if (editedTitle && editedTitle !== f.title) updateFeatureTitle(f.id, editedTitle);
                 focus();
               }}
+              add={() => { addFeature(f.epicId, f.id) }}
               remove={() => { maybeRemoveFeature(f.epicId, f.id) }}
               navigate={maybeNavigate}>
             </Note>
@@ -255,6 +258,7 @@ export function UserStoryMap() {
                     if (editedTitle && editedTitle !== s.title) updateStoryTitle(f.id, s.id, editedTitle);
                     focus();
                   }}
+                  add={() => { addStory(f.epicId, f.id, s.id) }}
                   remove={() => { maybeRemoveStory(f.epicId, f.id, s.id) }}
                   navigate={maybeNavigate}>
                 </Note>
