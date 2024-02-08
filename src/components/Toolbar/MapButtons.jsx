@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { NOTE_TYPE } from "../../const";
 import { MapSelectionContext } from "../../context/MapSelectionContext";
 import { StoriesContext } from "../../context/StoriesContext";
+import { useStoryMap } from "../../hooks/useStoryMap";
 import ActionButton from "./ActionButton";
 import { BUTTON_NAVIGATION } from "./Toolbar";
 
@@ -12,13 +13,15 @@ const TOOLBAR_BUTTONS = [
 ];
 
 export function MapButtons() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const { selectedNote, focus, clear } = useContext(MapSelectionContext);
   const {
     epics, features,
     addEpic, addFeature, addStory,
-    removeEpic, removeFeature, removeStory
-  } = useContext(StoriesContext);
+    selectedNote, focus,
+    maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory
+  } = useStoryMap({
+    ...useContext(StoriesContext), ...useContext(MapSelectionContext)
+  });
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const button = document.getElementById(`toolbar__button_${activeIndex}`);
@@ -48,21 +51,6 @@ export function MapButtons() {
       default:
         return;
     }
-  }
-
-  async function maybeRemoveEpic(epicId) {
-    const success = await removeEpic(epicId);
-    if (success) clear();
-  }
-
-  async function maybeRemoveFeature(epicId, featureId) {
-    const success = await removeFeature(epicId, featureId);
-    if (success) clear();
-  }
-
-  async function maybeRemoveStory(epicId, featureId, storyId) {
-    const success = await removeStory(epicId, featureId, storyId);
-    if (success) clear();
   }
 
   function doButtonAction(action) {
