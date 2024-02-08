@@ -18,9 +18,8 @@ const NAV_BUTTONS = [
 ];
 
 export function Toolbar() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const location = useLocation();
-  const { pathname } = location;
+  const [activeIndex] = useState(0);
+  const { pathname } = useLocation();
 
   useEffect(() => {
     const button = document.getElementById(`toolbar__button_${activeIndex}`);

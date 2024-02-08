@@ -3,13 +3,15 @@ import { NOTE_TYPE } from "../../const";
 import { MapSelectionContext } from "../../context/MapSelectionContext";
 import { StoriesContext } from "../../context/StoriesContext";
 import { useStoryMap } from "../../hooks/useStoryMap";
-import ActionButton from "./ActionButton";
 import { BUTTON_NAVIGATION } from "./Toolbar";
+import { Focus } from "./actions/Focus";
+import { New } from "./actions/New";
+import { Remove } from "./actions/Remove";
 
 const TOOLBAR_BUTTONS = [
-  { id: 1, label: 'Select', title: 'Select', iconCls: 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
-  { id: 2, label: 'New', title: 'New (+)', iconCls: 'fa-file-circle-plus', disabled: false, action: 'addNew' },
-  { id: 3, label: 'Remove', title: 'Remove (Del)', iconCls: 'fa-trash-can', disabled: false, action: 'remove' }
+  { id: 'FOCUS', label: 'Focus', title: 'Focus', iconCls: 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
+  { id: 'NEW', label: 'New', title: 'New (+)', iconCls: 'fa-file-circle-plus', disabled: false, action: 'addNew' },
+  { id: 'REMOVE', label: 'Remove', title: 'Remove (Delete)', iconCls: 'fa-trash-can', disabled: false, action: 'remove' }
 ];
 
 export function MapButtons() {
@@ -28,7 +30,7 @@ export function MapButtons() {
     if (button) button.focus();
   }, [activeIndex]);
 
-  function navigateToButton(buttonNav) {
+  function navigate(buttonNav) {
     switch (buttonNav) {
       case BUTTON_NAVIGATION.FIRST: {
         setActiveIndex(0);
@@ -53,43 +55,29 @@ export function MapButtons() {
     }
   }
 
-  function doButtonAction(action) {
-    switch (action) {
-      case 'focusSelected':
-        focus();
-        break;
-      case 'addNew':
-        switch (selected.type) {
-          case NOTE_TYPE.EPIC:
-            addEpic(selected.id);
-            break;
-          case NOTE_TYPE.FEATURE:
-            addFeature(selected.epicId, selected.id);
-            break;
-          case NOTE_TYPE.STORY:
-            addStory(selected.epicId, selected.featureId, selected.id);
-            break;
-          default:
-            break;
-        }
-        break;
-      case 'remove':
-        switch (selected.type) {
-          case NOTE_TYPE.EPIC:
-            maybeRemoveEpic(selected.id);
-            break;
-          case NOTE_TYPE.FEATURE:
-            maybeRemoveFeature(selected.epicId, selected.id);
-            break;
-          case NOTE_TYPE.STORY:
-            maybeRemoveStory(selected.epicId, selected.featureId, selected.id);
-            break;
-          default:
-            break;
-        }
-        break;
+  function addNote() {
+    switch (selected.type) {
+      case NOTE_TYPE.EPIC:
+        return addEpic;
+      case NOTE_TYPE.FEATURE:
+        return addFeature;
+      case NOTE_TYPE.STORY:
+        return addStory;
       default:
-        break;
+        return () => { };
+    }
+  }
+
+  function removeNote() {
+    switch (selected.type) {
+      case NOTE_TYPE.EPIC:
+        return maybeRemoveEpic;
+      case NOTE_TYPE.FEATURE:
+        return maybeRemoveFeature;
+      case NOTE_TYPE.STORY:
+        return maybeRemoveStory;
+      default:
+        return () => { };
     }
   }
 
@@ -108,11 +96,11 @@ export function MapButtons() {
 
     return TOOLBAR_BUTTONS.map(b => {
       switch (b.id) {
-        case 1: // Select
+        case 'FOCUS':
           return { ...b, disabled: noSelection };
-        case 2: // New
+        case 'NEW':
           return { ...b, disabled: noSelection }
-        case 3: // Remove
+        case 'REMOVE':
           let disabled = selected.id === undefined;
           disabled = disabled || (selectedEpic && epics.length === 1);
           disabled = disabled || (selectedFeature && epic.features.length === 1);
@@ -128,16 +116,19 @@ export function MapButtons() {
   const buttons = getToolbarButtons(); // TODO: useMemo?
 
   return (
-    buttons.map((b, index) => (
-      <ActionButton key={b.id}
-        id={index}
-        icon={b.iconCls}
-        label={b.label}
-        title={b.title}
-        selected={activeIndex === index}
-        disabled={b.disabled}
-        navigateToButton={navigateToButton}
-        doAction={() => { doButtonAction(b.action) }} />
-    ))
+    buttons.map((b, index) => {
+      const isActive = activeIndex === index;
+      // TODO: use builder pattern
+      switch (b.id) {
+        case 'FOCUS':
+          return <Focus key={b.id} button={b} isSelected={isActive} navigate={navigate} focus={focus} />;
+        case 'NEW':
+          return <New key={b.id} button={b} isSelected={isActive} navigate={navigate} selected={selected} addNote={addNote} />
+        case 'REMOVE':
+          return <Remove key={b.id} button={b} isSelected={isActive} navigate={navigate} selected={selected} removeNote={removeNote} />
+        default:
+          return null;
+      }
+    })
   )
 }

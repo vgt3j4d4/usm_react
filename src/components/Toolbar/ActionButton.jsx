@@ -1,22 +1,22 @@
 import * as constants from "../../const";
 import { BUTTON_NAVIGATION } from "./Toolbar";
 
-export default function ActionButton({ id, icon, label, title, selected = false, disabled = false, navigateToButton, doAction }) {
+export default function ActionButton({ id, icon, label, title, selected = false, disabled = false, navigate, doAction }) {
   function focusAnotherToolbarButton(e) {
     if (!constants.NAVIGATION_KEYS.includes(e.key)) return;
 
     if (e.key === 'Home') {
-      navigateToButton(BUTTON_NAVIGATION.FIRST);
+      navigate(BUTTON_NAVIGATION.FIRST);
       return;
     }
     if (e.key === 'End') {
-      navigateToButton(BUTTON_NAVIGATION.LAST);
+      navigate(BUTTON_NAVIGATION.LAST);
       return;
     }
     if (e.key === 'ArrowRight') {
-      navigateToButton(BUTTON_NAVIGATION.NEXT);
+      navigate(BUTTON_NAVIGATION.NEXT);
     } else {
-      navigateToButton(BUTTON_NAVIGATION.PREV);
+      navigate(BUTTON_NAVIGATION.PREV);
     }
   }
 
