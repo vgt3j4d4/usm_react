@@ -12,8 +12,10 @@ export function Note({
   useEffect(() => {
     if (editing) {
       const noteEl = titleRef.current;
-      noteEl.focus();
-      utils.selectText(noteEl);
+      if (noteEl) {
+        noteEl.focus();
+        utils.selectText(noteEl);
+      }
     }
   }, [editing]);
 
@@ -32,24 +34,35 @@ export function Note({
     toggleFocus(false);
   }
 
-  function stopEditing(e) {
+  function stopEditing(e, revert = false) {
     e.stopPropagation();
     setEditing(false);
-    const editedTitle = titleRef.current.innerText;
+
+    let editedTitle;
+    if (revert) {
+      editedTitle = title;
+      titleRef.current.innerText = title;
+    } else {
+      editedTitle = titleRef.current.innerText;
+    }
     updateTitle(editedTitle);
   }
 
   function maybeTriggerKeyboardAction(e) {
     if (!e || !e.key) return;
 
+    if (e.key === 'F2') {
+      e.preventDefault();
+      if (!editing) startEditing(e);
+      return;
+    }
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (editing) stopEditing(e)
-      else startEditing(e);
+      if (editing) stopEditing(e);
       return;
     }
     if (e.key === 'Escape') {
-      if (editing) stopEditing(e);
+      if (editing) stopEditing(e, true);
       return;
     }
     if (e.key === '+') {

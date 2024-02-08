@@ -1,6 +1,6 @@
-import ActionButton from "../ActionButton";
+import { ActionButton } from "../../ActionButton";
 
-export function Focus({ button, isSelected, navigate, focus }) {
+export function New({ button, isSelected, navigate, addNote }) {
   return (
     <ActionButton
       id={button.id}
@@ -10,6 +10,6 @@ export function Focus({ button, isSelected, navigate, focus }) {
       selected={isSelected}
       disabled={button.disabled}
       navigate={navigate}
-      doAction={focus} />
+      doAction={addNote} />
   )
 }

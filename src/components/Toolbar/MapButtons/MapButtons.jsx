@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { NOTE_TYPE } from "../../const";
-import { MapSelectionContext } from "../../context/MapSelectionContext";
-import { StoriesContext } from "../../context/StoriesContext";
-import { useStoryMap } from "../../hooks/useStoryMap";
-import { BUTTON_NAVIGATION } from "./Toolbar";
+import { NOTE_TYPE } from "../../../const";
+import { MapSelectionContext } from "../../../context/MapSelectionContext";
+import { StoriesContext } from "../../../context/StoriesContext";
+import { useStoryMap } from "../../../hooks/useStoryMap";
+import { BUTTON_NAVIGATION } from "../Toolbar";
 import { Focus } from "./actions/Focus";
 import { New } from "./actions/New";
 import { Remove } from "./actions/Remove";
@@ -58,26 +58,32 @@ export function MapButtons() {
   function addNote() {
     switch (selected.type) {
       case NOTE_TYPE.EPIC:
-        return addEpic;
+        addEpic(selected.id);
+        break;
       case NOTE_TYPE.FEATURE:
-        return addFeature;
+        addFeature(selected.epicId, selected.id);
+        break;
       case NOTE_TYPE.STORY:
-        return addStory;
+        addStory(selected.epicId, selected.featureId, selected.id);
+        break;
       default:
-        return () => { };
+        break;
     }
   }
 
   function removeNote() {
     switch (selected.type) {
       case NOTE_TYPE.EPIC:
-        return maybeRemoveEpic;
+        maybeRemoveEpic(selected.id);
+        break;
       case NOTE_TYPE.FEATURE:
-        return maybeRemoveFeature;
+        maybeRemoveFeature(selected.epicId, selected.id);
+        break;
       case NOTE_TYPE.STORY:
-        return maybeRemoveStory;
+        maybeRemoveStory(selected.epicId, selected.featureId, selected.id);
+        break;
       default:
-        return () => { };
+        break;
     }
   }
 
@@ -123,9 +129,9 @@ export function MapButtons() {
         case 'FOCUS':
           return <Focus key={b.id} button={b} isSelected={isActive} navigate={navigate} focus={focus} />;
         case 'NEW':
-          return <New key={b.id} button={b} isSelected={isActive} navigate={navigate} selected={selected} addNote={addNote} />
+          return <New key={b.id} button={b} isSelected={isActive} navigate={navigate} addNote={addNote} />
         case 'REMOVE':
-          return <Remove key={b.id} button={b} isSelected={isActive} navigate={navigate} selected={selected} removeNote={removeNote} />
+          return <Remove key={b.id} button={b} isSelected={isActive} navigate={navigate} removeNote={removeNote} />
         default:
           return null;
       }

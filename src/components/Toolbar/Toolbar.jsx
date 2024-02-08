@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ROUTES } from "../../routes";
-import { MapButtons } from "./MapButtons";
+import { MapButtons } from "./MapButtons/MapButtons";
 import NavButton from "./NavButton";
 import { IterationsButtons } from "./IterationsButtons";
 
