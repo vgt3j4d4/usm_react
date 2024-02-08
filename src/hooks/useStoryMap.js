@@ -31,8 +31,9 @@ export function useStoryMap({
     if (success) {
       const feature = features.find(f => f.id === featureId);
       const index = features.indexOf(feature);
-      const featureToFocus = features[index + (index === 0 ? 1 : -1)];
-      // TODO(bugfix): if feature === epic.features[0] then focus the next epic's feature if any
+      const newIndex = index + (index === 0 ? 1 : -1);
+      let featureToFocus = features[newIndex];
+      if (featureToFocus.epicId !== epicId) featureToFocus = features[newIndex + 2];
       setSelected({ id: featureToFocus.id, epicId, type: NOTE_TYPE.FEATURE, focus: true });
     }
   }
