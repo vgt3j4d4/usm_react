@@ -37,5 +37,5 @@ p {
   font-marker
   cursor-grab
   hover:shadow-md hover:shadow-black
-  focus:ring-4 focus:ring-offset-4;
+  focus:ring-4 focus:ring-offset-4 focus:ring-red-500;
 }
