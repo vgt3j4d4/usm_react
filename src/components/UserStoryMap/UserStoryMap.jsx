@@ -5,6 +5,7 @@ import { StoriesContext } from "../../context/StoriesContext";
 import { useStoryMap } from "../../hooks/useStoryMap";
 import { Note } from "../Note/Note";
 import { VisualArrowKeys } from "../VisualArrowKeys/VisualArrowKeys";
+import { isMobile } from "../../utils/utils";
 
 function EmptyNotes({ length }) {
   if (length === 0) return null;
@@ -114,7 +115,7 @@ export function UserStoryMap() {
 
       </div >
 
-      {isNoteFocused ? <VisualArrowKeys /> : null}
+      {isNoteFocused && !isMobile() ? <VisualArrowKeys /> : null}
     </>
   )
 }

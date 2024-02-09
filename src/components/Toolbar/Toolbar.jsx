@@ -29,7 +29,7 @@ export function Toolbar() {
   const isMappingView = pathname === ROUTES.MAPPING;
 
   return (
-    <div role="toolbar" className="fixed top-0 z-10 w-full flex justify-between items-center gap-2 p-2 bg-black text-white">
+    <div role="toolbar" className="fixed top-0 z-10 min-w-full w-full flex justify-between items-center gap-2 p-2 bg-black text-white">
 
       <nav role="group">
         <ol className="m-0 p-0">

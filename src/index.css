@@ -39,3 +39,8 @@ p {
   hover:shadow-md hover:shadow-black
   focus:ring-4 focus:ring-offset-4 focus:ring-red-500;
 }
+
+.note__content {
+  @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+  text-center;
+}

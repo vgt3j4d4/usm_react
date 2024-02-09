@@ -119,7 +119,7 @@ export function Note({
       onClick={markAsSelected}
       onKeyDown={maybeTriggerKeyboardAction}
       aria-selected={selected}>
-      <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+      <span className="note__content">
         <span className={editing ? 'ring-0 outline-none' : 'hidden'}
           ref={titleRef}
           contentEditable={editing} suppressContentEditableWarning={true}
