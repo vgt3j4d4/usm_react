@@ -12,7 +12,7 @@ import { isMobile } from "../../../utils/utils";
 const _isMobile = isMobile();
 
 const TOOLBAR_BUTTONS = [
-  { id: 'FOCUS', label: 'Focus', title: 'Focus', iconCls: _isMobile ? 'fa-hand-point-up' : 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
+  { id: 'FOCUS', label: 'Focus', title: 'Focus', iconCls: _isMobile ? 'fa-hand-pointer' : 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
   { id: 'NEW', label: 'New', title: 'New (+)', iconCls: 'fa-file-circle-plus', disabled: false, action: 'addNew' },
   { id: 'REMOVE', label: 'Remove', title: 'Remove (Delete)', iconCls: 'fa-trash-can', disabled: false, action: 'remove' }
 ];
