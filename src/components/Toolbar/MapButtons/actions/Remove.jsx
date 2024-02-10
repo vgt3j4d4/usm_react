@@ -1,6 +1,6 @@
 import { ActionButton } from "../../ActionButton";
 
-export function Remove({ button, isSelected, navigate, remove }) {
+export function Remove({ button, isSelected, navigate, removeNote }) {
 
   return (
     <ActionButton
@@ -11,6 +11,6 @@ export function Remove({ button, isSelected, navigate, remove }) {
       selected={isSelected}
       disabled={button.disabled}
       navigate={navigate}
-      doAction={remove} />
+      doAction={removeNote} />
   )
 }
