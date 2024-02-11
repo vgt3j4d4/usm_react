@@ -37,7 +37,7 @@ p {
   font-marker
   cursor-grab
   hover:shadow-md hover:shadow-black
-  focus:ring-4 focus:ring-offset-4 focus:ring-red-500;
+  transition focus:-rotate-3;
 }
 
 .note__content {

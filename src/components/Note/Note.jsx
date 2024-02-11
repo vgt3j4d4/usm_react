@@ -103,7 +103,7 @@ export function Note({
         break;
     }
 
-    if (selected) className += ' border-2 border-black transition';
+    if (selected) className += ' border-2 border-black ring-4 ring-offset-4 ring-red-500';
 
     return className;
   }
