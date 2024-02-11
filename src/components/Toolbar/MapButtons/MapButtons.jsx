@@ -120,8 +120,8 @@ export function MapButtons() {
     }
   }
 
-  // eslint-disable-next-line
   // TODO: use activeButtons to set the propert activeIndex when the buttons[activeIndex] is disabled
+  // eslint-disable-next-line
   const [buttons, activeButtons] = getToolbarButtons();
 
   return (
