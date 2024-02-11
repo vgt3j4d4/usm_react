@@ -9,11 +9,11 @@ export default function NoteProvider({ children }) {
   const focus = useCallback(() => {
     if (!selected.id) return;
     const note = document.querySelector(`[data-note-id="${selected.id}"]`);
-    if (note) note.focus();
+    if (note) note.focus({ focusVisible: true });
   }, [selected]);
 
   useEffect(() => {
-    if (selected.id && selected.focus === true) focus();
+    if (selected.id && selected.focus === true) focus({ focusVisible: true });
   }, [selected, focus]);
 
   return (
