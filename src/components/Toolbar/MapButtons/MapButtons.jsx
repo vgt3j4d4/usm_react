@@ -3,16 +3,12 @@ import { NOTE_TYPE } from "../../../const";
 import { NoteContext } from "../../../context/NoteContext";
 import { StoriesContext } from "../../../context/StoriesContext";
 import { useStoryMap } from "../../../hooks/useStoryMap";
-import { BUTTON_NAVIGATION } from "../Toolbar";
-import { Focus } from "./actions/Focus";
-import { New } from "./actions/New";
-import { Remove } from "./actions/Remove";
 import { isMobile } from "../../../utils/utils";
-
-const _isMobile = isMobile();
+import { ActionButton } from "../ActionButton";
+import { BUTTON_NAVIGATION } from "../Toolbar";
 
 const TOOLBAR_BUTTONS = [
-  { id: 'FOCUS', label: 'Focus', title: 'Focus', iconCls: _isMobile ? 'fa-hand-pointer' : 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
+  { id: 'FOCUS', label: 'Focus', title: 'Focus', iconCls: isMobile() ? 'fa-hand-pointer' : 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
   { id: 'NEW', label: 'New', title: 'New (+)', iconCls: 'fa-file-circle-plus', disabled: false, action: 'addNew' },
   { id: 'REMOVE', label: 'Remove', title: 'Remove (Delete)', iconCls: 'fa-trash-can', disabled: false, action: 'remove' }
 ];
@@ -32,6 +28,40 @@ export function MapButtons() {
     const button = document.getElementById(`toolbar__button_${activeIndex}`);
     if (button) button.focus();
   }, [activeIndex]);
+
+  function getToolbarButtons() {
+    let epic, feature;
+    let selectedEpic, selectedFeature, selectedStory;
+
+    selectedEpic = epics.find(e => e.id === selected.id);
+    selectedFeature = features.find(f => f.id === selected.id);
+    if (selectedFeature) epic = epics.find(e => e.id === selectedFeature.epicId);
+    if (selected.type === NOTE_TYPE.STORY) {
+      feature = features.find(f => f.id === selected.featureId);
+      if (feature) selectedStory = feature.stories.find(s => s.id === selected.id);
+    }
+    const noSelection = selected.id === undefined;
+
+    const buttons = TOOLBAR_BUTTONS.map(b => {
+      switch (b.id) {
+        case 'FOCUS':
+          const selectedIsFocused = selected.id === document.activeElement.getAttribute('data-note-id');
+          return { ...b, disabled: noSelection || (isFocused && selectedIsFocused) };
+        case 'NEW':
+          return { ...b, disabled: noSelection }
+        case 'REMOVE':
+          let disabled = selected.id === undefined;
+          disabled = disabled || (selectedEpic && epics.length === 1);
+          disabled = disabled || (selectedFeature && epic.features.length === 1);
+          disabled = disabled || (selectedStory && feature.stories.length === 1);
+          return { ...b, disabled };
+        default:
+          return b;
+      }
+    });
+
+    return [buttons, buttons.filter(b => !b.disabled)];
+  }
 
   function navigate(buttonNav) {
     switch (buttonNav) {
@@ -90,52 +120,18 @@ export function MapButtons() {
     }
   }
 
-  function getToolbarButtons() {
-    let epic, feature;
-    let selectedEpic, selectedFeature, selectedStory;
-
-    selectedEpic = epics.find(e => e.id === selected.id);
-    selectedFeature = features.find(f => f.id === selected.id);
-    if (selectedFeature) epic = epics.find(e => e.id === selectedFeature.epicId);
-    if (selected.type === NOTE_TYPE.STORY) {
-      feature = features.find(f => f.id === selected.featureId);
-      if (feature) selectedStory = feature.stories.find(s => s.id === selected.id);
-    }
-    const noSelection = selected.id === undefined;
-
-    return TOOLBAR_BUTTONS.map(b => {
-      switch (b.id) {
-        case 'FOCUS':
-          const selectedIsFocused = selected.id === document.activeElement.getAttribute('data-note-id');
-          return { ...b, disabled: noSelection || (isFocused && selectedIsFocused) };
-        case 'NEW':
-          return { ...b, disabled: noSelection }
-        case 'REMOVE':
-          let disabled = selected.id === undefined;
-          disabled = disabled || (selectedEpic && epics.length === 1);
-          disabled = disabled || (selectedFeature && epic.features.length === 1);
-          disabled = disabled || (selectedStory && feature.stories.length === 1);
-          return { ...b, disabled };
-        default:
-          return b;
-      }
-
-    });
-  }
-
-  const buttons = getToolbarButtons(); // TODO: useMemo?
+  const [buttons, activeButtons] = getToolbarButtons();
 
   return (
     buttons.map((b, index) => {
-      const isActive = activeIndex === index;
       // TODO: use builder pattern
       switch (b.id) {
         case 'FOCUS':
-          return <Focus key={b.id} button={b} isSelected={isActive} navigate={navigate} focus={focus} />;
+          return <ActionButton key={b.id} id={index} icon={b.iconCls} label={b.label} title={b.title} selected={activeIndex === index} disabled={b.disabled} navigate={navigate} doAction={focus} />
         case 'NEW':
-          return <New key={b.id} button={b} isSelected={isActive} navigate={navigate} addNote={addNote} />
+          return <ActionButton key={b.id} id={index} icon={b.iconCls} label={b.label} title={b.title} selected={activeIndex === index} disabled={b.disabled} navigate={navigate} doAction={addNote} />
         case 'REMOVE':
-          return <Remove key={b.id} button={b} isSelected={isActive} navigate={navigate} removeNote={removeNote} />
+          return <ActionButton key={b.id} id={index} icon={b.iconCls} label={b.label} title={b.title} selected={activeIndex === index} disabled={b.disabled} navigate={navigate} doAction={removeNote} />
         default:
           return null;
       }
