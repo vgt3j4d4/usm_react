@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { NOTE_TYPE } from "../../../const";
-import { MapSelectionContext } from "../../../context/MapSelectionContext";
+import { NoteContext } from "../../../context/NoteContext";
 import { StoriesContext } from "../../../context/StoriesContext";
 import { useStoryMap } from "../../../hooks/useStoryMap";
 import { BUTTON_NAVIGATION } from "../Toolbar";
@@ -21,10 +21,10 @@ export function MapButtons() {
   const {
     epics, features,
     addEpic, addFeature, addStory,
-    selected, focus,
+    selected, isFocused, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory
   } = useStoryMap({
-    ...useContext(StoriesContext), ...useContext(MapSelectionContext)
+    ...useContext(StoriesContext), ...useContext(NoteContext)
   });
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -106,7 +106,8 @@ export function MapButtons() {
     return TOOLBAR_BUTTONS.map(b => {
       switch (b.id) {
         case 'FOCUS':
-          return { ...b, disabled: noSelection };
+          const selectedIsFocused = selected.id === document.activeElement.getAttribute('data-note-id');
+          return { ...b, disabled: noSelection || (isFocused && selectedIsFocused) };
         case 'NEW':
           return { ...b, disabled: noSelection }
         case 'REMOVE':

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ARROW_KEYS, NOTE_TYPE } from "../const";
 
 export function useStoryMap({
@@ -6,9 +5,8 @@ export function useStoryMap({
   updateEpicTitle, updateFeatureTitle, updateStoryTitle,
   addEpic, addFeature, addStory,
   removeEpic, removeFeature, removeStory,
-  selected, setSelected, focus
+  selected, setSelected, focused, isFocused, setIsFocused, focus
 }) {
-  const [isNoteFocused, setIsNoteFocused] = useState(false);
 
   async function maybeRemoveEpic(epicId) {
     if (epics.length === 1) return;
@@ -184,9 +182,9 @@ export function useStoryMap({
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
     addEpic, addFeature, addStory,
     removeEpic, removeFeature, removeStory,
-    selected, setSelected, focus,
+    selected, setSelected, focused, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
     maybeNavigate,
-    isNoteFocused, setIsNoteFocused
+    isFocused, setIsFocused
   }
 };

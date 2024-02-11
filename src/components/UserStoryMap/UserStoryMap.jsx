@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { NOTE_TYPE } from "../../const";
-import { MapSelectionContext } from "../../context/MapSelectionContext";
+import { NoteContext } from "../../context/NoteContext";
 import { StoriesContext } from "../../context/StoriesContext";
 import { useStoryMap } from "../../hooks/useStoryMap";
 import { Note } from "../Note/Note";
@@ -28,9 +28,9 @@ export function UserStoryMap() {
     selected, setSelected, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
     maybeNavigate,
-    isNoteFocused, setIsNoteFocused
+    isFocused, setIsFocused
   } = useStoryMap({
-    ...useContext(StoriesContext), ...useContext(MapSelectionContext)
+    ...useContext(StoriesContext), ...useContext(NoteContext)
   });
 
   return (
@@ -47,7 +47,7 @@ export function UserStoryMap() {
                 type={NOTE_TYPE.EPIC}
                 isFirst={Object.keys(selected).length === 0 && index === 0}
                 selected={selected.id === e.id}
-                toggleFocus={(isFocused) => { setIsNoteFocused(isFocused) }}
+                toggleFocus={(isFocused) => { setIsFocused(isFocused) }}
                 markAsSelected={() => setSelected({ id: e.id, type: NOTE_TYPE.EPIC })}
                 updateTitle={(editedTitle) => {
                   if (editedTitle && editedTitle !== e.title) updateEpicTitle(e.id, editedTitle);
@@ -71,7 +71,7 @@ export function UserStoryMap() {
               title={f.title}
               type={NOTE_TYPE.FEATURE}
               selected={selected.id === f.id}
-              toggleFocus={(isFocused) => { setIsNoteFocused(isFocused) }}
+              toggleFocus={(isFocused) => { setIsFocused(isFocused) }}
               markAsSelected={() => setSelected({ id: f.id, epicId: f.epicId, type: NOTE_TYPE.FEATURE })}
               updateTitle={(editedTitle) => {
                 if (editedTitle && editedTitle !== f.title) updateFeatureTitle(f.id, editedTitle);
@@ -94,7 +94,7 @@ export function UserStoryMap() {
                   title={s.title}
                   type={NOTE_TYPE.STORY}
                   selected={selected.id === s.id}
-                  toggleFocus={(isFocused) => { setIsNoteFocused(isFocused) }}
+                  toggleFocus={(isFocused) => { setIsFocused(isFocused) }}
                   markAsSelected={() =>
                     setSelected({
                       id: s.id, epicId: f.epicId, featureId: s.featureId, type: NOTE_TYPE.STORY
@@ -115,7 +115,7 @@ export function UserStoryMap() {
 
       </div >
 
-      {isNoteFocused && !isMobile() ? <VisualArrowKeys /> : null}
+      {isFocused && !isMobile() ? <VisualArrowKeys /> : null}
     </>
   )
 }

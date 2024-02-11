@@ -1,20 +1,20 @@
 import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
 import { BrowserRouter } from 'react-router-dom';
-import MapSelectionProvider from './context/MapSelectionContext';
+import App from './App';
+import NoteProvider from './context/NoteContext';
 import StoriesProvider from './context/StoriesContext';
+import './index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <StrictMode>
     <BrowserRouter>
-      <MapSelectionProvider>
+      <NoteProvider>
         <StoriesProvider>
           <App />
         </StoriesProvider>
-      </MapSelectionProvider>
+      </NoteProvider>
     </BrowserRouter>
   </StrictMode>
 );
