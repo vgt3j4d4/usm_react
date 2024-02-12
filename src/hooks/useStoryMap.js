@@ -130,8 +130,13 @@ export function useStoryMap({
         index = feature.stories.indexOf(story);
         switch (arrowKey) {
           case ARROW_KEYS.UP:
-            toFocus = index === 0 ? feature : feature.stories[index - 1];
-            setSelected({ id: toFocus.id, epicId: toFocus.epicId, type: NOTE_TYPE.FEATURE, focus: true });
+            if (index === 0) {
+              toFocus = feature;
+              setSelected({ id: toFocus.id, epicId: toFocus.epicId, type: NOTE_TYPE.FEATURE, focus: true });
+            } else {
+              toFocus = feature.stories[index - 1];
+              setSelected({ id: toFocus.id, featureId: feature.id, epicId: feature.epicId, type: NOTE_TYPE.STORY, focus: true });
+            }
             break;
           case ARROW_KEYS.DOWN:
             if (index === (feature.stories.length - 1)) return;

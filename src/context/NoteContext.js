@@ -1,4 +1,9 @@
-import { createContext, useCallback, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+
+const focusNote = (noteId) => {
+  const el = document.querySelector(`[data-note-id="${noteId}"]`);
+  if (el) el.focus({ focusVisible: true });
+}
 
 export const NoteContext = createContext();
 
@@ -6,15 +11,14 @@ export default function NoteProvider({ children }) {
   const [selected, setSelected] = useState({});
   const [isFocused, setIsFocused] = useState(false);
 
-  const focus = useCallback(() => {
-    if (!selected.id) return;
-    const note = document.querySelector(`[data-note-id="${selected.id}"]`);
-    if (note) note.focus({ focusVisible: true });
-  }, [selected]);
+  function focus() {
+    if (!selected || !selected.id) return;
+    focusNote(selected.id);
+  };
 
   useEffect(() => {
-    if (selected.id && selected.focus === true) focus({ focusVisible: true });
-  }, [selected, focus]);
+    if (selected.id && selected.focus === true) focusNote(selected.id);
+  }, [selected]);
 
   return (
     <NoteContext.Provider value={{

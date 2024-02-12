@@ -40,6 +40,10 @@ p {
   transition focus:-rotate-3;
 }
 
+.note--selected {
+  @apply border-2 border-black ring-4 ring-offset-4 ring-red-500;
+}
+
 .note__content {
   @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
   text-center;

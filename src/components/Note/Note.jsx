@@ -14,7 +14,7 @@ export function Note({
       const noteEl = titleRef.current;
       if (noteEl) {
         noteEl.focus();
-        utils.selectText(noteEl);
+        utils.selectTextWithin(noteEl);
       }
     }
   }, [editing]);
@@ -103,7 +103,7 @@ export function Note({
         break;
     }
 
-    if (selected) className += ' border-2 border-black ring-4 ring-offset-4 ring-red-500';
+    if (selected) className += ' note--selected';
 
     return className;
   }
