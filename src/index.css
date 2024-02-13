@@ -37,11 +37,13 @@ p {
   font-marker
   cursor-grab
   hover:shadow-md hover:shadow-black
-  transition focus:-rotate-3;
+  focus:ring-4 focus:ring-offset-4 focus:ring-red-500;
 }
 
 .note--selected {
-  @apply border-2 border-black ring-4 ring-offset-4 ring-red-500;
+  @apply border-2 border-black
+  shadow-md shadow-black
+  transition -rotate-3;
 }
 
 .note__content {
