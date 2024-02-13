@@ -8,9 +8,12 @@ import { ActionButton } from "../ActionButton";
 import { BUTTON_NAVIGATION } from "../Toolbar";
 
 const TOOLBAR_BUTTONS = [
+  // { id: 'UNDO', label: 'Undo', title: 'Undo', iconCls: 'fa-rotate-left', disabled: false, action: 'undo' },
+  // { id: 'REDO', label: 'Redo', title: 'Redo', iconCls: 'fa-rotate-right', disabled: false, action: 'redo' },
   { id: 'FOCUS', label: 'Focus', title: 'Focus', iconCls: isMobileOrTablet() ? 'fa-hand-pointer' : 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
   { id: 'NEW', label: 'New', title: 'New (+)', iconCls: 'fa-file-circle-plus', disabled: false, action: 'addNew' },
-  { id: 'REMOVE', label: 'Remove', title: 'Remove (Delete)', iconCls: 'fa-trash-can', disabled: false, action: 'remove' }
+  { id: 'REMOVE', label: 'Remove', title: 'Remove (Delete)', iconCls: 'fa-trash-can', disabled: false, action: 'remove' },
+  // { id: 'MOVE', label: 'Move', title: 'Move', iconCls: 'fa-up-down-left-right', disabled: false, action: 'move' },
 ];
 
 export function MapButtons() {
@@ -134,6 +137,7 @@ export function MapButtons() {
         case 'REMOVE':
           return <ActionButton key={b.id} id={index} button={b} selected={activeIndex === index} navigate={navigate} doAction={removeNote} />
         default:
+          // return <ActionButton key={b.id} id={index} button={b} selected={activeIndex === index} navigate={navigate} doAction={() => { }} />;
           return null;
       }
     })
