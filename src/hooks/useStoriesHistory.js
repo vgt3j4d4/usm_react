@@ -2,6 +2,15 @@ import { addItemAtIndex } from "../utils/utils";
 
 const MAX_HISTORY_LENGTH = 10;
 
+export const HISTORY_ACTIONS = Object.freeze({
+  ADD_EPIC: 'addEpic',
+  ADD_FEATURE: 'addFeature',
+  ADD_STORY: 'addStory',
+  REMOVE_EPIC: 'removeEpic',
+  REMOVE_FEATURE: 'removeFeature',
+  REMOVE_STORY: 'removeStory'
+});
+
 export function useStoriesHistory({ storiesHistory, epics, features }) {
 
   function addToHistory(action) {

@@ -1,5 +1,5 @@
 import { createContext, useEffect, useRef, useState } from "react";
-import { useStoriesHistory } from "../hooks/useStoriesHistory";
+import { useStoriesHistory, HISTORY_ACTIONS } from "../hooks/useStoriesHistory";
 import * as storiesService from "../services/StoriesService";
 import * as utils from "../utils/utils";
 
@@ -43,7 +43,7 @@ export default function StoriesProvider({ children }) {
 
     if (newFeatures) setFeatures(newFeatures);
     setEpics(newEpics);
-    addToHistory({ id: 'addEpic', params: { epic } });
+    addToHistory({ id: HISTORY_ACTIONS.ADD_EPIC, params: { epic } });
   }
 
   async function addFeature(epicId, originFeatureId) {
@@ -62,7 +62,7 @@ export default function StoriesProvider({ children }) {
       const epic = epics.find(e => e.id === epicId);
       epic.features.push(feature);
       setFeatures(newFeatures);
-      addToHistory({ id: 'addFeature', params: { feature } });
+      addToHistory({ id: HISTORY_ACTIONS.ADD_FEATURE, params: { feature } });
     }
   }
 
@@ -85,7 +85,7 @@ export default function StoriesProvider({ children }) {
       }
 
       setFeatures(newFeatures);
-      addToHistory({ id: 'adStory', params: { story } });
+      addToHistory({ id: HISTORY_ACTIONS.ADD_STORY, params: { story } });
     }
   }
 
@@ -95,7 +95,7 @@ export default function StoriesProvider({ children }) {
       await storiesService.removeEpic(epicId);
       setEpics(epics.filter(e => e.id !== epic.id));
       setFeatures(features.filter(f => f.epicId !== epic.id));
-      addToHistory({ id: 'removeEpic', params: { epic, index: epics.indexOf(epic) } });
+      addToHistory({ id: HISTORY_ACTIONS.REMOVE_EPIC, params: { epic, index: epics.indexOf(epic) } });
       return true;
     }
     return false;
@@ -107,7 +107,7 @@ export default function StoriesProvider({ children }) {
       await storiesService.removeFeature(epicId, featureId);
       setEpics(epics.map(e => e.id === epicId ? { ...e, features: e.features.filter(f => f.id !== featureId) } : e));
       setFeatures(features.filter(f => f.id !== featureId));
-      addToHistory({ id: 'removeFeature', params: { feature, index: features.indexOf(feature) } });
+      addToHistory({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: { feature, index: features.indexOf(feature) } });
       return true;
     }
     return false;
@@ -119,7 +119,7 @@ export default function StoriesProvider({ children }) {
     if (story) {
       await storiesService.removeStory(epicId, featureId, storyId);
       setFeatures(features.map(f => f.id === featureId ? { ...f, stories: f.stories.filter(s => s.id !== storyId) } : f));
-      addToHistory({ id: 'removeStory', params: { story, index: feature.stories.indexOf(story) } });
+      addToHistory({ id: HISTORY_ACTIONS.REMOVE_STORY, params: { story, index: feature.stories.indexOf(story) } });
       return true;
     }
 
