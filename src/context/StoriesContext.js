@@ -33,15 +33,13 @@ export default function StoriesProvider({ children }) {
       const epicFeatures = features.filter(f => f.epicId === originEpic.id);
       const lastFeatureIndex = features.indexOf(epicFeatures[epicFeatures.length - 1]);
       newFeatures = utils.addItemAtIndex([...features], epic.features[0], lastFeatureIndex + 1);
-      setEpics(newEpics);
       setFeatures(newFeatures);
     } else { // add epic at the end of the epics array
       newEpics = [...epics, epic];
-      newFeatures = [...features, ...epic.features];
+      features.push(epic.features[0]);
     }
 
     setEpics(newEpics);
-    setFeatures(newFeatures);
   }
 
   async function addFeature(epicId, originFeatureId) {
@@ -57,7 +55,8 @@ export default function StoriesProvider({ children }) {
         newFeatures = [...features, feature];
       }
 
-      setEpics(epics.map(e => e.id === feature.epicId ? { ...e, features: [...e.features, feature] } : e));
+      const epic = epics.find(e => e.id === epicId);
+      epic.features.push(feature);
       setFeatures(newFeatures);
     }
   }
