@@ -29,11 +29,15 @@ p {
 }
 
 .empty-note {
-  @apply min-h-28 min-w-36 max-w-min;
+  @apply max-w-min
+  min-h-14 min-w-16
+  sm:max-2xl:min-h-28 sm:max-2xl:min-w-36;
 }
 
 .note {
-  @apply min-h-28 min-w-36 max-w-min
+  @apply max-w-min
+  min-h-14 min-w-16
+  sm:max-2xl:min-h-28 sm:max-2xl:min-w-36
   font-marker
   cursor-grab
   hover:shadow-md hover:shadow-black
@@ -48,5 +52,7 @@ p {
 
 .note__content {
   @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+  text-xs
+  sm:max-2xl:text-base
   text-center;
 }
