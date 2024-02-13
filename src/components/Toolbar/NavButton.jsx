@@ -10,7 +10,7 @@ export default function NavButton({ active, position, label, icon, route }) {
   if (active) return (
     <span className={className}>
       <i className={`fa-solid ${icon} mr-1`}></i>
-      <span className="max-md:hidden">{label}</span>
+      <span className="max-sm:hidden">{label}</span>
     </span>
   );
 
@@ -18,7 +18,7 @@ export default function NavButton({ active, position, label, icon, route }) {
     <Link to={route}>
       <span className={className}>
         <i className={`fa-solid ${icon} mr-1`}></i>
-        <span className="max-md:hidden">{label}</span>
+        <span className="max-sm:hidden">{label}</span>
       </span>
     </Link>
   )

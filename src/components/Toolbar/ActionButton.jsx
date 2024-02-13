@@ -31,7 +31,7 @@ export function ActionButton({ id, button, selected = false, navigate, doAction 
       onClick={doAction}
       title={button.title}>
       <i className={`fa-solid ${button.iconCls}`}></i>
-      <span className="text-sm max-md:hidden">{button.label}</span>
+      <span className="text-sm max-sm:hidden">{button.label}</span>
     </button>
   )
 }
