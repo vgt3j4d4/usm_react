@@ -51,36 +51,30 @@ export function Note({
   function maybeTriggerKeyboardAction(e) {
     if (!e || !e.key) return;
 
-    if (e.key === 'F2') {
-      e.preventDefault();
-      if (!editing) startEditing(e);
-      return;
-    }
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (editing) stopEditing(e);
-      return;
-    }
-    if (e.key === 'Escape') {
-      if (editing) stopEditing(e, true);
-      return;
-    }
-    if (e.key === '+') {
-      if (!editing) add();
-      return;
-    }
-    if (e.key === 'Delete') {
-      if (!editing) remove();
-      return;
-    }
-
-    if (Object.values(ARROW_KEYS).includes(e.key)) {
-      e.preventDefault();
-      navigate(e.key);
-      return;
+    if (editing) {
+      if (e.key === 'Enter' || e.key === 'Escape' || e.key === 'Tab') {
+        e.preventDefault();
+        stopEditing(e, e.key === 'Escape');
+        return;
+      }
+    } else {
+      if (e.key === 'F2') {
+        e.preventDefault();
+        startEditing(e);
+        return;
+      }
+      if (e.key === '+') {
+        add();
+        return;
+      }
+      if (e.key === 'Delete') {
+        remove();
+        return;
+      }
     }
 
     if (Object.values(ARROW_KEYS).includes(e.key)) {
+      e.preventDefault();
       navigate(e.key);
       return;
     }
