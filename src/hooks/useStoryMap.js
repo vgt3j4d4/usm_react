@@ -5,6 +5,7 @@ export function useStoryMap({
   updateEpicTitle, updateFeatureTitle, updateStoryTitle,
   addEpic, addFeature, addStory,
   removeEpic, removeFeature, removeStory,
+  canUndo, canRedo,
   selected, setSelected, focused, isFocused, setIsFocused, focus
 }) {
 
@@ -187,6 +188,7 @@ export function useStoryMap({
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
     addEpic, addFeature, addStory,
     removeEpic, removeFeature, removeStory,
+    canUndo, canRedo,
     selected, setSelected, focused, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
     maybeNavigate,

@@ -1,4 +1,5 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
+import { useStoriesHistory } from "../hooks/useStoriesHistory";
 import * as storiesService from "../services/StoriesService";
 import * as utils from "../utils/utils";
 
@@ -9,6 +10,8 @@ export const StoriesContext = createContext();
 export default function StoriesProvider({ children }) {
   const [epics, setEpics] = useState([]);
   const [features, setFeatures] = useState([]);
+  const storiesHistory = useRef({ index: undefined, actions: [/** { id: '', params: {} } */] });
+  const { addToHistory, canUndo, canRedo } = useStoriesHistory({ storiesHistory, epics, features });
 
   useEffect(() => {
     const retrieveState = async () => {
@@ -33,13 +36,14 @@ export default function StoriesProvider({ children }) {
       const epicFeatures = features.filter(f => f.epicId === originEpic.id);
       const lastFeatureIndex = features.indexOf(epicFeatures[epicFeatures.length - 1]);
       newFeatures = utils.addItemAtIndex([...features], epic.features[0], lastFeatureIndex + 1);
-      setFeatures(newFeatures);
     } else { // add epic at the end of the epics array
       newEpics = [...epics, epic];
       features.push(epic.features[0]);
     }
 
+    if (newFeatures) setFeatures(newFeatures);
     setEpics(newEpics);
+    addToHistory({ id: 'addEpic', params: { epic } });
   }
 
   async function addFeature(epicId, originFeatureId) {
@@ -58,6 +62,7 @@ export default function StoriesProvider({ children }) {
       const epic = epics.find(e => e.id === epicId);
       epic.features.push(feature);
       setFeatures(newFeatures);
+      addToHistory({ id: 'addFeature', params: { feature } });
     }
   }
 
@@ -80,6 +85,7 @@ export default function StoriesProvider({ children }) {
       }
 
       setFeatures(newFeatures);
+      addToHistory({ id: 'adStory', params: { story } });
     }
   }
 
@@ -89,6 +95,7 @@ export default function StoriesProvider({ children }) {
       await storiesService.removeEpic(epicId);
       setEpics(epics.filter(e => e.id !== epic.id));
       setFeatures(features.filter(f => f.epicId !== epic.id));
+      addToHistory({ id: 'removeEpic', params: { epic, index: epics.indexOf(epic) } });
       return true;
     }
     return false;
@@ -100,6 +107,7 @@ export default function StoriesProvider({ children }) {
       await storiesService.removeFeature(epicId, featureId);
       setEpics(epics.map(e => e.id === epicId ? { ...e, features: e.features.filter(f => f.id !== featureId) } : e));
       setFeatures(features.filter(f => f.id !== featureId));
+      addToHistory({ id: 'removeFeature', params: { feature, index: features.indexOf(feature) } });
       return true;
     }
     return false;
@@ -111,6 +119,7 @@ export default function StoriesProvider({ children }) {
     if (story) {
       await storiesService.removeStory(epicId, featureId, storyId);
       setFeatures(features.map(f => f.id === featureId ? { ...f, stories: f.stories.filter(s => s.id !== storyId) } : f));
+      addToHistory({ id: 'removeStory', params: { story, index: feature.stories.indexOf(story) } });
       return true;
     }
 
@@ -140,7 +149,8 @@ export default function StoriesProvider({ children }) {
       epics, features,
       addEpic, addFeature, addStory,
       updateEpicTitle, updateFeatureTitle, updateStoryTitle,
-      removeEpic, removeFeature, removeStory
+      removeEpic, removeFeature, removeStory,
+      canUndo, canRedo
     }}>
       {children}
     </StoriesContext.Provider>
