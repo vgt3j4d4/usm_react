@@ -11,10 +11,10 @@ export const HISTORY_ACTIONS = Object.freeze({
   REMOVE_STORY: 'removeStory'
 });
 
-export function useStoriesHistory({ storiesHistory, epics, features }) {
+export function useStoriesRef({ storiesRef, epics, features }) {
 
   function addToHistory(action) {
-    const { index, actions } = storiesHistory.current;
+    const { index, actions } = storiesRef.current;
     let newIndex = index || 0;
     let newActions = [...actions];
 
@@ -27,23 +27,23 @@ export function useStoriesHistory({ storiesHistory, epics, features }) {
       newActions = newActions.slice(1);
     }
 
-    storiesHistory.current = { index: newIndex, actions: newActions };
+    storiesRef.current = { index: newIndex, actions: newActions };
   }
 
   function getCurrentFromHistory() {
-    const { index, actions } = storiesHistory.current;
+    const { index, actions } = storiesRef.current;
     if (actions.length === 0) return undefined;
     if (isNaN(index) || index < 0 || index > (actions.length - 1)) return undefined;
     return actions[index];
   }
 
   function canUndo() {
-    const { index, actions } = storiesHistory.current;
+    const { index, actions } = storiesRef.current;
     return actions.length > 0 && index > 0;
   }
 
   function canRedo() {
-    const { index, actions } = storiesHistory.current;
+    const { index, actions } = storiesRef.current;
     return actions.length > 0 && index < (actions.length - 1);
   }
 

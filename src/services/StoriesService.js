@@ -6,16 +6,16 @@ const DEFAULT_STORY = Object.freeze({ title: 'New Story' });
 const DEFAULT_FEATURE = Object.freeze({ title: 'New Feature', stories: [{ ...DEFAULT_STORY }] });
 const DEFAULT_EPIC = Object.freeze({ title: 'New Epic', features: [{ ...DEFAULT_FEATURE }] });
 
-const _storyMap = { id: null, epics: [buildEpic()] };
+const _storyMap = { epics: [buildEpic()] };
 
-export async function getStoryMap(_storyMapId) {
+export async function getStoryDefaultMap() {
   let storyMap = localStorage.getItem(LOCAL_STORAGE_KEY);
 
   if (storyMap) {
     storyMap = JSON.parse(storyMap);
     _storyMap.epics = storyMap.epics;
   } else {
-    storyMap = { ..._storyMap, id: _storyMapId || null };
+    storyMap = { ..._storyMap };
   }
 
   return Promise.resolve(clone(storyMap));

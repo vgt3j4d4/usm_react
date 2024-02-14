@@ -1,13 +1,139 @@
 import { ARROW_KEYS, NOTE_TYPE } from "../const";
+import * as storiesService from "../services/StoriesService";
+import * as utils from "../utils/utils";
+import { HISTORY_ACTIONS, useStoriesRef } from "./useStoriesRef";
 
 export function useStoryMap({
   epics, features,
-  updateEpicTitle, updateFeatureTitle, updateStoryTitle,
-  addEpic, addFeature, addStory,
-  removeEpic, removeFeature, removeStory,
-  canUndo, canRedo,
-  selected, setSelected, focused, isFocused, setIsFocused, focus
+  setEpics, setFeatures,
+  storiesRef, storyMapIdRef,
+  selected, setSelected, isFocused, setIsFocused, focus
 }) {
+  const {
+    addToHistory,
+    canUndo,
+    canRedo
+  } = useStoriesRef({ storiesRef, epics, features });
+
+  async function addEpic(originEpicId) {
+    const epic = await storiesService.addEpic(storyMapIdRef.current);
+    if (!epic) return;
+
+    let newEpics, newFeatures;
+    const originEpic = originEpicId ? epics.find(e => e.id === originEpicId) : null;
+    if (originEpic && epics.length > 1) { // add the new epic at next to originEpic
+      const originEpicIndex = epics.indexOf(originEpic);
+      newEpics = utils.addItemAtIndex([...epics], epic, originEpicIndex + 1);
+      const epicFeatures = features.filter(f => f.epicId === originEpic.id);
+      const lastFeatureIndex = features.indexOf(epicFeatures[epicFeatures.length - 1]);
+      newFeatures = utils.addItemAtIndex([...features], epic.features[0], lastFeatureIndex + 1);
+    } else { // add epic at the end of the epics array
+      newEpics = [...epics, epic];
+      features.push(epic.features[0]);
+    }
+
+    if (newFeatures) setFeatures(newFeatures);
+    setEpics(newEpics);
+    addToHistory({ id: HISTORY_ACTIONS.ADD_EPIC, params: { epic } });
+  }
+
+  async function addFeature(epicId, originFeatureId) {
+    const feature = await storiesService.addFeature(storyMapIdRef.current, epicId);
+
+    if (feature) {
+      let newFeatures;
+      const originFeature = originFeatureId ? features.find(f => f.id === originFeatureId) : null;
+      if (originFeature && features.length > 1) {
+        const index = features.indexOf(originFeature);
+        newFeatures = utils.addItemAtIndex([...features], feature, index + 1);
+      } else {
+        newFeatures = [...features, feature];
+      }
+
+      const epic = epics.find(e => e.id === epicId);
+      epic.features.push(feature);
+      setFeatures(newFeatures);
+      addToHistory({ id: HISTORY_ACTIONS.ADD_FEATURE, params: { feature } });
+    }
+  }
+
+  async function addStory(epicId, featureId, originStoryId) {
+    const story = await storiesService.addStory(storyMapIdRef.current, epicId, featureId);
+
+    if (story) {
+      let newFeatures;
+      const feature = features.find(f => f.id === featureId);
+      if (originStoryId && feature.stories.length > 1) {
+        const originStory = feature.stories.find(s => s.id === originStoryId);
+        const index = feature.stories.indexOf(originStory);
+        newFeatures = features.map(f =>
+          f.id === featureId ? { ...f, stories: utils.addItemAtIndex([...f.stories], story, index + 1) } : f
+        );
+      } else {
+        newFeatures = features.map(f =>
+          f.id === featureId ? { ...f, stories: [...f.stories, story] } : f
+        );
+      }
+
+      setFeatures(newFeatures);
+      addToHistory({ id: HISTORY_ACTIONS.ADD_STORY, params: { story } });
+    }
+  }
+
+  async function removeEpic(epicId) {
+    const epic = epics.find(e => e.id === epicId);
+    if (epic) {
+      await storiesService.removeEpic(epicId);
+      setEpics(epics.filter(e => e.id !== epic.id));
+      setFeatures(features.filter(f => f.epicId !== epic.id));
+      addToHistory({ id: HISTORY_ACTIONS.REMOVE_EPIC, params: { epic, index: epics.indexOf(epic) } });
+      return true;
+    }
+    return false;
+  }
+
+  async function removeFeature(epicId, featureId) {
+    const feature = features.find(f => f.epicId === epicId);
+    if (feature) {
+      await storiesService.removeFeature(epicId, featureId);
+      setEpics(epics.map(e => e.id === epicId ? { ...e, features: e.features.filter(f => f.id !== featureId) } : e));
+      setFeatures(features.filter(f => f.id !== featureId));
+      addToHistory({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: { feature, index: features.indexOf(feature) } });
+      return true;
+    }
+    return false;
+  }
+
+  async function removeStory(epicId, featureId, storyId) {
+    const feature = features.find(f => f.id === featureId);
+    const story = feature.stories.find(s => s.id === storyId);
+    if (story) {
+      await storiesService.removeStory(epicId, featureId, storyId);
+      setFeatures(features.map(f => f.id === featureId ? { ...f, stories: f.stories.filter(s => s.id !== storyId) } : f));
+      addToHistory({ id: HISTORY_ACTIONS.REMOVE_STORY, params: { story, index: feature.stories.indexOf(story) } });
+      return true;
+    }
+
+    return false;
+  }
+
+  function updateEpicTitle(epicId, title) {
+    setEpics(epics.map(e => e.id === epicId ? { ...e, title } : e));
+  }
+
+  function updateFeatureTitle(featureId, title) {
+    setFeatures(features.map(f => f.id === featureId ? { ...f, title } : f));
+  }
+
+  function updateStoryTitle(featureId, storyId, title) {
+    setFeatures(features.map(f => {
+      if (f.id === featureId) {
+        const story = f.stories.find(s => s.id === storyId);
+        if (story) return { ...f, stories: f.stories.map(s => s.id === storyId ? { ...s, title } : s) }
+      }
+      return f;
+    }))
+  }
 
   async function maybeRemoveEpic(epicId) {
     if (epics.length === 1) return;
@@ -185,13 +311,12 @@ export function useStoryMap({
 
   return {
     epics, features,
-    updateEpicTitle, updateFeatureTitle, updateStoryTitle,
     addEpic, addFeature, addStory,
-    removeEpic, removeFeature, removeStory,
-    canUndo, canRedo,
-    selected, setSelected, focused, focus,
+    updateEpicTitle, updateFeatureTitle, updateStoryTitle,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
     maybeNavigate,
-    isFocused, setIsFocused
+    selected, setSelected, focus,
+    isFocused, setIsFocused,
+    canUndo, canRedo,
   }
 };
