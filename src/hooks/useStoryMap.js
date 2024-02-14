@@ -1,19 +1,20 @@
 import { ARROW_KEYS, NOTE_TYPE } from "../const";
 import * as storiesService from "../services/StoriesService";
 import * as utils from "../utils/utils";
-import { HISTORY_ACTIONS, useStoriesRef } from "./useStoriesRef";
+import { HISTORY_ACTIONS, useStoryMapHistory } from "./useStoryMapHistory";
 
 export function useStoryMap({
   epics, features,
   setEpics, setFeatures,
-  storiesRef, storyMapIdRef,
+  storyMapHistoryRef, storyMapIdRef,
   selected, setSelected, isFocused, setIsFocused, focus
 }) {
   const {
     addToHistory,
-    canUndo,
-    canRedo
-  } = useStoriesRef({ storiesRef, epics, features });
+    canUndo, canRedo,
+    getUndoItem, getRedoItem,
+    undo, redo
+  } = useStoryMapHistory({ storyMapHistoryRef });
 
   async function addEpic(originEpicId) {
     const epic = await storiesService.addEpic(storyMapIdRef.current);
@@ -309,6 +310,18 @@ export function useStoryMap({
     }
   }
 
+  function doUndo() {
+    const item = getUndoItem();
+    // TODO: actually undo the item.action
+    undo(item);
+  }
+
+  function doRedo() {
+    const item = getRedoItem();
+    // TODO: actually redo the item.action
+    redo(item);
+  }
+
   return {
     epics, features,
     addEpic, addFeature, addStory,
@@ -318,5 +331,6 @@ export function useStoryMap({
     selected, setSelected, focus,
     isFocused, setIsFocused,
     canUndo, canRedo,
+    doUndo, doRedo,
   }
 };

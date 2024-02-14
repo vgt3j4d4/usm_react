@@ -1,13 +1,14 @@
 import { createContext, useEffect, useRef, useState } from "react";
 import * as storiesService from "../services/StoriesService";
 import * as utils from "../utils/utils";
+import { List } from "linked-list";
 
 export const StoriesContext = createContext();
 
 export default function StoriesProvider({ children }) {
   const [epics, setEpics] = useState([]);
   const [features, setFeatures] = useState([]);
-  const storiesRef = useRef({ index: undefined, actions: [/** { id: '', params: {} } */] });
+  const storyMapHistoryRef = useRef({ undo: new List(), redo: new List() });
   const storyMapIdRef = useRef(null);
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function StoriesProvider({ children }) {
     <StoriesContext.Provider value={{
       epics, features,
       setEpics, setFeatures,
-      storiesRef,
+      storyMapHistoryRef,
       storyMapIdRef,
     }}>
       {children}

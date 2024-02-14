@@ -21,6 +21,7 @@ export function MapButtons() {
     epics, features,
     addEpic, addFeature, addStory,
     canUndo, canRedo,
+    doUndo, doRedo,
     selected, isFocused, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory
   } = useStoryMap({
@@ -134,15 +135,20 @@ export function MapButtons() {
   return (
     buttons.map((b, index) => {
       // TODO: use builder pattern
+      const isActive = activeIndex === index;
       switch (b.id) {
         case 'FOCUS':
-          return <ActionButton key={b.id} id={index} button={b} selected={activeIndex === index} navigate={navigate} doAction={focus} />
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={focus} />
         case 'NEW':
-          return <ActionButton key={b.id} id={index} button={b} selected={activeIndex === index} navigate={navigate} doAction={addNote} />
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={addNote} />
         case 'REMOVE':
-          return <ActionButton key={b.id} id={index} button={b} selected={activeIndex === index} navigate={navigate} doAction={removeNote} />
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={removeNote} />
+        case 'UNDO':
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={doUndo} />
+        case 'REDO':
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={doRedo} />
         default:
-          return <ActionButton key={b.id} id={index} button={b} selected={activeIndex === index} navigate={navigate} doAction={() => { }} />;
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={() => { }} />;
         // return null;
       }
     })
