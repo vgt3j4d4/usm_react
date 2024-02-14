@@ -4,22 +4,6 @@ export function id() {
   return uuidv4().split('-').join('');
 }
 
-export function getFeatures(epics = [], features = []) {
-  if (epics.length > 0) {
-    features = [...features, ...epics[0].features];
-    return getFeatures(epics.slice(1), features);
-  }
-  return features;
-}
-
-export function getStories(features = [], stories = []) {
-  if (features.length > 0) {
-    stories = [...stories, ...features[0].stories];
-    return getStories(features.slice(1), stories);
-  }
-  return stories;
-}
-
 export function selectTextWithin(textEl) {
   let range, selection;
   if (document.body.createTextRange) {

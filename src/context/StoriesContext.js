@@ -1,7 +1,7 @@
+import { List } from "linked-list";
 import { createContext, useEffect, useRef, useState } from "react";
 import * as storiesService from "../services/StoriesService";
-import * as utils from "../utils/utils";
-import { List } from "linked-list";
+import { getFeatures } from "../utils/storyMapUtils";
 
 export const StoriesContext = createContext();
 
@@ -16,7 +16,7 @@ export default function StoriesProvider({ children }) {
       const storyMap = await storiesService.getStoryDefaultMap();
       const epics = [...storyMap.epics];
       setEpics(epics);
-      setFeatures(utils.getFeatures(epics));
+      setFeatures(getFeatures(epics));
     }
 
     retrieveState();
