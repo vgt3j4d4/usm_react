@@ -1,7 +1,17 @@
 import { ARROW_KEYS, NOTE_TYPE } from "../const";
 import * as storiesService from "../services/StoriesService";
 import * as utils from "../utils/utils";
-import { HISTORY_ACTIONS, useStoryMapHistory } from "./useStoryMapHistory";
+import { useStoryMapHistory } from "./useStoryMapHistory";
+
+export const HISTORY_ACTIONS = Object.freeze({
+  ADD_EPIC: 'addEpic',
+  ADD_FEATURE: 'addFeature',
+  ADD_STORY: 'addStory',
+  REMOVE_EPIC: 'removeEpic',
+  REMOVE_FEATURE: 'removeFeature',
+  REMOVE_STORY: 'removeStory',
+  UPDATE_TITLE: 'updateTitle'
+});
 
 export function useStoryMap({
   epics, features,
@@ -21,7 +31,7 @@ export function useStoryMap({
     if (!epic) return;
 
     let newEpics, newFeatures;
-    const originEpic = originEpicId ? epics.find(e => e.id === originEpicId) : null;
+    const originEpic = epics.find(e => e.id === originEpicId);
     if (originEpic && epics.length > 1) { // add the new epic at next to originEpic
       const originEpicIndex = epics.indexOf(originEpic);
       newEpics = utils.addItemAtIndex([...epics], epic, originEpicIndex + 1);
@@ -35,7 +45,7 @@ export function useStoryMap({
 
     if (newFeatures) setFeatures(newFeatures);
     setEpics(newEpics);
-    addToHistory({ id: HISTORY_ACTIONS.ADD_EPIC, params: { epic } });
+    addToHistory({ id: HISTORY_ACTIONS.ADD_EPIC, params: { epic, originEpicId } });
   }
 
   async function addFeature(epicId, originFeatureId) {
@@ -54,7 +64,7 @@ export function useStoryMap({
       const epic = epics.find(e => e.id === epicId);
       epic.features.push(feature);
       setFeatures(newFeatures);
-      addToHistory({ id: HISTORY_ACTIONS.ADD_FEATURE, params: { feature } });
+      addToHistory({ id: HISTORY_ACTIONS.ADD_FEATURE, params: { feature, originFeatureId } });
     }
   }
 
@@ -77,11 +87,11 @@ export function useStoryMap({
       }
 
       setFeatures(newFeatures);
-      addToHistory({ id: HISTORY_ACTIONS.ADD_STORY, params: { story } });
+      addToHistory({ id: HISTORY_ACTIONS.ADD_STORY, params: { story, originStoryId } });
     }
   }
 
-  async function removeEpic(epicId) {
+  async function _removeEpic(epicId) {
     const epic = epics.find(e => e.id === epicId);
     if (epic) {
       await storiesService.removeEpic(epicId);
@@ -93,7 +103,7 @@ export function useStoryMap({
     return false;
   }
 
-  async function removeFeature(epicId, featureId) {
+  async function _removeFeature(epicId, featureId) {
     const feature = features.find(f => f.epicId === epicId);
     if (feature) {
       await storiesService.removeFeature(epicId, featureId);
@@ -105,7 +115,7 @@ export function useStoryMap({
     return false;
   }
 
-  async function removeStory(epicId, featureId, storyId) {
+  async function _removeStory(epicId, featureId, storyId) {
     const feature = features.find(f => f.id === featureId);
     const story = feature.stories.find(s => s.id === storyId);
     if (story) {
@@ -119,11 +129,15 @@ export function useStoryMap({
   }
 
   function updateEpicTitle(epicId, title) {
-    setEpics(epics.map(e => e.id === epicId ? { ...e, title } : e));
+    const epic = epics.find(e => e.id === epicId);
+    setEpics(epics.map(e => e === epic ? { ...e, title } : e));
+    addToHistory({ id: HISTORY_ACTIONS.UPDATE_TITLE, params: { id: epic.id, title: epic.title } });
   }
 
   function updateFeatureTitle(featureId, title) {
-    setFeatures(features.map(f => f.id === featureId ? { ...f, title } : f));
+    const feature = features.find(f => f.id === featureId);
+    setFeatures(features.map(f => f === feature ? { ...f, title } : f));
+    addToHistory({ id: HISTORY_ACTIONS.UPDATE_TITLE, params: { id: feature.id, title: feature.title } });
   }
 
   function updateStoryTitle(featureId, storyId, title) {
@@ -139,7 +153,7 @@ export function useStoryMap({
   async function maybeRemoveEpic(epicId) {
     if (epics.length === 1) return;
 
-    const success = await removeEpic(epicId);
+    const success = await _removeEpic(epicId);
     if (success) {
       const index = epics.indexOf(epics.find(e => e.id === epicId));
       let epicToFocus;
@@ -153,7 +167,7 @@ export function useStoryMap({
     const epic = epics.find(e => e.id === epicId);
     if (!epic || epic.features.length === 1) return;
 
-    const success = await removeFeature(epicId, featureId);
+    const success = await _removeFeature(epicId, featureId);
     if (success) {
       const feature = features.find(f => f.id === featureId);
       const index = features.indexOf(feature);
@@ -168,7 +182,7 @@ export function useStoryMap({
     const feature = features.find(f => f.id === featureId);
     if (!feature || feature.stories.length === 1) return;
 
-    const success = await removeStory(epicId, featureId, storyId);
+    const success = await _removeStory(epicId, featureId, storyId);
     if (success) {
       const feature = features.find(f => f.id === featureId);
       const story = feature.stories.find(s => s.id === storyId);
@@ -312,13 +326,17 @@ export function useStoryMap({
 
   function doUndo() {
     const item = getUndoItem();
+
     // TODO: actually undo the item.action
+
     undo(item);
   }
 
   function doRedo() {
     const item = getRedoItem();
+
     // TODO: actually redo the item.action
+
     redo(item);
   }
 

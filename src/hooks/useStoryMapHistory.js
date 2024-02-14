@@ -2,15 +2,6 @@ import { Item } from "linked-list";
 
 const MAX_HISTORY_LENGTH = 10;
 
-export const HISTORY_ACTIONS = Object.freeze({
-  ADD_EPIC: 'addEpic',
-  ADD_FEATURE: 'addFeature',
-  ADD_STORY: 'addStory',
-  REMOVE_EPIC: 'removeEpic',
-  REMOVE_FEATURE: 'removeFeature',
-  REMOVE_STORY: 'removeStory'
-});
-
 export function useStoryMapHistory({ storyMapHistoryRef }) {
 
   function addToHistory(action) {
@@ -44,7 +35,6 @@ export function useStoryMapHistory({ storyMapHistoryRef }) {
 
   function undo(item) {
     if (!canUndo()) return;
-
     const { redo } = storyMapHistoryRef.current;
     item.detach();
     redo.prepend(item);
@@ -52,7 +42,6 @@ export function useStoryMapHistory({ storyMapHistoryRef }) {
 
   function redo(item) {
     if (!canRedo()) return;
-
     const { undo } = storyMapHistoryRef.current;
     item.detach();
     undo.prepend(item);
