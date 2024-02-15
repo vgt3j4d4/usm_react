@@ -19,7 +19,7 @@ const TOOLBAR_BUTTONS = [
 export function MapButtons() {
   const {
     epics, features,
-    addEpic, addFeature, addStory,
+    addNewEpic, addNewFeature, addNewStory,
     canUndo, canRedo,
     doUndo, doRedo,
     selected, isFocused, focus,
@@ -73,13 +73,13 @@ export function MapButtons() {
   function addNote() {
     switch (selected.type) {
       case NOTE_TYPE.EPIC:
-        addEpic(selected.id);
+        addNewEpic(selected.id);
         break;
       case NOTE_TYPE.FEATURE:
-        addFeature(selected.epicId, selected.id);
+        addNewFeature(selected.epicId, selected.id);
         break;
       case NOTE_TYPE.STORY:
-        addStory(selected.epicId, selected.featureId, selected.id);
+        addNewStory(selected.epicId, selected.featureId, selected.id);
         break;
       default:
         break;

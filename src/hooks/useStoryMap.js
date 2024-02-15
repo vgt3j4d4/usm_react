@@ -1,7 +1,7 @@
 import { ARROW_KEYS, NOTE_TYPE } from "../const";
 import * as storiesService from "../services/StoriesService";
-import * as utils from "../utils/utils";
 import { useStoryMapHistory } from "./useStoryMapHistory";
+import { useStoryMapOps } from "./useStoryMapOps";
 
 export const HISTORY_ACTIONS = Object.freeze({
   ADD_EPIC: 'addEpic',
@@ -25,102 +25,77 @@ export function useStoryMap({
     getUndoItem, getRedoItem,
     undo, redo
   } = useStoryMapHistory({ storyMapHistoryRef });
+  const {
+    addEpic, addFeature, addStory,
+    removeEpic, removeFeature, removeStory,
+    updateEpic, updateFeature, updateStory,
+  } = useStoryMapOps({ epics, features });
 
-  async function addEpic(originEpicId) {
+  async function addNewEpic(originEpicId) {
     const epic = await storiesService.addEpic(storyMapIdRef.current);
     if (!epic) return;
 
-    let newEpics, newFeatures;
-    const originEpic = epics.find(e => e.id === originEpicId);
-    if (originEpic && epics.length > 1) { // add the new epic at next to originEpic
-      const originEpicIndex = epics.indexOf(originEpic);
-      newEpics = utils.addItemAtIndex([...epics], epic, originEpicIndex + 1);
-      const epicFeatures = features.filter(f => f.epicId === originEpic.id);
-      const lastFeatureIndex = features.indexOf(epicFeatures[epicFeatures.length - 1]);
-      newFeatures = utils.addItemAtIndex([...features], epic.features[0], lastFeatureIndex + 1);
-    } else { // add epic at the end of the epics array
-      newEpics = [...epics, epic];
-      features.push(epic.features[0]);
-    }
-
+    const { newEpics, newFeatures } = addEpic(epic, originEpicId);
     if (newFeatures) setFeatures(newFeatures);
     setEpics(newEpics);
+
     addToHistory({ id: HISTORY_ACTIONS.ADD_EPIC, params: { epic, originEpicId } });
   }
 
-  async function addFeature(epicId, originFeatureId) {
+  async function addNewFeature(epicId, originFeatureId) {
     const feature = await storiesService.addFeature(storyMapIdRef.current, epicId);
 
     if (feature) {
-      let newFeatures;
-      const originFeature = originFeatureId ? features.find(f => f.id === originFeatureId) : null;
-      if (originFeature && features.length > 1) {
-        const index = features.indexOf(originFeature);
-        newFeatures = utils.addItemAtIndex([...features], feature, index + 1);
-      } else {
-        newFeatures = [...features, feature];
-      }
-
-      const epic = epics.find(e => e.id === epicId);
-      epic.features.push(feature);
+      const { newFeatures } = addFeature(feature, originFeatureId);
+      // TODO: should I call setEpics too?
       setFeatures(newFeatures);
       addToHistory({ id: HISTORY_ACTIONS.ADD_FEATURE, params: { feature, originFeatureId } });
     }
   }
 
-  async function addStory(epicId, featureId, originStoryId) {
+  async function addNewStory(epicId, featureId, originStoryId) {
     const story = await storiesService.addStory(storyMapIdRef.current, epicId, featureId);
 
     if (story) {
-      let newFeatures;
-      const feature = features.find(f => f.id === featureId);
-      if (originStoryId && feature.stories.length > 1) {
-        const originStory = feature.stories.find(s => s.id === originStoryId);
-        const index = feature.stories.indexOf(originStory);
-        newFeatures = features.map(f =>
-          f.id === featureId ? { ...f, stories: utils.addItemAtIndex([...f.stories], story, index + 1) } : f
-        );
-      } else {
-        newFeatures = features.map(f =>
-          f.id === featureId ? { ...f, stories: [...f.stories, story] } : f
-        );
-      }
-
+      const { newFeatures } = addStory(story, originStoryId);
       setFeatures(newFeatures);
       addToHistory({ id: HISTORY_ACTIONS.ADD_STORY, params: { story, originStoryId } });
     }
   }
 
-  async function _removeEpic(epicId) {
+  async function removeEpicById(epicId) {
     const epic = epics.find(e => e.id === epicId);
     if (epic) {
       await storiesService.removeEpic(epicId);
-      setEpics(epics.filter(e => e.id !== epic.id));
-      setFeatures(features.filter(f => f.epicId !== epic.id));
+      const { newEpics, newFeatures } = removeEpic(epic);
+      setEpics(newEpics);
+      setFeatures(newFeatures);
       addToHistory({ id: HISTORY_ACTIONS.REMOVE_EPIC, params: { epic, index: epics.indexOf(epic) } });
       return true;
     }
     return false;
   }
 
-  async function _removeFeature(epicId, featureId) {
+  async function removeFeatureById(epicId, featureId) {
     const feature = features.find(f => f.epicId === epicId);
     if (feature) {
       await storiesService.removeFeature(epicId, featureId);
-      setEpics(epics.map(e => e.id === epicId ? { ...e, features: e.features.filter(f => f.id !== featureId) } : e));
-      setFeatures(features.filter(f => f.id !== featureId));
+      const { newEpics, newFeatures } = removeFeature(feature);
+      setEpics(newEpics);
+      setFeatures(newFeatures);
       addToHistory({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: { feature, index: features.indexOf(feature) } });
       return true;
     }
     return false;
   }
 
-  async function _removeStory(epicId, featureId, storyId) {
+  async function removeStoryById(epicId, featureId, storyId) {
     const feature = features.find(f => f.id === featureId);
     const story = feature.stories.find(s => s.id === storyId);
     if (story) {
       await storiesService.removeStory(epicId, featureId, storyId);
-      setFeatures(features.map(f => f.id === featureId ? { ...f, stories: f.stories.filter(s => s.id !== storyId) } : f));
+      const { newFeatures } = removeStory(story);
+      setFeatures(newFeatures);
       addToHistory({ id: HISTORY_ACTIONS.REMOVE_STORY, params: { story, index: feature.stories.indexOf(story) } });
       return true;
     }
@@ -130,30 +105,28 @@ export function useStoryMap({
 
   function updateEpicTitle(epicId, title) {
     const epic = epics.find(e => e.id === epicId);
-    setEpics(epics.map(e => e === epic ? { ...e, title } : e));
+    const { newEpics } = updateEpic(epicId, { title });
+    setEpics(newEpics);
     addToHistory({ id: HISTORY_ACTIONS.UPDATE_TITLE, params: { id: epic.id, title: epic.title } });
   }
 
   function updateFeatureTitle(featureId, title) {
     const feature = features.find(f => f.id === featureId);
-    setFeatures(features.map(f => f === feature ? { ...f, title } : f));
+    const { newFeatures } = updateFeature(featureId, { title });
+    setFeatures(newFeatures);
     addToHistory({ id: HISTORY_ACTIONS.UPDATE_TITLE, params: { id: feature.id, title: feature.title } });
   }
 
   function updateStoryTitle(featureId, storyId, title) {
-    setFeatures(features.map(f => {
-      if (f.id === featureId) {
-        const story = f.stories.find(s => s.id === storyId);
-        if (story) return { ...f, stories: f.stories.map(s => s.id === storyId ? { ...s, title } : s) }
-      }
-      return f;
-    }))
+    const { newFeatures } = updateStory(featureId, storyId, { title });
+    setFeatures(newFeatures);
+    addToHistory({ id: HISTORY_ACTIONS.UPDATE_TITLE, params: { id: storyId.id, featureId, title } });
   }
 
   async function maybeRemoveEpic(epicId) {
     if (epics.length === 1) return;
 
-    const success = await _removeEpic(epicId);
+    const success = await removeEpicById(epicId);
     if (success) {
       const index = epics.indexOf(epics.find(e => e.id === epicId));
       let epicToFocus;
@@ -167,7 +140,7 @@ export function useStoryMap({
     const epic = epics.find(e => e.id === epicId);
     if (!epic || epic.features.length === 1) return;
 
-    const success = await _removeFeature(epicId, featureId);
+    const success = await removeFeatureById(epicId, featureId);
     if (success) {
       const feature = features.find(f => f.id === featureId);
       const index = features.indexOf(feature);
@@ -182,7 +155,7 @@ export function useStoryMap({
     const feature = features.find(f => f.id === featureId);
     if (!feature || feature.stories.length === 1) return;
 
-    const success = await _removeStory(epicId, featureId, storyId);
+    const success = await removeStoryById(epicId, featureId, storyId);
     if (success) {
       const feature = features.find(f => f.id === featureId);
       const story = feature.stories.find(s => s.id === storyId);
@@ -342,7 +315,7 @@ export function useStoryMap({
 
   return {
     epics, features,
-    addEpic, addFeature, addStory,
+    addNewEpic, addNewFeature, addNewStory,
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
     maybeNavigate,
