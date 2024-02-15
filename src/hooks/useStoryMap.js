@@ -3,15 +3,29 @@ import * as storiesService from "../services/StoriesService";
 import { useStoryMapHistory } from "./useStoryMapHistory";
 import { useStoryMapOps } from "./useStoryMapOps";
 
-export const HISTORY_ACTIONS = Object.freeze({
+const HISTORY_ACTIONS = Object.freeze({
   ADD_EPIC: 'addEpic',
   ADD_FEATURE: 'addFeature',
   ADD_STORY: 'addStory',
   REMOVE_EPIC: 'removeEpic',
   REMOVE_FEATURE: 'removeFeature',
   REMOVE_STORY: 'removeStory',
-  UPDATE_TITLE: 'updateTitle'
+  UPDATE_EPIC_TITLE: 'updateEpicTitle',
+  UPDATE_FEATURE_TITLE: 'updateFeatureTitle',
+  UPDATE_STORY_TITLE: 'updateStoryTitle',
 });
+
+const REDO_ACTION_MAP = Object.freeze(new Map([
+  [HISTORY_ACTIONS.ADD_EPIC, HISTORY_ACTIONS.REMOVE_EPIC],
+  [HISTORY_ACTIONS.ADD_FEATURE, HISTORY_ACTIONS.REMOVE_FEATURE],
+  [HISTORY_ACTIONS.ADD_STORY, HISTORY_ACTIONS.REMOVE_STORY],
+  [HISTORY_ACTIONS.REMOVE_EPIC, HISTORY_ACTIONS.ADD_EPIC],
+  [HISTORY_ACTIONS.REMOVE_FEATURE, HISTORY_ACTIONS.ADD_FEATURE],
+  [HISTORY_ACTIONS.REMOVE_STORY, HISTORY_ACTIONS.ADD_STORY],
+  [HISTORY_ACTIONS.UPDATE_EPIC_TITLE, HISTORY_ACTIONS.UPDATE_EPIC_TITLE],
+  [HISTORY_ACTIONS.UPDATE_FEATURE_TITLE, HISTORY_ACTIONS.UPDATE_FEATURE_TITLE],
+  [HISTORY_ACTIONS.UPDATE_STORY_TITLE, HISTORY_ACTIONS.UPDATE_STORY_TITLE],
+]));
 
 export function useStoryMap({
   epics, features,
@@ -26,8 +40,8 @@ export function useStoryMap({
     undo, redo
   } = useStoryMapHistory({ storyMapHistoryRef });
   const {
-    addEpic, addFeature, addStory,
-    removeEpic, removeFeature, removeStory,
+    addToEpics, addToFeatures, addToStories,
+    removeFromEpics, removeFromFeatures, removeFromStories,
     updateEpic, updateFeature, updateStory,
   } = useStoryMapOps({ epics, features });
 
@@ -35,7 +49,7 @@ export function useStoryMap({
     const epic = await storiesService.addEpic(storyMapIdRef.current);
     if (!epic) return;
 
-    const { newEpics, newFeatures } = addEpic(epic, originEpicId);
+    const { newEpics, newFeatures } = addToEpics(epic, originEpicId);
     if (newFeatures) setFeatures(newFeatures);
     setEpics(newEpics);
 
@@ -46,7 +60,7 @@ export function useStoryMap({
     const feature = await storiesService.addFeature(storyMapIdRef.current, epicId);
 
     if (feature) {
-      const { newFeatures } = addFeature(feature, originFeatureId);
+      const { newFeatures } = addToFeatures(feature, originFeatureId);
       // TODO: should I call setEpics too?
       setFeatures(newFeatures);
       addToHistory({ id: HISTORY_ACTIONS.ADD_FEATURE, params: { feature, originFeatureId } });
@@ -57,7 +71,7 @@ export function useStoryMap({
     const story = await storiesService.addStory(storyMapIdRef.current, epicId, featureId);
 
     if (story) {
-      const { newFeatures } = addStory(story, originStoryId);
+      const { newFeatures } = addToStories(story, originStoryId);
       setFeatures(newFeatures);
       addToHistory({ id: HISTORY_ACTIONS.ADD_STORY, params: { story, originStoryId } });
     }
@@ -67,7 +81,7 @@ export function useStoryMap({
     const epic = epics.find(e => e.id === epicId);
     if (epic) {
       await storiesService.removeEpic(epicId);
-      const { newEpics, newFeatures } = removeEpic(epic);
+      const { newEpics, newFeatures } = removeFromEpics(epic);
       setEpics(newEpics);
       setFeatures(newFeatures);
       addToHistory({ id: HISTORY_ACTIONS.REMOVE_EPIC, params: { epic, index: epics.indexOf(epic) } });
@@ -80,7 +94,7 @@ export function useStoryMap({
     const feature = features.find(f => f.epicId === epicId);
     if (feature) {
       await storiesService.removeFeature(epicId, featureId);
-      const { newEpics, newFeatures } = removeFeature(feature);
+      const { newEpics, newFeatures } = removeFromFeatures(feature);
       setEpics(newEpics);
       setFeatures(newFeatures);
       addToHistory({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: { feature, index: features.indexOf(feature) } });
@@ -94,7 +108,7 @@ export function useStoryMap({
     const story = feature.stories.find(s => s.id === storyId);
     if (story) {
       await storiesService.removeStory(epicId, featureId, storyId);
-      const { newFeatures } = removeStory(story);
+      const { newFeatures } = removeFromStories(story);
       setFeatures(newFeatures);
       addToHistory({ id: HISTORY_ACTIONS.REMOVE_STORY, params: { story, index: feature.stories.indexOf(story) } });
       return true;
@@ -107,20 +121,20 @@ export function useStoryMap({
     const epic = epics.find(e => e.id === epicId);
     const { newEpics } = updateEpic(epicId, { title });
     setEpics(newEpics);
-    addToHistory({ id: HISTORY_ACTIONS.UPDATE_TITLE, params: { id: epic.id, title: epic.title } });
+    addToHistory({ id: HISTORY_ACTIONS.UPDATE_EPIC_TITLE, params: { id: epic.id, title: epic.title } });
   }
 
   function updateFeatureTitle(featureId, title) {
     const feature = features.find(f => f.id === featureId);
     const { newFeatures } = updateFeature(featureId, { title });
     setFeatures(newFeatures);
-    addToHistory({ id: HISTORY_ACTIONS.UPDATE_TITLE, params: { id: feature.id, title: feature.title } });
+    addToHistory({ id: HISTORY_ACTIONS.UPDATE_FEATURE_TITLE, params: { id: feature.id, title: feature.title } });
   }
 
   function updateStoryTitle(featureId, storyId, title) {
     const { newFeatures } = updateStory(featureId, storyId, { title });
     setFeatures(newFeatures);
-    addToHistory({ id: HISTORY_ACTIONS.UPDATE_TITLE, params: { id: storyId.id, featureId, title } });
+    addToHistory({ id: HISTORY_ACTIONS.UPDATE_STORY_TITLE, params: { id: storyId.id, featureId, title } });
   }
 
   async function maybeRemoveEpic(epicId) {
@@ -294,6 +308,30 @@ export function useStoryMap({
       default:
         // no-op
         break;
+    }
+  }
+
+  function getActionById(actionId) {
+    switch (actionId) {
+      case HISTORY_ACTIONS.ADD_EPIC:
+        return addToEpics;
+      case HISTORY_ACTIONS.ADD_FEATURE:
+        return addToFeatures;
+      case HISTORY_ACTIONS.ADD_STORY:
+        return addToStories;
+      case HISTORY_ACTIONS.REMOVE_EPIC:
+        return removeFromEpics;
+      case HISTORY_ACTIONS.REMOVE_FEATURE:
+        return removeFromFeatures;
+      case HISTORY_ACTIONS.REMOVE_STORY:
+        return removeFromStories;
+      case HISTORY_ACTIONS.UPDATE_EPIC_TITLE:
+        return updateEpicTitle;
+      case HISTORY_ACTIONS.UPDATE_FEATURE_TITLE:
+        return updateFeatureTitle;
+      case HISTORY_ACTIONS.UPDATE_STORY_TITLE:
+        return updateStoryTitle;
+      default: return null;
     }
   }
 

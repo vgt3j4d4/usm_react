@@ -2,7 +2,7 @@ import { addItemAtIndex } from "../utils/utils";
 
 export function useStoryMapOps({ epics, features }) {
 
-  function addEpic(epic, originEpicId) {
+  function addToEpics(epic, originEpicId) {
     let newEpics, newFeatures;
 
     const originEpic = epics.find(e => e.id === originEpicId);
@@ -20,7 +20,7 @@ export function useStoryMapOps({ epics, features }) {
     return { newEpics, newFeatures };
   }
 
-  function addFeature(feature, originFeatureId) {
+  function addToFeatures(feature, originFeatureId) {
     let newFeatures;
     const originFeature = originFeatureId ? features.find(f => f.id === originFeatureId) : null;
     if (originFeature && features.length > 1) {
@@ -36,7 +36,7 @@ export function useStoryMapOps({ epics, features }) {
     return { newEpics: epics, newFeatures };
   }
 
-  function addStory(story, originStoryId) {
+  function addToStories(story, originStoryId) {
     let newFeatures;
     const feature = features.find(f => f.id === story.featureId);
     if (originStoryId && feature.stories.length > 1) {
@@ -54,19 +54,19 @@ export function useStoryMapOps({ epics, features }) {
     return { newFeatures };
   }
 
-  function removeEpic(epic) {
+  function removeFromEpics(epic) {
     const newEpics = epics.filter(e => e.id !== epic.id);
     const newFeatures = features.filter(f => f.epicId !== epic.id);
     return { newEpics, newFeatures };
   }
 
-  function removeFeature(feature) {
+  function removeFromFeatures(feature) {
     const newEpics = epics.map(e => e.id === feature.epicId ? { ...e, features: e.features.filter(f => f.id !== feature.id) } : e);
     const newFeatures = features.filter(f => f.id !== feature.id);
     return { newEpics, newFeatures };
   }
 
-  function removeStory(story) {
+  function removeFromStories(story) {
     const newFeatures = features.map(f => f.id === story.featureId ? { ...f, stories: f.stories.filter(s => s.id !== story.id) } : f);
     return { newFeatures };
   }
@@ -93,8 +93,8 @@ export function useStoryMapOps({ epics, features }) {
   }
 
   return {
-    addEpic, addFeature, addStory,
-    removeEpic, removeFeature, removeStory,
+    addToEpics, addToFeatures, addToStories,
+    removeFromEpics, removeFromFeatures, removeFromStories,
     updateEpic, updateFeature, updateStory
   }
 }
