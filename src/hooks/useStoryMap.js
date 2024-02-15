@@ -15,6 +15,7 @@ const HISTORY_ACTIONS = Object.freeze({
   UPDATE_STORY_TITLE: 'updateStoryTitle',
 });
 
+// eslint-disable-next-line
 const REDO_ACTION_MAP = Object.freeze(new Map([
   [HISTORY_ACTIONS.ADD_EPIC, HISTORY_ACTIONS.REMOVE_EPIC],
   [HISTORY_ACTIONS.ADD_FEATURE, HISTORY_ACTIONS.REMOVE_FEATURE],
@@ -311,6 +312,7 @@ export function useStoryMap({
     }
   }
 
+  // eslint-disable-next-line
   function getActionById(actionId) {
     switch (actionId) {
       case HISTORY_ACTIONS.ADD_EPIC:
