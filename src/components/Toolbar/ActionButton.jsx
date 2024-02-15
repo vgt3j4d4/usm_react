@@ -4,6 +4,7 @@ import { BUTTON_NAVIGATION } from "./Toolbar";
 export function ActionButton({ id, button, selected = false, navigate, doAction }) {
   function focusOtherButton(e) {
     if (!NAVIGATION_KEYS.includes(e.key)) return;
+    e.preventDefault();
 
     if (e.key === 'Home') {
       navigate(BUTTON_NAVIGATION.FIRST);
