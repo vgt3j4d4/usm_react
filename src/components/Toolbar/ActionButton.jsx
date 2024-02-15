@@ -1,9 +1,9 @@
-import * as constants from "../../const";
+import { NAVIGATION_KEYS } from "../../const";
 import { BUTTON_NAVIGATION } from "./Toolbar";
 
 export function ActionButton({ id, button, selected = false, navigate, doAction }) {
   function focusOtherButton(e) {
-    if (!constants.NAVIGATION_KEYS.includes(e.key)) return;
+    if (!NAVIGATION_KEYS.includes(e.key)) return;
     e.preventDefault();
 
     if (e.key === 'Home') {

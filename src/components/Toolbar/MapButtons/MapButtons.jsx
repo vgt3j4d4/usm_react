@@ -8,8 +8,8 @@ import { ActionButton } from "../ActionButton";
 import { BUTTON_NAVIGATION } from "../Toolbar";
 
 const TOOLBAR_BUTTONS = [
-  // { id: 'UNDO', label: 'Undo', title: 'Undo', iconCls: 'fa-rotate-left', disabled: false, action: 'undo' },
-  // { id: 'REDO', label: 'Redo', title: 'Redo', iconCls: 'fa-rotate-right', disabled: false, action: 'redo' },
+  { id: 'UNDO', label: 'Undo', title: 'Undo', iconCls: 'fa-rotate-left', disabled: false, action: 'undo' },
+  { id: 'REDO', label: 'Redo', title: 'Redo', iconCls: 'fa-rotate-right', disabled: false, action: 'redo' },
   { id: 'FOCUS', label: 'Focus', title: 'Focus', iconCls: isMobileOrTablet() ? 'fa-hand-pointer' : 'fa-arrow-pointer', disabled: false, action: 'focusSelected' },
   { id: 'NEW', label: 'New', title: 'New (+)', iconCls: 'fa-file-circle-plus', disabled: false, action: 'addNew' },
   { id: 'REMOVE', label: 'Remove', title: 'Remove (Delete)', iconCls: 'fa-trash-can', disabled: false, action: 'remove' },
@@ -19,13 +19,20 @@ const TOOLBAR_BUTTONS = [
 export function MapButtons() {
   const {
     epics, features,
-    addEpic, addFeature, addStory,
+    addNewEpic, addNewFeature, addNewStory,
+    canUndo, canRedo,
+    doUndo, doRedo,
     selected, isFocused, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory
   } = useStoryMap({
     ...useContext(StoriesContext), ...useContext(NoteContext)
   });
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const [buttons, activeButtons] = getToolbarButtons();
+  if (buttons[activeIndex].disabled && activeButtons.length > 0) {
+    setActiveIndex(buttons.indexOf(activeButtons[0]));
+  }
 
   function navigate(buttonNav) {
     if (activeButtons.length === 0) return;
@@ -66,13 +73,13 @@ export function MapButtons() {
   function addNote() {
     switch (selected.type) {
       case NOTE_TYPE.EPIC:
-        addEpic(selected.id);
+        addNewEpic(selected.id);
         break;
       case NOTE_TYPE.FEATURE:
-        addFeature(selected.epicId, selected.id);
+        addNewFeature(selected.epicId, selected.id);
         break;
       case NOTE_TYPE.STORY:
-        addStory(selected.epicId, selected.featureId, selected.id);
+        addNewStory(selected.epicId, selected.featureId, selected.id);
         break;
       default:
         break;
@@ -99,6 +106,10 @@ export function MapButtons() {
     const noSelection = selected.id === undefined;
     const buttons = TOOLBAR_BUTTONS.map(b => {
       switch (b.id) {
+        case 'UNDO':
+          return { ...b, disabled: !canUndo() };
+        case 'REDO':
+          return { ...b, disabled: !canRedo() };
         case 'FOCUS':
           return { ...b, disabled: noSelection || isFocused };
         case 'NEW':
@@ -121,24 +132,24 @@ export function MapButtons() {
     return [buttons, buttons.filter(b => !b.disabled)];
   }
 
-  const [buttons, activeButtons] = getToolbarButtons();
-  if (buttons[activeIndex].disabled && activeButtons.length > 0) {
-    setActiveIndex(buttons.indexOf(activeButtons[0]));
-  }
-
   return (
     buttons.map((b, index) => {
       // TODO: use builder pattern
+      const isActive = activeIndex === index;
       switch (b.id) {
         case 'FOCUS':
-          return <ActionButton key={b.id} id={index} button={b} selected={activeIndex === index} navigate={navigate} doAction={focus} />
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={focus} />
         case 'NEW':
-          return <ActionButton key={b.id} id={index} button={b} selected={activeIndex === index} navigate={navigate} doAction={addNote} />
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={addNote} />
         case 'REMOVE':
-          return <ActionButton key={b.id} id={index} button={b} selected={activeIndex === index} navigate={navigate} doAction={removeNote} />
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={removeNote} />
+        case 'UNDO':
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={doUndo} />
+        case 'REDO':
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={doRedo} />
         default:
-          // return <ActionButton key={b.id} id={index} button={b} selected={activeIndex === index} navigate={navigate} doAction={() => { }} />;
-          return null;
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={() => { }} />;
+        // return null;
       }
     })
   )

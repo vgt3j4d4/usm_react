@@ -24,7 +24,7 @@ export function UserStoryMap() {
   const {
     epics, features,
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
-    addEpic, addFeature, addStory,
+    addNewEpic, addNewFeature, addNewStory,
     selected, setSelected, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
     maybeNavigate,
@@ -53,7 +53,7 @@ export function UserStoryMap() {
                   if (editedTitle && editedTitle !== e.title) updateEpicTitle(e.id, editedTitle);
                   focus();
                 }}
-                add={() => { addEpic(e.id) }}
+                add={() => { addNewEpic(e.id) }}
                 remove={() => { maybeRemoveEpic(e.id) }}
                 navigate={maybeNavigate}>
               </Note>
@@ -77,7 +77,7 @@ export function UserStoryMap() {
                 if (editedTitle && editedTitle !== f.title) updateFeatureTitle(f.id, editedTitle);
                 focus();
               }}
-              add={() => { addFeature(f.epicId, f.id) }}
+              add={() => { addNewFeature(f.epicId, f.id) }}
               remove={() => { maybeRemoveFeature(f.epicId, f.id) }}
               navigate={maybeNavigate}>
             </Note>
@@ -102,7 +102,7 @@ export function UserStoryMap() {
                     if (editedTitle && editedTitle !== s.title) updateStoryTitle(f.id, s.id, editedTitle);
                     focus();
                   }}
-                  add={() => { addStory(f.epicId, f.id, s.id) }}
+                  add={() => { addNewStory(f.epicId, f.id, s.id) }}
                   remove={() => { maybeRemoveStory(f.epicId, f.id, s.id) }}
                   navigate={maybeNavigate}>
                 </Note>
