@@ -74,7 +74,6 @@ export function Note({
     }
 
     if (Object.values(ARROW_KEYS).includes(e.key)) {
-      e.preventDefault();
       navigate(e.key);
       return;
     }
