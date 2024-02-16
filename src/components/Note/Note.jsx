@@ -1,23 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { ARROW_KEYS, NOTE_TYPE } from "../../const";
-import * as utils from "../../utils/utils";
+import { useNote } from "../../hooks/useNote";
 
 export function Note({
   id, title, type, selected = false, isFirst = false,
   toggleFocus, markAsSelected, updateTitle, add, remove, navigate
 }) {
-  const [editing, setEditing] = useState(false);
-  const titleRef = useRef(null);
-
-  useEffect(() => {
-    if (editing) {
-      const noteEl = titleRef.current;
-      if (noteEl) {
-        noteEl.focus();
-        utils.selectTextWithin(noteEl);
-      }
-    }
-  }, [editing]);
+  const { editing, setEditing, titleRef } = useNote();
 
   function focusNote(e) {
     toggleFocus(e.target !== titleRef.current);
