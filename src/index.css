@@ -44,6 +44,18 @@ p {
   focus:ring-4 focus:ring-offset-4 focus:ring-red-500;
 }
 
+.note--epic {
+  @apply bg-orange-300;
+}
+
+.note--feature {
+  @apply bg-cyan-300;
+}
+
+.note--story {
+  @apply bg-yellow-300;
+}
+
 .note--selected {
   @apply border-2 border-black
   shadow-md shadow-black

@@ -1,6 +1,7 @@
 import { fireEvent } from "@testing-library/react";
 import { noop, render } from "../../test-utils";
 import { Note } from "./Note";
+import { NOTE_TYPE } from "../../const";
 
 describe('Note', () => {
 
@@ -75,6 +76,30 @@ describe('Note', () => {
     titles = getAllByText(testTitle);
     expect(titles[0]).toBeVisible();
     expect(titles[1]).not.toBeVisible();
+  });
+
+  it('should display epic note', () => {
+    const { container } = render(<Note id="1" type={NOTE_TYPE.EPIC} />);
+    expect(container).toBeDefined();
+
+    const noteEl = container.children[0];
+    expect(noteEl).toHaveClass('note--epic');
+  });
+
+  it('should display feature note', () => {
+    const { container } = render(<Note id="1" type={NOTE_TYPE.FEATURE} />);
+    expect(container).toBeDefined();
+
+    const noteEl = container.children[0];
+    expect(noteEl).toHaveClass('note--feature');
+  });
+
+  it('should display story note', () => {
+    const { container } = render(<Note id="1" type={NOTE_TYPE.STORY} />);
+    expect(container).toBeDefined();
+
+    const noteEl = container.children[0];
+    expect(noteEl).toHaveClass('note--story');
   });
 
 });
