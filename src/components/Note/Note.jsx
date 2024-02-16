@@ -84,13 +84,13 @@ export function Note({
 
     switch (type) {
       case NOTE_TYPE.EPIC:
-        className += ' bg-orange-300';
+        className += ' note--epic';
         break;
       case NOTE_TYPE.FEATURE:
-        className += ' bg-cyan-300';
+        className += ' note--feature';
         break;
       case NOTE_TYPE.STORY:
-        className += ' bg-yellow-300';
+        className += ' note--story';
         break;
       default:
         break;
