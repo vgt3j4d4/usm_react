@@ -1,13 +1,15 @@
 import { List } from "linked-list";
 import { createContext, useEffect, useRef, useState } from "react";
 import * as storiesService from "../services/StoriesService";
-import { getFeatures } from "../utils/storyMapUtils";
+import { buildItem, getFeatures } from "../utils/storyMapUtils";
 
 export const StoriesContext = createContext();
 
 export default function StoriesProvider({ children }) {
   const [epics, setEpics] = useState([]);
+  const epicListRef = useRef(new List()); // parallel double linked list of epics
   const [features, setFeatures] = useState([]);
+  const featureListRef = useRef(new List()); // parallel double linked list of features
   const storyMapHistoryRef = useRef({ undo: new List(), redo: new List() });
   const storyMapIdRef = useRef(null);
 
@@ -15,8 +17,11 @@ export default function StoriesProvider({ children }) {
     const retrieveState = async () => {
       const storyMap = await storiesService.getStoryDefaultMap();
       const epics = [...storyMap.epics];
+      const features = getFeatures(epics);
       setEpics(epics);
-      setFeatures(getFeatures(epics));
+      epicListRef.current = List.from(epics.map(e => buildItem(e)));
+      setFeatures(features);
+      featureListRef.current = List.from(features.map(f => buildItem(f)));
     }
 
     retrieveState();
@@ -24,6 +29,7 @@ export default function StoriesProvider({ children }) {
 
   return (
     <StoriesContext.Provider value={{
+      epicListRef, featureListRef,
       epics, features,
       setEpics, setFeatures,
       storyMapHistoryRef,

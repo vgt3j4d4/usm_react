@@ -1,100 +1,114 @@
+import { buildItem, getDataArray } from "../utils/storyMapUtils";
 import { addItemAtIndex } from "../utils/utils";
 
-export function useStoryMapOps({ epics, features }) {
+export function useStoryMapOps({ epicList, featureList }) {
 
-  function addToEpics(epic, originEpicId) {
-    let newEpics, newFeatures;
+  function addToEpicList(epic, originEpicId) {
+    const epicItem = buildItem(epic);
+    let featureItem;
+    featureItem = buildItem(epic.features[0]); // TODO: what if epic.features.length > 1
 
-    const originEpic = epics.find(e => e.id === originEpicId);
-    if (epics.length > 1) { // add the new epic at next to originEpic
-      const originEpicIndex = epics.indexOf(originEpic);
-      newEpics = addItemAtIndex([...epics], epic, originEpicIndex + 1);
-      const epicFeatures = features.filter(f => f.epicId === originEpic.id);
-      const lastFeatureIndex = features.indexOf(epicFeatures[epicFeatures.length - 1]);
-      newFeatures = addItemAtIndex([...features], epic.features[0], lastFeatureIndex + 1);
-    } else { // add epic at the end of the epics array
-      newEpics = [...epics, epic];
-      features.push(epic.features[0]);
+    const originEpicItem = epicList.toArray().find(i => i.data.id === originEpicId);
+    if (originEpicItem) {
+      originEpicItem.append(epicItem);
+      const originEpicFeatureItems = featureList.toArray().filter(i => i.data.epicId === originEpicId);
+      originEpicFeatureItems[originEpicFeatureItems.length - 1].append(featureItem);
+    } else {
+      epicList.append(epicItem);
+      featureList.append(featureItem);
     }
 
-    return { newEpics, newFeatures };
+    return {
+      newEpics: getDataArray(epicList),
+      newFeatures: getDataArray(featureList)
+    };
   }
 
-  function addToFeatures(feature, originFeatureId) {
-    let newFeatures;
-    const originFeature = originFeatureId ? features.find(f => f.id === originFeatureId) : null;
-    if (originFeature && features.length > 1) {
-      const index = features.indexOf(originFeature);
-      newFeatures = addItemAtIndex([...features], feature, index + 1);
+  function addToFeatureList(feature, originFeatureId) {
+    const featureItem = buildItem(feature);
+    const originFeatureItem = featureList.toArray().find(i => i.data.id === originFeatureId);
+    if (originFeatureItem) {
+      originFeatureItem.append(featureItem);
     } else {
-      newFeatures = [...features, feature];
+      featureList.append(featureItem);
     }
 
-    const epic = epics.find(e => e.id === feature.epicId);
-    epic.features.push(feature);
+    const epicItem = epicList.toArray().find(i => i.data.id === feature.epicId);
+    epicItem.data.features.push(feature);
 
-    return { newEpics: epics, newFeatures };
+    return {
+      newEpics: getDataArray(epicList),
+      newFeatures: getDataArray(featureList)
+    };
   }
 
   function addToStories(story, originStoryId) {
-    let newFeatures;
-    const feature = features.find(f => f.id === story.featureId);
+    const featureItem = featureList.toArray().find(i => i.data.id === story.featureId);
+    const feature = featureItem.data;
     if (originStoryId && feature.stories.length > 1) {
       const originStory = feature.stories.find(s => s.id === originStoryId);
       const index = feature.stories.indexOf(originStory);
-      newFeatures = features.map(f =>
-        f.id === story.featureId ? { ...f, stories: addItemAtIndex([...f.stories], story, index + 1) } : f
-      );
+      feature.stories = addItemAtIndex([...feature.stories], story, index + 1);
     } else {
-      newFeatures = features.map(f =>
-        f.id === story.featureId ? { ...f, stories: [...f.stories, story] } : f
-      );
+      feature.stories.push(story);
     }
 
-    return { newFeatures };
+    return {
+      newFeatures: getDataArray(featureList)
+    };
   }
 
-  function removeFromEpics(epic) {
-    const newEpics = epics.filter(e => e.id !== epic.id);
-    const newFeatures = features.filter(f => f.epicId !== epic.id);
-    return { newEpics, newFeatures };
+  function removeFromEpicList(epic) {
+    const epicItem = epicList.toArray().find(i => i.data.id === epic.id);
+    epicItem.detach();
+    const featureItems = featureList.toArray().filter(i => i.data.epicId === epic.id);
+    featureItems.every(i => i.detach());
+
+    return {
+      newEpics: getDataArray(epicList),
+      newFeatures: getDataArray(featureList)
+    };
   }
 
-  function removeFromFeatures(feature) {
-    const newEpics = epics.map(e => e.id === feature.epicId ? { ...e, features: e.features.filter(f => f.id !== feature.id) } : e);
-    const newFeatures = features.filter(f => f.id !== feature.id);
-    return { newEpics, newFeatures };
+  function removeFromFeatureList(feature) {
+    const { data: epic } = epicList.toArray().find(i => i.data.id === feature.epicId);
+    epic.features = epic.features.filter(f => f.id !== feature.id);
+    const featureItem = featureList.toArray().find(i => i.data.id === feature.id);
+    featureItem.detach();
+
+    return {
+      newEpics: getDataArray(epicList),
+      newFeatures: getDataArray(featureList)
+    };
   }
 
   function removeFromStories(story) {
-    const newFeatures = features.map(f => f.id === story.featureId ? { ...f, stories: f.stories.filter(s => s.id !== story.id) } : f);
-    return { newFeatures };
+    const { data: feature } = featureList.toArray().find(i => i.data.id === story.featureId);
+    feature.stories = feature.stories.filter(s => s.id !== story.id)
+    return { newFeatures: getDataArray(featureList) };
   }
 
-  function updateEpic(epicId, data) {
-    const newEpics = epics.map(e => e.id === epicId ? { ...e, ...data } : e)
-    return { newEpics };
+  function updateEpicFromList(epicId, data) {
+    const epicItem = epicList.toArray().find(i => i.data.id === epicId);
+    epicItem.data = { ...epicItem.data, ...data };
+    return { newEpics: getDataArray(epicList) };
   }
 
-  function updateFeature(featureId, data) {
-    const newFeatures = features.map(f => f.id === featureId ? { ...f, ...data } : f)
-    return { newFeatures };
+  function updateFeatureFromList(featureId, data) {
+    const featureItem = featureList.toArray().find(i => i.data.id === featureId);
+    featureItem.data = { ...featureItem.data, ...data };
+    return { newFeatures: getDataArray(featureList) };
   }
 
   function updateStory(featureId, storyId, data) {
-    const newFeatures = features.map(f => {
-      if (f.id === featureId) {
-        const story = f.stories.find(s => s.id === storyId);
-        if (story) return { ...f, stories: f.stories.map(s => s.id === storyId ? { ...s, ...data } : s) }
-      }
-      return f;
-    });
-    return { newFeatures };
+    const featureItem = featureList.toArray().find(i => i.data.id === featureId);
+    featureItem.data.stories = featureItem.data.stories.map(s => s.id === storyId ? { ...s, ...data } : s);
+    return { newFeatures: getDataArray(featureList) };
   }
 
   return {
-    addToEpics, addToFeatures, addToStories,
-    removeFromEpics, removeFromFeatures, removeFromStories,
-    updateEpic, updateFeature, updateStory
+    addToEpicList, addToFeatureList, addToStories,
+    removeFromEpicList, removeFromFeatureList, removeFromStories,
+    updateEpicFromList, updateFeatureFromList, updateStory
   }
 }
