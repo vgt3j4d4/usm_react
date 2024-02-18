@@ -1,17 +1,18 @@
 import { useMemo } from "react";
 import { ARROW_KEYS, NOTE_TYPE } from "../../const";
 import { useNote } from "../../hooks/useNote";
+import { focusNoteById } from "../../utils/storyMapUtils";
 
 export function Note({
   id, title, type,
-  selected = false,
+  focusable = false, selected = false,
   toggleFocus, markAsSelected, updateTitle, add, remove, navigate
 }) {
   const { editing, setEditing, titleRef } = useNote();
 
   function focusNote(e) {
     toggleFocus(e.target !== titleRef.current);
-    maybeMarkAsSelected();
+    markAsSelected();
   }
 
   function defocusNote() {
@@ -19,9 +20,7 @@ export function Note({
   }
 
   function maybeMarkAsSelected() {
-    // TODO: check why uncommenting below results in a bug?
-    // bug = navigation between notes get messed up
-    /**if (!selected)*/ markAsSelected();
+    if (!selected) markAsSelected();
   }
 
   function startEditing(e) {
@@ -31,7 +30,6 @@ export function Note({
   }
 
   function stopEditing(e, revert = false) {
-    e.stopPropagation();
     setEditing(false);
 
     let editedTitle;
@@ -42,6 +40,15 @@ export function Note({
       editedTitle = titleRef.current.innerText;
     }
     if (editedTitle !== title) updateTitle(editedTitle);
+
+    if (!e.relatedTarget) { // onKeyDown
+      focusNoteById(id)
+    } else { // onBlur
+      // only refocus if e.relatedTarget is within the current note
+      if (e.relatedTarget.contains(titleRef.current)) {
+        focusNoteById(id);
+      }
+    }
   }
 
   function maybeTriggerKeyboardAction(e) {
@@ -100,7 +107,7 @@ export function Note({
   const className = useMemo(() => getClassName(type, selected), [type, selected]);
 
   return (
-    <div role="gridcell" tabIndex={selected ? '0' : '-1'}
+    <div role="gridcell" tabIndex={(focusable || selected) ? '0' : '-1'}
       data-note-id={id}
       className={className}
       onFocus={focusNote}

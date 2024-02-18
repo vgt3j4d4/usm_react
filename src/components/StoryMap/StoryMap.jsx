@@ -5,22 +5,10 @@ import { StoriesContext } from "../../context/StoriesContext";
 import { useStoryMap } from "../../hooks/useStoryMap";
 import { isMobileOrTablet } from "../../utils/utils";
 import { ArrowKeys } from "../ArrowKeys/ArrowKeys";
+import { EmptyNotes } from "../EmptyNotes/EmptyNotes";
 import { Note } from "../Note/Note";
 
-function EmptyNotes({ length }) {
-  if (length === 0) return null;
-  return (
-    Array
-      .from('_'.repeat(length))
-      .map((_, index) => (
-        <div key={index}
-          className="empty-note"
-          tabIndex="-1" aria-hidden="true">
-        </div>
-      )));
-}
-
-export function UserStoryMap() {
+export function StoryMap() {
   const {
     epics, features,
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
@@ -45,7 +33,8 @@ export function UserStoryMap() {
                 id={e.id}
                 title={e.title}
                 type={NOTE_TYPE.EPIC}
-                selected={(index === 0 && Object.keys(selected).length === 0) || selected.id === e.id}
+                focusable={index === 0 && Object.keys(selected).length === 0}
+                selected={selected.id === e.id}
                 toggleFocus={(value) => { setIsFocused(value) }}
                 markAsSelected={() => setSelected({ id: e.id, type: NOTE_TYPE.EPIC })}
                 updateTitle={(editedTitle) => {

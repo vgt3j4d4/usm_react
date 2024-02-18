@@ -1,9 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-
-const focusNote = (noteId) => {
-  const el = document.querySelector(`[data-note-id="${noteId}"]`);
-  if (el) el.focus({ focusVisible: true });
-}
+import { focusNoteById } from "../utils/storyMapUtils";
 
 export const NoteContext = createContext();
 
@@ -13,11 +9,11 @@ export default function NoteProvider({ children }) {
 
   function focus() {
     if (!selected || !selected.id) return;
-    focusNote(selected.id);
+    focusNoteById(selected.id);
   };
 
   useEffect(() => {
-    if (selected.id && selected.focus === true) focusNote(selected.id);
+    if (selected.id && selected.focus === true) focusNoteById(selected.id);
   }, [selected]);
 
   return (

@@ -17,3 +17,8 @@ export function buildItem(data) {
 export function getDataArray(list) {
   return list.toArray().map(i => i.data);
 }
+
+export const focusNoteById = (noteId) => {
+  const el = document.querySelector(`[data-note-id="${noteId}"]`);
+  if (el) el.focus({ focusVisible: true });
+}
