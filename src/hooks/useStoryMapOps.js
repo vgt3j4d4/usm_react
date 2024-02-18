@@ -1,9 +1,12 @@
 import { buildItem, getDataArray } from "../utils/storyMapUtils";
 import { addItemAtIndex } from "../utils/utils";
 
-export function useStoryMapOps({ epicList, featureList }) {
+export function useStoryMapOps({ epicListRef, featureListRef }) {
 
-  function addToEpicList(epic, originEpicId) {
+  const epicList = epicListRef.current;
+  const featureList = featureListRef.current;
+
+  function addEpic(epic, originEpicId) {
     const epicItem = buildItem(epic);
     let featureItem;
     featureItem = buildItem(epic.features[0]); // TODO: what if epic.features.length > 1
@@ -24,7 +27,7 @@ export function useStoryMapOps({ epicList, featureList }) {
     };
   }
 
-  function addToFeatureList(feature, originFeatureId) {
+  function addFeature(feature, originFeatureId) {
     const featureItem = buildItem(feature);
     const originFeatureItem = featureList.toArray().find(i => i.data.id === originFeatureId);
     if (originFeatureItem) {
@@ -42,7 +45,7 @@ export function useStoryMapOps({ epicList, featureList }) {
     };
   }
 
-  function addToStories(story, originStoryId) {
+  function addStory(story, originStoryId) {
     const featureItem = featureList.toArray().find(i => i.data.id === story.featureId);
     const feature = featureItem.data;
     if (originStoryId && feature.stories.length > 1) {
@@ -58,7 +61,7 @@ export function useStoryMapOps({ epicList, featureList }) {
     };
   }
 
-  function removeFromEpicList(epic) {
+  function removeEpic(epic) {
     const epicItem = epicList.toArray().find(i => i.data.id === epic.id);
     epicItem.detach();
     const featureItems = featureList.toArray().filter(i => i.data.epicId === epic.id);
@@ -70,7 +73,7 @@ export function useStoryMapOps({ epicList, featureList }) {
     };
   }
 
-  function removeFromFeatureList(feature) {
+  function removeFeature(feature) {
     const { data: epic } = epicList.toArray().find(i => i.data.id === feature.epicId);
     epic.features = epic.features.filter(f => f.id !== feature.id);
     const featureItem = featureList.toArray().find(i => i.data.id === feature.id);
@@ -82,19 +85,19 @@ export function useStoryMapOps({ epicList, featureList }) {
     };
   }
 
-  function removeFromStories(story) {
+  function removeStory(story) {
     const { data: feature } = featureList.toArray().find(i => i.data.id === story.featureId);
     feature.stories = feature.stories.filter(s => s.id !== story.id)
     return { newFeatures: getDataArray(featureList) };
   }
 
-  function updateEpicFromList(epicId, data) {
+  function updateEpic(epicId, data) {
     const epicItem = epicList.toArray().find(i => i.data.id === epicId);
     epicItem.data = { ...epicItem.data, ...data };
     return { newEpics: getDataArray(epicList) };
   }
 
-  function updateFeatureFromList(featureId, data) {
+  function updateFeature(featureId, data) {
     const featureItem = featureList.toArray().find(i => i.data.id === featureId);
     featureItem.data = { ...featureItem.data, ...data };
     return { newFeatures: getDataArray(featureList) };
@@ -107,8 +110,8 @@ export function useStoryMapOps({ epicList, featureList }) {
   }
 
   return {
-    addToEpicList, addToFeatureList, addToStories,
-    removeFromEpicList, removeFromFeatureList, removeFromStories,
-    updateEpicFromList, updateFeatureFromList, updateStory
+    addEpic, addFeature, addStory,
+    removeEpic, removeFeature, removeStory,
+    updateEpic, updateFeature, updateStory
   }
 }

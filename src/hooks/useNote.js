@@ -8,10 +8,10 @@ export function useNote() {
 
   useEffect(() => {
     if (editing) {
-      const noteEl = titleRef.current;
-      if (noteEl) {
-        noteEl.focus();
-        selectTextWithin(noteEl);
+      const titleEl = titleRef.current;
+      if (titleEl) {
+        titleEl.focus();
+        selectTextWithin(titleEl);
       }
     }
   }, [editing]);

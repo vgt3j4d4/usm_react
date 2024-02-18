@@ -7,9 +7,9 @@ export const StoriesContext = createContext();
 
 export default function StoriesProvider({ children }) {
   const [epics, setEpics] = useState([]);
-  const epicListRef = useRef(new List()); // parallel double linked list of epics
+  const epicListRef = useRef(new List()); // parallel double linked list to epics
   const [features, setFeatures] = useState([]);
-  const featureListRef = useRef(new List()); // parallel double linked list of features
+  const featureListRef = useRef(new List()); // parallel double linked list to features
   const storyMapHistoryRef = useRef({ undo: new List(), redo: new List() });
   const storyMapIdRef = useRef(null);
 

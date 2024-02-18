@@ -1,4 +1,4 @@
-export function VisualArrowKeys() {
+export function ArrowKeys() {
   // TODO: just render this on desktop
   return (
     <div className="fixed bottom-0 left-0 max-w-24 max-h-24 z-10">

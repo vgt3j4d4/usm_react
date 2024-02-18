@@ -3,18 +3,25 @@ import { ARROW_KEYS, NOTE_TYPE } from "../../const";
 import { useNote } from "../../hooks/useNote";
 
 export function Note({
-  id, title, type, selected = false, isFirst = false,
+  id, title, type,
+  selected = false,
   toggleFocus, markAsSelected, updateTitle, add, remove, navigate
 }) {
   const { editing, setEditing, titleRef } = useNote();
 
   function focusNote(e) {
     toggleFocus(e.target !== titleRef.current);
-    markAsSelected();
+    maybeMarkAsSelected();
   }
 
   function defocusNote() {
     toggleFocus(false);
+  }
+
+  function maybeMarkAsSelected() {
+    // TODO: check why uncommenting below results in a bug?
+    // bug = navigation between notes get messed up
+    /**if (!selected)*/ markAsSelected();
   }
 
   function startEditing(e) {
@@ -34,7 +41,7 @@ export function Note({
     } else {
       editedTitle = titleRef.current.innerText;
     }
-    updateTitle(editedTitle);
+    if (editedTitle !== title) updateTitle(editedTitle);
   }
 
   function maybeTriggerKeyboardAction(e) {
@@ -63,7 +70,7 @@ export function Note({
     }
 
     if (Object.values(ARROW_KEYS).includes(e.key)) {
-      navigate(e.key);
+      if (!editing) navigate(e.key);
       return;
     }
   }
@@ -93,19 +100,19 @@ export function Note({
   const className = useMemo(() => getClassName(type, selected), [type, selected]);
 
   return (
-    <div role="gridcell" tabIndex={isFirst || selected ? '0' : '-1'}
+    <div role="gridcell" tabIndex={selected ? '0' : '-1'}
       data-note-id={id}
       className={className}
       onFocus={focusNote}
       onBlur={defocusNote}
-      onClick={markAsSelected}
+      onClick={maybeMarkAsSelected}
       onKeyDown={maybeTriggerKeyboardAction}
       aria-selected={selected}>
       <span className="note__content">
-        <span className={editing ? 'ring-0 outline-none' : 'hidden'}
+        <span className={editing ? 'outline-none' : 'hidden'}
           ref={titleRef}
           contentEditable={editing} suppressContentEditableWarning={true}
-          tabIndex={editing ? "0" : "-1"}
+          tabIndex={editing ? '0' : '-1'}
           onKeyDown={maybeTriggerKeyboardAction}
           onBlur={stopEditing}>
           {title}

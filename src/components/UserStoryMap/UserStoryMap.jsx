@@ -3,9 +3,9 @@ import { NOTE_TYPE } from "../../const";
 import { NoteContext } from "../../context/NoteContext";
 import { StoriesContext } from "../../context/StoriesContext";
 import { useStoryMap } from "../../hooks/useStoryMap";
-import { Note } from "../Note/Note";
-import { VisualArrowKeys } from "../VisualArrowKeys/VisualArrowKeys";
 import { isMobileOrTablet } from "../../utils/utils";
+import { ArrowKeys } from "../ArrowKeys/ArrowKeys";
+import { Note } from "../Note/Note";
 
 function EmptyNotes({ length }) {
   if (length === 0) return null;
@@ -45,12 +45,11 @@ export function UserStoryMap() {
                 id={e.id}
                 title={e.title}
                 type={NOTE_TYPE.EPIC}
-                isFirst={index === 0 && Object.keys(selected).length === 0}
-                selected={selected.id === e.id}
+                selected={(index === 0 && Object.keys(selected).length === 0) || selected.id === e.id}
                 toggleFocus={(value) => { setIsFocused(value) }}
                 markAsSelected={() => setSelected({ id: e.id, type: NOTE_TYPE.EPIC })}
                 updateTitle={(editedTitle) => {
-                  if (editedTitle && editedTitle !== e.title) updateEpicTitle(e.id, editedTitle);
+                  updateEpicTitle(e.id, editedTitle);
                   focus();
                 }}
                 add={() => { addNewEpic(e.id) }}
@@ -74,7 +73,7 @@ export function UserStoryMap() {
               toggleFocus={(value) => { setIsFocused(value) }}
               markAsSelected={() => setSelected({ id: f.id, epicId: f.epicId, type: NOTE_TYPE.FEATURE })}
               updateTitle={(editedTitle) => {
-                if (editedTitle && editedTitle !== f.title) updateFeatureTitle(f.id, editedTitle);
+                updateFeatureTitle(f.id, editedTitle);
                 focus();
               }}
               add={() => { addNewFeature(f.epicId, f.id) }}
@@ -99,7 +98,7 @@ export function UserStoryMap() {
                     setSelected({ id: s.id, epicId: f.epicId, featureId: s.featureId, type: NOTE_TYPE.STORY })
                   }
                   updateTitle={(editedTitle) => {
-                    if (editedTitle && editedTitle !== s.title) updateStoryTitle(f.id, s.id, editedTitle);
+                    updateStoryTitle(f.epicId, f.id, s.id, editedTitle);
                     focus();
                   }}
                   add={() => { addNewStory(f.epicId, f.id, s.id) }}
@@ -113,7 +112,7 @@ export function UserStoryMap() {
 
       </div >
 
-      {isFocused && !isMobileOrTablet() ? <VisualArrowKeys /> : null}
+      {isFocused && !isMobileOrTablet() ? <ArrowKeys /> : null}
     </>
   )
 }
