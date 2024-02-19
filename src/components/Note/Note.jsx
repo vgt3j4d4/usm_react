@@ -124,7 +124,7 @@ export function Note({
           onBlur={stopEditing}>
           {title}
         </span>
-        <span className={editing ? 'hidden' : 'hover:cursor-text'} onClick={startEditing}>{title}</span>
+        <span className={editing ? 'hidden' : 'select-none hover:cursor-text'} onClick={startEditing}>{title}</span>
       </span>
     </div>
   )
