@@ -36,7 +36,7 @@ export function useStoryMap() {
     epicListRef, featureListRef,
     epics, features,
     setEpics, setFeatures,
-    storyMapHistoryRef, storyMapIdRef
+    storyMapHistoryRef
   } = useContext(StoriesContext);
   const {
     selected, setSelected,

@@ -112,7 +112,8 @@ export function MapButtons() {
           return { ...b, disabled: noSelection }
         case 'REMOVE':
           const isSingleEpic = epics.length === 1;
-          const isSingleFeature = features.length === 1;
+          const parentEpic = selected.type === NOTE_TYPE.FEATURE && epics.find(e => e.id === selected.epicId);
+          const isSingleFeature = features.length === 1 || (parentEpic && parentEpic.features.length === 1);
           const parentFeature = selected.type === NOTE_TYPE.STORY && features.find(f => f.id === selected.featureId);
           const isSingleStory = parentFeature && parentFeature.stories.length === 1;
           let disabled = selected.id === undefined;
