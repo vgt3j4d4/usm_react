@@ -1,23 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { ARROW_KEYS, NOTE_TYPE } from "../../const";
-import * as utils from "../../utils/utils";
+import { useNote } from "../../hooks/useNote";
+import { focusNoteById } from "../../utils/storyMapUtils";
 
 export function Note({
-  id, title, type, selected = false, isFirst = false,
+  id, title, type,
+  focusable = false, selected = false,
   toggleFocus, markAsSelected, updateTitle, add, remove, navigate
 }) {
-  const [editing, setEditing] = useState(false);
-  const titleRef = useRef(null);
-
-  useEffect(() => {
-    if (editing) {
-      const noteEl = titleRef.current;
-      if (noteEl) {
-        noteEl.focus();
-        utils.selectTextWithin(noteEl);
-      }
-    }
-  }, [editing]);
+  const { editing, setEditing, titleRef } = useNote();
 
   function focusNote(e) {
     toggleFocus(e.target !== titleRef.current);
@@ -28,6 +19,10 @@ export function Note({
     toggleFocus(false);
   }
 
+  function maybeMarkAsSelected() {
+    if (!selected) markAsSelected();
+  }
+
   function startEditing(e) {
     e.stopPropagation();
     setEditing(true);
@@ -35,7 +30,6 @@ export function Note({
   }
 
   function stopEditing(e, revert = false) {
-    e.stopPropagation();
     setEditing(false);
 
     let editedTitle;
@@ -45,7 +39,16 @@ export function Note({
     } else {
       editedTitle = titleRef.current.innerText;
     }
-    updateTitle(editedTitle);
+    if (editedTitle !== title) updateTitle(editedTitle);
+
+    if (!e.relatedTarget) { // onKeyDown
+      focusNoteById(id)
+    } else { // onBlur
+      // only refocus if e.relatedTarget is within the current note
+      if (e.relatedTarget.contains(titleRef.current)) {
+        focusNoteById(id);
+      }
+    }
   }
 
   function maybeTriggerKeyboardAction(e) {
@@ -74,7 +77,7 @@ export function Note({
     }
 
     if (Object.values(ARROW_KEYS).includes(e.key)) {
-      navigate(e.key);
+      if (!editing) navigate(e.key);
       return;
     }
   }
@@ -104,24 +107,24 @@ export function Note({
   const className = useMemo(() => getClassName(type, selected), [type, selected]);
 
   return (
-    <div role="gridcell" tabIndex={isFirst || selected ? '0' : '-1'}
+    <div role="gridcell" tabIndex={(focusable || selected) ? '0' : '-1'}
       data-note-id={id}
       className={className}
       onFocus={focusNote}
       onBlur={defocusNote}
-      onClick={markAsSelected}
+      onClick={maybeMarkAsSelected}
       onKeyDown={maybeTriggerKeyboardAction}
       aria-selected={selected}>
       <span className="note__content">
-        <span className={editing ? 'ring-0 outline-none' : 'hidden'}
+        <span className={editing ? 'outline-none' : 'hidden'}
           ref={titleRef}
           contentEditable={editing} suppressContentEditableWarning={true}
-          tabIndex={editing ? "0" : "-1"}
+          tabIndex={editing ? '0' : '-1'}
           onKeyDown={maybeTriggerKeyboardAction}
           onBlur={stopEditing}>
           {title}
         </span>
-        <span className={editing ? 'hidden' : 'hover:cursor-text'} onClick={startEditing}>{title}</span>
+        <span className={editing ? 'hidden' : 'select-none hover:cursor-text'} onClick={startEditing}>{title}</span>
       </span>
     </div>
   )

@@ -6,7 +6,7 @@ const DEFAULT_STORY = Object.freeze({ title: 'New Story' });
 const DEFAULT_FEATURE = Object.freeze({ title: 'New Feature', stories: [{ ...DEFAULT_STORY }] });
 const DEFAULT_EPIC = Object.freeze({ title: 'New Epic', features: [{ ...DEFAULT_FEATURE }] });
 
-const _storyMap = { epics: [_buildEpic()] };
+const _storyMap = { epics: [buildEpic()] };
 
 export async function getStoryDefaultMap() {
   let storyMap = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -22,10 +22,10 @@ export async function getStoryDefaultMap() {
 }
 
 export async function addEpic(_storyMapId) {
-  const epic = _buildEpic();
+  const epic = buildEpic();
   const { epics } = _storyMap;
   epics.push(epic);
-  _save();
+  save();
 
   return Promise.resolve(clone(epic));
 }
@@ -33,9 +33,9 @@ export async function addEpic(_storyMapId) {
 export async function addFeature(_storyMapId, epicId) {
   const epic = _storyMap.epics.find(e => e.id === epicId);
   if (epic) {
-    const feature = _buildFeature(epicId);
+    const feature = buildFeature(epicId);
     epic.features.push(feature);
-    _save();
+    save();
 
     return Promise.resolve(clone(feature));
   }
@@ -47,9 +47,9 @@ export async function addStory(_storyMapId, epicId, featureId) {
   if (epic) {
     const feature = epic.features.find(f => f.id === featureId);
     if (feature) {
-      const story = _buildStory(featureId);
+      const story = buildStory(epicId, featureId);
       feature.stories.push(story);
-      _save();
+      save();
 
       return Promise.resolve(clone(story));
     }
@@ -61,7 +61,7 @@ export async function removeEpic(epicId) {
   const epic = _storyMap.epics.find(e => e.id === epicId);
   if (epic) {
     _storyMap.epics = _storyMap.epics.filter(e => e.id !== epicId);
-    _save();
+    save();
     return Promise.resolve(epic);
   }
   return Promise.resolve(null);
@@ -73,7 +73,7 @@ export async function removeFeature(epicId, featureId) {
     const feature = epic.features.find(f => featureId);
     if (feature) {
       epic.features = epic.features.filter(f => f.id !== featureId);
-      _save();
+      save();
       return Promise.resolve(feature);
     }
   }
@@ -88,7 +88,7 @@ export async function removeStory(epicId, featureId, storyId) {
       const story = feature.stories.find(s => s.id === storyId);
       if (story) {
         feature.stories = feature.stories.filter(s => s.id !== storyId);
-        _save();
+        save();
         return Promise.resolve(story);
       }
     }
@@ -96,34 +96,61 @@ export async function removeStory(epicId, featureId, storyId) {
   return Promise.resolve(null);
 }
 
-function _save() {
+export async function updateEpic(epic) {
+  const { epics } = _storyMap;
+  _storyMap.epics = epics.map(e => e.id === epic.id ? { ...e, ...epic } : e);
+  save();
+  return Promise.resolve(epic.id);
+}
+
+export async function updateFeature(feature) {
+  const { epics } = _storyMap;
+  const epic = epics.find(e => e.id === feature.epicId);
+  epic.features = epic.features.map(f => f.id === feature.id ? { ...f, ...feature } : f);
+  _storyMap.epics = epics;
+  save();
+  return Promise.resolve(feature.id);
+}
+
+export async function updateStory(story) {
+  const { epics } = _storyMap;
+  const epic = epics.find(e => e.id === story.epicId);
+  const feature = epic.features.find(f => f.id === story.featureId);
+  feature.stories = feature.stories.map(s => s.id === story.id ? { ...s, ...story } : s);
+  _storyMap.epics = epics;
+  save();
+  return Promise.resolve(story.id);
+}
+
+function save() {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(_storyMap));
 }
 
-function _buildEpic() {
+function buildEpic() {
   const epicId = id();
   return {
     id: epicId,
     ...DEFAULT_EPIC,
-    features: [_buildFeature(epicId)]
+    features: [buildFeature(epicId)]
   }
 }
 
-function _buildFeature(epicId) {
+function buildFeature(epicId) {
   const featureId = id();
   return {
     id: featureId,
     epicId: epicId,
     ...DEFAULT_FEATURE,
-    stories: [_buildStory(featureId)]
+    stories: [buildStory(epicId, featureId)]
   }
 }
 
-function _buildStory(featureId) {
+function buildStory(epicId, featureId) {
   const storyId = id();
   return {
     id: storyId,
-    featureId: featureId,
+    epicId,
+    featureId,
     ...DEFAULT_STORY
   };
 }
