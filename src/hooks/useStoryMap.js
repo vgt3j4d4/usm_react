@@ -1,4 +1,7 @@
+import { useContext } from "react";
 import { ARROW_KEYS, NOTE_TYPE } from "../const";
+import { NoteContext } from "../context/NoteContext";
+import { StoriesContext } from "../context/StoriesContext";
 import * as storiesService from "../services/StoriesService";
 import { useStoryMapHistory } from "./useStoryMapHistory";
 import { useStoryMapOps } from "./useStoryMapOps";
@@ -28,13 +31,18 @@ const REDO_ACTION_MAP = Object.freeze(new Map([
   [HISTORY_ACTIONS.UPDATE_STORY_TITLE, HISTORY_ACTIONS.UPDATE_STORY_TITLE],
 ]));
 
-export function useStoryMap({
-  epicListRef, featureListRef,
-  epics, features,
-  setEpics, setFeatures,
-  storyMapHistoryRef, storyMapIdRef,
-  selected, setSelected, isFocused, setIsFocused, focus
-}) {
+export function useStoryMap() {
+  const {
+    epicListRef, featureListRef,
+    epics, features,
+    setEpics, setFeatures,
+    storyMapHistoryRef
+  } = useContext(StoriesContext);
+  const {
+    selected, setSelected,
+    isFocused, setIsFocused,
+    focus
+  } = useContext(NoteContext);
   const {
     addToHistory,
     canUndo, canRedo,
@@ -43,8 +51,10 @@ export function useStoryMap({
   } = useStoryMapHistory({ storyMapHistoryRef });
   const storyMapOps = useStoryMapOps({ epicListRef, featureListRef });
 
+  const storyMapId = storyMapHistoryRef.current;
+
   async function addNewEpic(originEpicId) {
-    const epic = await storiesService.addEpic(storyMapIdRef.current);
+    const epic = await storiesService.addEpic(storyMapId);
     if (!epic) return;
 
     const { newEpics, newFeatures } = storyMapOps.addEpic(epic, originEpicId);
@@ -54,7 +64,7 @@ export function useStoryMap({
   }
 
   async function addNewFeature(epicId, originFeatureId) {
-    const feature = await storiesService.addFeature(storyMapIdRef.current, epicId);
+    const feature = await storiesService.addFeature(storyMapId, epicId);
 
     if (feature) {
       const { newFeatures } = storyMapOps.addFeature(feature, originFeatureId);
@@ -65,7 +75,7 @@ export function useStoryMap({
   }
 
   async function addNewStory(epicId, featureId, originStoryId) {
-    const story = await storiesService.addStory(storyMapIdRef.current, epicId, featureId);
+    const story = await storiesService.addStory(storyMapId, epicId, featureId);
 
     if (story) {
       const { newFeatures } = storyMapOps.addStory(story, originStoryId);

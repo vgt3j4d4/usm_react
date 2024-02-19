@@ -1,7 +1,7 @@
 import { NAVIGATION_KEYS } from "../../const";
 import { BUTTON_NAVIGATION } from "./Toolbar";
 
-export function ActionButton({ id, button, selected = false, navigate, doAction }) {
+export function ActionButton({ id, button, selected = false, navigate, doAction, children }) {
   function focusOtherButton(e) {
     if (!NAVIGATION_KEYS.includes(e.key)) return;
     e.preventDefault();
@@ -20,6 +20,19 @@ export function ActionButton({ id, button, selected = false, navigate, doAction 
       navigate(BUTTON_NAVIGATION.PREV);
     }
   }
+
+  if (children) return (
+    <button type="button"
+      id={`toolbar__button_${id}`}
+      className="flex flex-col items-center p-1 disabled:opacity-50"
+      disabled={button.disabled}
+      tabIndex={selected ? '0' : '-1'}
+      onKeyDown={(e) => focusOtherButton(e)}
+      onClick={doAction}
+      title={button.title}>
+      {children}
+    </button>
+  );
 
   return (
     <button type="button"

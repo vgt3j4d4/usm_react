@@ -1,7 +1,4 @@
-import { useContext } from "react";
 import { NOTE_TYPE } from "../../const";
-import { NoteContext } from "../../context/NoteContext";
-import { StoriesContext } from "../../context/StoriesContext";
 import { useStoryMap } from "../../hooks/useStoryMap";
 import { isMobileOrTablet } from "../../utils/utils";
 import { ArrowKeys } from "../ArrowKeys/ArrowKeys";
@@ -17,9 +14,7 @@ export function StoryMap() {
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
     maybeNavigate,
     isFocused, setIsFocused
-  } = useStoryMap({
-    ...useContext(StoriesContext), ...useContext(NoteContext)
-  });
+  } = useStoryMap();
 
   return (
     <>
