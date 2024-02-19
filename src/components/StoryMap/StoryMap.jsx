@@ -23,7 +23,7 @@ export function StoryMap() {
 
   return (
     <>
-      <div role="grid" className="min-w-max divide-y">
+      <div role="grid" className="min-w-max divide-y-2 divide-gray-400">
 
         {/* epics */}
         <div role="row" className="p-4 flex gap-4">
