@@ -1,7 +1,5 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { NOTE_TYPE } from "../../../const";
-import { NoteContext } from "../../../context/NoteContext";
-import { StoriesContext } from "../../../context/StoriesContext";
 import { useStoryMap } from "../../../hooks/useStoryMap";
 import { isMobileOrTablet } from "../../../utils/utils";
 import { ActionButton } from "../ActionButton";
@@ -24,9 +22,7 @@ export function MapButtons() {
     doUndo, doRedo,
     selected, isFocused, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory
-  } = useStoryMap({
-    ...useContext(StoriesContext), ...useContext(NoteContext)
-  });
+  } = useStoryMap();
   const [activeIndex, setActiveIndex] = useState(0);
 
   const [buttons, activeButtons] = getToolbarButtons();
