@@ -24,7 +24,7 @@ export function useStoryMapHistory({ storyMapHistoryRef }) {
     const item = new Item();
     item.value = action;
     undoList.prepend(item);
-    if (undoList.size > MAX_HISTORY_LENGTH) undo.tail.detach();
+    if (undoList.size > MAX_HISTORY_LENGTH) undoList.tail.detach();
   }
 
   function addToRedo(action) {

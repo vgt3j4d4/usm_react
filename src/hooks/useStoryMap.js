@@ -4,7 +4,7 @@ import { NoteContext } from "../context/NoteContext";
 import { StoriesContext } from "../context/StoriesContext";
 import * as storiesService from "../services/StoriesService";
 import { HISTORY_ACTIONS, useStoryMapHistory } from "./useStoryMapHistory";
-import { useStoryMapOps } from "./useStoryMapOps";
+import { useStoryMapLists } from "./useStoryMapLists";
 
 export function useStoryMap() {
   const {
@@ -19,15 +19,15 @@ export function useStoryMap() {
     focus
   } = useContext(NoteContext);
   const history = useStoryMapHistory({ storyMapHistoryRef });
-  const storyMapOps = useStoryMapOps({ epicListRef, featureListRef });
+  const lists = useStoryMapLists({ epicListRef, featureListRef });
 
   const storyMapId = storyMapHistoryRef.current;
 
-  async function addNewEpic({ originEpicId }, addToRedo = false) {
+  async function addNewEpic(originEpicId, addToRedo = false) {
     const epic = await storiesService.addNewEpic(storyMapId);
     if (!epic) return;
 
-    const { newEpics, newFeatures } = storyMapOps.addEpic(epic, originEpicId);
+    const { newEpics, newFeatures } = lists.addEpic(epic, originEpicId);
     if (newFeatures) setFeatures(newFeatures);
     setEpics(newEpics);
 
@@ -42,7 +42,7 @@ export function useStoryMap() {
     const epicId = await storiesService.addEpic(storyMapId, epic, originEpicId);
     if (!epicId) return;
 
-    const { newEpics, newFeatures } = storyMapOps.addEpic(epic, originEpicId);
+    const { newEpics, newFeatures } = lists.addEpic(epic, originEpicId);
     if (newFeatures) setFeatures(newFeatures);
     setEpics(newEpics);
 
@@ -62,7 +62,7 @@ export function useStoryMap() {
   }
 
   function addFeature(feature, originFeatureId) {
-    const { newFeatures } = storyMapOps.addFeature(feature, originFeatureId);
+    const { newFeatures } = lists.addFeature(feature, originFeatureId);
     setFeatures(newFeatures);
   }
 
@@ -70,7 +70,7 @@ export function useStoryMap() {
     const story = await storiesService.addNewStory(storyMapId, epicId, featureId);
 
     if (story) {
-      const { newFeatures } = storyMapOps.addStory(story, originStoryId);
+      const { newFeatures } = lists.addStory(story, originStoryId);
       setFeatures(newFeatures);
       history.addToUndo({ id: HISTORY_ACTIONS.ADD_STORY, params: { story, originStoryId } });
     }
@@ -128,7 +128,7 @@ export function useStoryMap() {
     const epic = epics.find(e => e.id === epicId);
     if (!updateEpic({ ...epic, title })) return;
 
-    const { newEpics } = storyMapOps.updateEpic(epicId, { title });
+    const { newEpics } = lists.updateEpic(epicId, { title });
     setEpics(newEpics);
     history.addToUndo({ id: HISTORY_ACTIONS.UPDATE_EPIC_TITLE, params: { id: epic.id, title: epic.title } });
   }
@@ -137,7 +137,7 @@ export function useStoryMap() {
     const feature = features.find(f => f.id === featureId);
     if (!updateFeature({ ...feature, title })) return;
 
-    const { newFeatures } = storyMapOps.updateFeature(featureId, { title });
+    const { newFeatures } = lists.updateFeature(featureId, { title });
     setFeatures(newFeatures);
     history.addToUndo({ id: HISTORY_ACTIONS.removeStory, params: { id: feature.id, title: feature.title } });
   }
@@ -151,7 +151,7 @@ export function useStoryMap() {
     if (!story) return;
     if (!updateStory({ ...story, title })) return;
 
-    const { newFeatures } = storyMapOps.updateStory(featureId, storyId, { title });
+    const { newFeatures } = lists.updateStory(featureId, storyId, { title });
     setFeatures(newFeatures);
     history.addToUndo({ id: HISTORY_ACTIONS.UPDATE_STORY_TITLE, params: { id: storyId.id, featureId, title } });
   }
@@ -164,7 +164,7 @@ export function useStoryMap() {
 
     const success = await removeEpicById(epicId);
     if (success) {
-      const { newEpics, newFeatures } = storyMapOps.removeEpic(epic);
+      const { newEpics, newFeatures } = lists.removeEpic(epic);
       setEpics(newEpics);
       setFeatures(newFeatures);
       const oldIndex = epics.indexOf(epic);
@@ -188,7 +188,7 @@ export function useStoryMap() {
 
     const success = await removeFeatureById(epicId, featureId);
     if (success) {
-      const { newEpics, newFeatures } = storyMapOps.removeFeature(feature);
+      const { newEpics, newFeatures } = lists.removeFeature(feature);
       setEpics(newEpics);
       setFeatures(newFeatures);
       const oldIndex = features.indexOf(feature);
@@ -211,7 +211,7 @@ export function useStoryMap() {
 
     const success = await removeStoryById(epicId, featureId, storyId);
     if (success) {
-      const { newFeatures } = storyMapOps.removeStory(story);
+      const { newFeatures } = lists.removeStory(story);
       setFeatures(newFeatures);
       const storyToFocus = feature.stories[oldIndex] || feature.stories[oldIndex - 1];
       setSelected({ id: storyToFocus.id, featureId, epicId, type: NOTE_TYPE.STORY, focus: true });

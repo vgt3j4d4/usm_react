@@ -1,7 +1,7 @@
 import { buildItem, getDataArray } from "../utils/storyMapUtils";
 import { addItemAtIndex } from "../utils/utils";
 
-export function useStoryMapOps({ epicListRef, featureListRef }) {
+export function useStoryMapLists({ epicListRef, featureListRef }) {
 
   const epicList = epicListRef.current;
   const featureList = featureListRef.current;
@@ -17,8 +17,8 @@ export function useStoryMapOps({ epicListRef, featureListRef }) {
       const originEpicFeatureItems = featureList.toArray().filter(i => i.data.epicId === originEpicId);
       originEpicFeatureItems[originEpicFeatureItems.length - 1].append(featureItem);
     } else {
-      epicList.append(epicItem);
-      featureList.append(featureItem);
+      epicList.prepend(epicItem);
+      featureList.prepend(featureItem);
     }
 
     return {
@@ -33,7 +33,7 @@ export function useStoryMapOps({ epicListRef, featureListRef }) {
     if (originFeatureItem) {
       originFeatureItem.append(featureItem);
     } else {
-      featureList.append(featureItem);
+      featureList.prepend(featureItem);
     }
 
     const epicItem = epicList.toArray().find(i => i.data.id === feature.epicId);
