@@ -3,33 +3,8 @@ import { ARROW_KEYS, NOTE_TYPE } from "../const";
 import { NoteContext } from "../context/NoteContext";
 import { StoriesContext } from "../context/StoriesContext";
 import * as storiesService from "../services/StoriesService";
-import { useStoryMapHistory } from "./useStoryMapHistory";
+import { HISTORY_ACTIONS, useStoryMapHistory } from "./useStoryMapHistory";
 import { useStoryMapOps } from "./useStoryMapOps";
-
-const HISTORY_ACTIONS = Object.freeze({
-  ADD_EPIC: 'addEpic',
-  ADD_FEATURE: 'addFeature',
-  ADD_STORY: 'addStory',
-  REMOVE_EPIC: 'removeEpic',
-  REMOVE_FEATURE: 'removeFeature',
-  REMOVE_STORY: 'removeStory',
-  UPDATE_EPIC_TITLE: 'updateEpicTitle',
-  UPDATE_FEATURE_TITLE: 'updateFeatureTitle',
-  UPDATE_STORY_TITLE: 'updateStoryTitle',
-});
-
-// eslint-disable-next-line
-const REDO_ACTION_MAP = Object.freeze(new Map([
-  [HISTORY_ACTIONS.ADD_EPIC, HISTORY_ACTIONS.REMOVE_EPIC],
-  [HISTORY_ACTIONS.ADD_FEATURE, HISTORY_ACTIONS.REMOVE_FEATURE],
-  [HISTORY_ACTIONS.ADD_STORY, HISTORY_ACTIONS.REMOVE_STORY],
-  [HISTORY_ACTIONS.REMOVE_EPIC, HISTORY_ACTIONS.ADD_EPIC],
-  [HISTORY_ACTIONS.REMOVE_FEATURE, HISTORY_ACTIONS.ADD_FEATURE],
-  [HISTORY_ACTIONS.REMOVE_STORY, HISTORY_ACTIONS.ADD_STORY],
-  [HISTORY_ACTIONS.UPDATE_EPIC_TITLE, HISTORY_ACTIONS.UPDATE_EPIC_TITLE],
-  [HISTORY_ACTIONS.UPDATE_FEATURE_TITLE, HISTORY_ACTIONS.UPDATE_FEATURE_TITLE],
-  [HISTORY_ACTIONS.UPDATE_STORY_TITLE, HISTORY_ACTIONS.UPDATE_STORY_TITLE],
-]));
 
 export function useStoryMap() {
   const {
@@ -43,44 +18,61 @@ export function useStoryMap() {
     isFocused, setIsFocused,
     focus
   } = useContext(NoteContext);
-  const {
-    addToHistory,
-    canUndo, canRedo,
-    getUndoItem, getRedoItem,
-    undo, redo
-  } = useStoryMapHistory({ storyMapHistoryRef });
+  const history = useStoryMapHistory({ storyMapHistoryRef });
   const storyMapOps = useStoryMapOps({ epicListRef, featureListRef });
 
   const storyMapId = storyMapHistoryRef.current;
 
-  async function addNewEpic(originEpicId) {
-    const epic = await storiesService.addEpic(storyMapId);
+  async function addNewEpic({ originEpicId }, addToRedo = false) {
+    const epic = await storiesService.addNewEpic(storyMapId);
     if (!epic) return;
 
     const { newEpics, newFeatures } = storyMapOps.addEpic(epic, originEpicId);
     if (newFeatures) setFeatures(newFeatures);
     setEpics(newEpics);
-    addToHistory({ id: HISTORY_ACTIONS.ADD_EPIC, params: { epic, originEpicId } });
-  }
 
-  async function addNewFeature(epicId, originFeatureId) {
-    const feature = await storiesService.addFeature(storyMapId, epicId);
-
-    if (feature) {
-      const { newFeatures } = storyMapOps.addFeature(feature, originFeatureId);
-      // TODO: should I call setEpics too?
-      setFeatures(newFeatures);
-      addToHistory({ id: HISTORY_ACTIONS.ADD_FEATURE, params: { feature, originFeatureId } });
+    if (addToRedo) {
+      history.addToRedo({ id: HISTORY_ACTIONS.REMOVE_EPIC, params: [epic.id] });
+    } else {
+      history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_EPIC, params: [epic.id] });
     }
   }
 
+  async function addEpic(epic, originEpicId, addToRedo = false) {
+    const epicId = await storiesService.addEpic(storyMapId, epic, originEpicId);
+    if (!epicId) return;
+
+    const { newEpics, newFeatures } = storyMapOps.addEpic(epic, originEpicId);
+    if (newFeatures) setFeatures(newFeatures);
+    setEpics(newEpics);
+
+    if (addToRedo) {
+    } else {
+      history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_EPIC, params: [epicId] });
+    }
+  }
+
+  async function addNewFeature(epicId, originFeatureId) {
+    const feature = await storiesService.addNewFeature(storyMapId, epicId);
+
+    if (feature) {
+      addFeature(feature, originFeatureId);
+      history.addToUndo({ id: HISTORY_ACTIONS.ADD_FEATURE, params: { feature, originFeatureId } });
+    }
+  }
+
+  function addFeature(feature, originFeatureId) {
+    const { newFeatures } = storyMapOps.addFeature(feature, originFeatureId);
+    setFeatures(newFeatures);
+  }
+
   async function addNewStory(epicId, featureId, originStoryId) {
-    const story = await storiesService.addStory(storyMapId, epicId, featureId);
+    const story = await storiesService.addNewStory(storyMapId, epicId, featureId);
 
     if (story) {
       const { newFeatures } = storyMapOps.addStory(story, originStoryId);
       setFeatures(newFeatures);
-      addToHistory({ id: HISTORY_ACTIONS.ADD_STORY, params: { story, originStoryId } });
+      history.addToUndo({ id: HISTORY_ACTIONS.ADD_STORY, params: { story, originStoryId } });
     }
   }
 
@@ -138,7 +130,7 @@ export function useStoryMap() {
 
     const { newEpics } = storyMapOps.updateEpic(epicId, { title });
     setEpics(newEpics);
-    addToHistory({ id: HISTORY_ACTIONS.UPDATE_EPIC_TITLE, params: { id: epic.id, title: epic.title } });
+    history.addToUndo({ id: HISTORY_ACTIONS.UPDATE_EPIC_TITLE, params: { id: epic.id, title: epic.title } });
   }
 
   function updateFeatureTitle(featureId, title) {
@@ -147,7 +139,7 @@ export function useStoryMap() {
 
     const { newFeatures } = storyMapOps.updateFeature(featureId, { title });
     setFeatures(newFeatures);
-    addToHistory({ id: HISTORY_ACTIONS.removeStory, params: { id: feature.id, title: feature.title } });
+    history.addToUndo({ id: HISTORY_ACTIONS.removeStory, params: { id: feature.id, title: feature.title } });
   }
 
   function updateStoryTitle(epicId, featureId, storyId, title) {
@@ -161,10 +153,10 @@ export function useStoryMap() {
 
     const { newFeatures } = storyMapOps.updateStory(featureId, storyId, { title });
     setFeatures(newFeatures);
-    addToHistory({ id: HISTORY_ACTIONS.UPDATE_STORY_TITLE, params: { id: storyId.id, featureId, title } });
+    history.addToUndo({ id: HISTORY_ACTIONS.UPDATE_STORY_TITLE, params: { id: storyId.id, featureId, title } });
   }
 
-  async function maybeRemoveEpic(epicId) {
+  async function maybeRemoveEpic(epicId, addToRedo = false) {
     if (epics.length === 1) return;
 
     const epic = epics.find(e => e.id === epicId);
@@ -178,7 +170,12 @@ export function useStoryMap() {
       const oldIndex = epics.indexOf(epic);
       const epicToFocus = newEpics[oldIndex] || newEpics[oldIndex - 1];
       setSelected({ id: epicToFocus.id, type: NOTE_TYPE.EPIC, focus: true });
-      addToHistory({ id: HISTORY_ACTIONS.REMOVE_EPIC, params: { epic, index: epics.indexOf(epic) } });
+
+      if (addToRedo) {
+        history.addToRedo({ id: HISTORY_ACTIONS.ADD_EPIC, params: [epic, epicToFocus.id] });
+      } else {
+        history.addToUndo({ id: HISTORY_ACTIONS.ADD_EPIC, params: [epic, epicToFocus.id] });
+      }
     }
   }
 
@@ -197,7 +194,7 @@ export function useStoryMap() {
       const oldIndex = features.indexOf(feature);
       let featureToFocus = newFeatures[oldIndex] || newFeatures[oldIndex - 1];
       setSelected({ id: featureToFocus.id, epicId, type: NOTE_TYPE.FEATURE, focus: true });
-      addToHistory({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: { feature, index: features.indexOf(feature) } });
+      history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: { feature, index: features.indexOf(feature) } });
     }
   }
 
@@ -218,7 +215,7 @@ export function useStoryMap() {
       setFeatures(newFeatures);
       const storyToFocus = feature.stories[oldIndex] || feature.stories[oldIndex - 1];
       setSelected({ id: storyToFocus.id, featureId, epicId, type: NOTE_TYPE.STORY, focus: true });
-      addToHistory({ id: HISTORY_ACTIONS.REMOVE_STORY, params: { story, index: feature.stories.indexOf(story) } });
+      history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_STORY, params: { story, index: feature.stories.indexOf(story) } });
     }
   }
 
@@ -356,45 +353,38 @@ export function useStoryMap() {
     }
   }
 
-  // eslint-disable-next-line
-  function getActionById(actionId) {
+  function getFnById(actionId) {
+    const noop = () => { };
+
     switch (actionId) {
+      case HISTORY_ACTIONS.ADD_NEW_EPIC:
+        return addNewEpic;
       case HISTORY_ACTIONS.ADD_EPIC:
-        return storyMapOps.addEpic;
-      case HISTORY_ACTIONS.ADD_FEATURE:
-        return storyMapOps.addFeature;
-      case HISTORY_ACTIONS.ADD_STORY:
-        return storyMapOps.addStory;
+        return addEpic;
       case HISTORY_ACTIONS.REMOVE_EPIC:
-        return storyMapOps.removeEpic;
-      case HISTORY_ACTIONS.REMOVE_FEATURE:
-        return storyMapOps.updateFeature;
-      case HISTORY_ACTIONS.REMOVE_STORY:
-        return storyMapOps.removeStory;
-      case HISTORY_ACTIONS.UPDATE_EPIC_TITLE:
-        return updateEpicTitle;
-      case HISTORY_ACTIONS.UPDATE_FEATURE_TITLE:
-        return updateFeatureTitle;
-      case HISTORY_ACTIONS.UPDATE_STORY_TITLE:
-        return updateStoryTitle;
-      default: return null;
+        return maybeRemoveEpic;
+      default:
+        // TODO: maybe log something?
+        return noop;
     }
   }
 
-  function doUndo() {
-    const item = getUndoItem();
+  function undo() {
+    if (!history.canUndo()) return;
 
-    // TODO: actually undo the item.action
-
-    undo(item);
+    const { id, params } = history.getUndo();
+    const undoFn = getFnById(id);
+    undoFn.apply(this, [...params, true]);
+    history.undo();
   }
 
-  function doRedo() {
-    const item = getRedoItem();
+  function redo() {
+    if (!history.canRedo()) return;
 
-    // TODO: actually redo the item.action
-
-    redo(item);
+    const { id, params } = history.getRedo();
+    const redoFn = getFnById(id);
+    redoFn.apply(this, params);
+    history.redo();
   }
 
   return {
@@ -405,7 +395,7 @@ export function useStoryMap() {
     maybeNavigate,
     selected, setSelected, focus,
     isFocused, setIsFocused,
-    canUndo, canRedo,
-    doUndo, doRedo,
+    canUndo: history.canUndo, canRedo: history.canRedo,
+    undo, redo,
   }
 };

@@ -1,4 +1,5 @@
 import { id, clone } from "../utils/utils";
+import { addItemAtIndex } from "../utils/utils";
 
 const LOCAL_STORAGE_KEY = 'STORY_MAP';
 
@@ -21,7 +22,7 @@ export async function getStoryDefaultMap() {
   return Promise.resolve(clone(storyMap));
 }
 
-export async function addEpic(_storyMapId) {
+export async function addNewEpic(_storyMapId) {
   const epic = buildEpic();
   const { epics } = _storyMap;
   epics.push(epic);
@@ -30,7 +31,7 @@ export async function addEpic(_storyMapId) {
   return Promise.resolve(clone(epic));
 }
 
-export async function addFeature(_storyMapId, epicId) {
+export async function addNewFeature(_storyMapId, epicId) {
   const epic = _storyMap.epics.find(e => e.id === epicId);
   if (epic) {
     const feature = buildFeature(epicId);
@@ -42,7 +43,7 @@ export async function addFeature(_storyMapId, epicId) {
   return Promise.resolve(null);
 }
 
-export async function addStory(_storyMapId, epicId, featureId) {
+export async function addNewStory(_storyMapId, epicId, featureId) {
   const epic = _storyMap.epics.find(e => e.id === epicId);
   if (epic) {
     const feature = epic.features.find(f => f.id === featureId);
@@ -94,6 +95,13 @@ export async function removeStory(epicId, featureId, storyId) {
     }
   }
   return Promise.resolve(null);
+}
+
+export async function addEpic(_storyMapId, epic, originEpicId) {
+  const { epics } = _storyMap;
+  _storyMap.epics = addItemAtIndex(epics, epic, epics.indexOf(originEpicId) + 1);
+  save();
+  return Promise.resolve(epic.id);
 }
 
 export async function updateEpic(epic) {

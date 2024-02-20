@@ -10,7 +10,7 @@ export default function StoriesProvider({ children }) {
   const epicListRef = useRef(new List()); // parallel double linked list to epics
   const [features, setFeatures] = useState([]);
   const featureListRef = useRef(new List()); // parallel double linked list to features
-  const storyMapHistoryRef = useRef({ undo: new List(), redo: new List() });
+  const storyMapHistoryRef = useRef({ undoList: new List(), redoList: new List() });
   const storyMapIdRef = useRef(null);
 
   useEffect(() => {

@@ -2,55 +2,79 @@ import { Item } from "linked-list";
 
 const MAX_HISTORY_LENGTH = 10;
 
-export function useStoryMapHistory({ storyMapHistoryRef }) {
+export const HISTORY_ACTIONS = Object.freeze({
+  ADD_NEW_EPIC: 'addNewEpic',
+  ADD_NEW_FEATURE: 'addNewFeature',
+  ADD_NEW_STORY: 'addNewStory',
+  ADD_EPIC: 'addEpic',
+  ADD_FEATURE: 'addFeature',
+  ADD_STORY: 'addStory',
+  REMOVE_EPIC: 'removeEpic',
+  REMOVE_FEATURE: 'removeFeature',
+  REMOVE_STORY: 'removeStory',
+  UPDATE_EPIC_TITLE: 'updateEpicTitle',
+  UPDATE_FEATURE_TITLE: 'updateFeatureTitle',
+  UPDATE_STORY_TITLE: 'updateStoryTitle',
+});
 
-  function addToHistory(action) {
-    const { undo } = storyMapHistoryRef.current;
+export function useStoryMapHistory({ storyMapHistoryRef }) {
+  const { undoList, redoList } = storyMapHistoryRef.current;
+
+  function addToUndo(action) {
     const item = new Item();
     item.value = action;
+    undoList.prepend(item);
+    if (undoList.size > MAX_HISTORY_LENGTH) undo.tail.detach();
+  }
 
-    undo.prepend(item);
-    if (undo.size > MAX_HISTORY_LENGTH) undo.tail.detach();
+  function addToRedo(action) {
+    const item = new Item();
+    item.value = action;
+    redoList.prepend(item);
   }
 
   function canUndo() {
-    const { undo } = storyMapHistoryRef.current;
-    return undo.size > 0;
+    return undoList.size > 0;
   }
 
   function canRedo() {
-    const { redo } = storyMapHistoryRef.current;
-    return redo.size > 0;
+    return redoList.size > 0;
   }
 
   function getUndoItem() {
-    const { undo } = storyMapHistoryRef.current;
-    return undo.head;
+    return undoList.head;
   }
 
   function getRedoItem() {
-    const { redo } = storyMapHistoryRef.current;
-    return redo.head;
+    return redoList.head;
   }
 
-  function undo(item) {
-    if (!canUndo()) return;
-    const { redo } = storyMapHistoryRef.current;
-    item.detach();
-    redo.prepend(item);
+  function getUndo() {
+    const item = getUndoItem();
+    const { value } = item;
+    return value;
   }
 
-  function redo(item) {
-    if (!canRedo()) return;
-    const { undo } = storyMapHistoryRef.current;
+  function getRedo() {
+    const item = getRedoItem();
+    const { value } = item;
+    return value;
+  }
+
+  function undo() {
+    const item = getUndoItem();
     item.detach();
-    undo.prepend(item);
+  }
+
+  function redo() {
+    const item = getRedoItem();
+    item.detach();
   }
 
   return {
-    addToHistory,
+    addToUndo, addToRedo,
     canUndo, canRedo,
-    getUndoItem, getRedoItem,
+    getUndo, getRedo,
     undo, redo,
   }
 }

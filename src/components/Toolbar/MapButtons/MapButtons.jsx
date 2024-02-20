@@ -19,7 +19,7 @@ export function MapButtons() {
     epics, features,
     addNewEpic, addNewFeature, addNewStory,
     canUndo, canRedo,
-    doUndo, doRedo,
+    undo, redo,
     selected, isFocused, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory
   } = useStoryMap();
@@ -141,9 +141,9 @@ export function MapButtons() {
         case 'REMOVE':
           return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={removeNote} />
         case 'UNDO':
-          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={doUndo} />
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={undo} />
         case 'REDO':
-          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={doRedo} />
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={redo} />
         default:
           return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={() => { }} />;
         // return null;
