@@ -62,13 +62,11 @@ export function useStoryMapHistory({ storyMapHistoryRef }) {
   }
 
   function undo() {
-    const item = getUndoItem();
-    item.detach();
+    getUndoItem().detach();
   }
 
   function redo() {
-    const item = getRedoItem();
-    item.detach();
+    getRedoItem().detach();
   }
 
   return {

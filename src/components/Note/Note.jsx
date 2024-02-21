@@ -42,7 +42,7 @@ export function Note({
     if (editedTitle !== title) updateTitle(editedTitle);
 
     if (!e.relatedTarget) { // onKeyDown
-      focusNoteById(id)
+      focusNoteById(id);
     } else { // onBlur
       // only refocus if e.relatedTarget is within the current note
       if (e.relatedTarget.contains(titleRef.current)) {
@@ -54,31 +54,31 @@ export function Note({
   function maybeTriggerKeyboardAction(e) {
     if (!e || !e.key) return;
 
-    if (editing) {
-      if (e.key === 'Enter' || e.key === 'Escape' || e.key === 'Tab') {
-        e.preventDefault();
-        stopEditing(e, e.key === 'Escape');
-        return;
-      }
-    } else {
-      if (e.key === 'F2') {
-        e.preventDefault();
-        startEditing(e);
-        return;
-      }
-      if (e.key === '+') {
-        add();
-        return;
-      }
-      if (e.key === 'Delete') {
-        remove();
-        return;
-      }
+    if (e.key === 'F2') {
+      startEditing(e);
+      return;
+    }
+    if (e.key === '+') {
+      add();
+      return;
+    }
+    if (e.key === 'Delete') {
+      remove();
+      return;
     }
 
     if (Object.values(ARROW_KEYS).includes(e.key)) {
       if (!editing) navigate(e.key);
       return;
+    }
+  }
+
+  function maybeTriggerTitleKeyboardAction(e) {
+    if (!e || !e.key) return;
+
+    if (e.key === 'Enter' || e.key === 'Escape' || e.key === 'Tab') {
+      e.preventDefault();
+      stopEditing(e, e.key === 'Escape');
     }
   }
 
@@ -120,7 +120,7 @@ export function Note({
           ref={titleRef}
           contentEditable={editing} suppressContentEditableWarning={true}
           tabIndex={editing ? '0' : '-1'}
-          onKeyDown={maybeTriggerKeyboardAction}
+          onKeyDown={maybeTriggerTitleKeyboardAction}
           onBlur={stopEditing}>
           {title}
         </span>

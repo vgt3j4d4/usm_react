@@ -104,6 +104,26 @@ export async function addEpic(_storyMapId, epic, originEpicId) {
   return Promise.resolve(epic.id);
 }
 
+export async function addFeature(_storyMapId, feature, originFeatureId) {
+  const { epics } = _storyMap;
+  const epic = epics.find(e => e.id === feature.epicId);
+  epic.features = addItemAtIndex(epic.features, feature, epic.features.indexOf(originFeatureId) + 1);
+  _storyMap.epics = epics;
+  save();
+  return Promise.resolve(feature.id);
+}
+
+export async function addStory(_storyMapId, story, originStoryId) {
+  const { epics } = _storyMap;
+  const epic = epics.find(e => e.id === story.epicId);
+  const feature = epic.features.find(f => f.id === story.featureId);
+  feature.stories = addItemAtIndex(feature.stories, story, feature.stories.indexOf(originStoryId) + 1);
+  _storyMap.epics = epics;
+  save();
+  return Promise.resolve(story.id);
+
+}
+
 export async function updateEpic(epic) {
   const { epics } = _storyMap;
   _storyMap.epics = epics.map(e => e.id === epic.id ? { ...e, ...epic } : e);
