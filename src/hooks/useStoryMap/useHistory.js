@@ -17,7 +17,7 @@ export const HISTORY_ACTIONS = Object.freeze({
   UPDATE_STORY_TITLE: 'updateStoryTitle',
 });
 
-export function useStoryMapHistory({ storyMapHistoryRef }) {
+export function useHistory({ storyMapHistoryRef }) {
   const { undoList, redoList } = storyMapHistoryRef.current;
 
   function addToUndo(action) {
@@ -49,24 +49,39 @@ export function useStoryMapHistory({ storyMapHistoryRef }) {
     return redoList.head;
   }
 
+  function getItemValue(list) {
+    const item = list.head;
+    if (!item) {
+      console.error('List is empty');
+      return null;
+    }
+    return item.value;
+  }
+
   function getUndo() {
-    const item = getUndoItem();
-    const { value } = item;
-    return value;
+    return getItemValue(undoList);
   }
 
   function getRedo() {
-    const item = getRedoItem();
-    const { value } = item;
-    return value;
+    return getItemValue(redoList);
   }
 
   function undo() {
-    getUndoItem().detach();
+    const item = getUndoItem();
+    if (!item) {
+      console.error('Undo list is empty');
+      return;
+    }
+    item.detach();
   }
 
   function redo() {
-    getRedoItem().detach();
+    const item = getRedoItem();
+    if (!item) {
+      console.error('Redo list is empty');
+      return;
+    }
+    item.detach();
   }
 
   return {

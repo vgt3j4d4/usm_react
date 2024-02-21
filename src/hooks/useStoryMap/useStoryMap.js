@@ -1,11 +1,11 @@
 import { useContext } from "react";
-import { NOTE_TYPE } from "../const";
-import { NoteContext } from "../context/NoteContext";
-import { StoriesContext } from "../context/StoriesContext";
-import * as storiesService from "../services/StoriesService";
-import { HISTORY_ACTIONS, useStoryMapHistory } from "./useStoryMapHistory";
-import { useStoryMapLists } from "./useStoryMapLists";
-import { useStoryMapNavigation } from "./useStoryMapNavigation";
+import { NOTE_TYPE } from "../../const";
+import { NoteContext } from "../../context/NoteContext";
+import { StoriesContext } from "../../context/StoriesContext";
+import * as storiesService from "../../services/StoriesService";
+import { HISTORY_ACTIONS, useHistory } from "./useHistory";
+import { useLists } from "./useLists";
+import { useNavigation } from "./useNavigation";
 
 export function useStoryMap() {
   const {
@@ -19,9 +19,9 @@ export function useStoryMap() {
     isFocused, setIsFocused,
     focus
   } = useContext(NoteContext);
-  const history = useStoryMapHistory({ storyMapHistoryRef });
-  const lists = useStoryMapLists({ epicListRef, featureListRef });
-  const { maybeNavigate } = useStoryMapNavigation({ epics, features, selected, setSelected });
+  const history = useHistory({ storyMapHistoryRef });
+  const lists = useLists({ epicListRef, featureListRef });
+  const { maybeNavigate } = useNavigation({ epics, features, selected, setSelected });
 
   const storyMapId = storyMapHistoryRef.current;
 
@@ -243,8 +243,10 @@ export function useStoryMap() {
         return updateFeatureTitle;
       case HISTORY_ACTIONS.UPDATE_STORY_TITLE:
         return updateStoryTitle;
+      case HISTORY_ACTIONS.ADD_STORY:
+        return addStory;
       default:
-        // TODO: maybe log something?
+        console.log('Unknown actionId', actionId);
         return noop;
     }
   }

@@ -1,6 +1,6 @@
-import { ARROW_KEYS, NOTE_TYPE } from "../const";
+import { ARROW_KEYS, NOTE_TYPE } from "../../const";
 
-export function useStoryMapNavigation({ epics, features, selected, setSelected }) {
+export function useNavigation({ epics, features, selected, setSelected }) {
 
   function maybeNavigate(arrowKey) {
     let epic, feature, story;

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NOTE_TYPE } from "../../../const";
-import { useStoryMap } from "../../../hooks/useStoryMap";
+import { useStoryMap } from "../../../hooks/useStoryMap/useStoryMap";
 import { isMobileOrTablet } from "../../../utils/utils";
 import { ActionButton } from "../ActionButton";
 import { BUTTON_NAVIGATION } from "../Toolbar";

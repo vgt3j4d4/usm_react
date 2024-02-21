@@ -1,7 +1,7 @@
-import { buildItem, getDataArray } from "../utils/storyMapUtils";
-import { addItemAtIndex } from "../utils/utils";
+import { buildItem, getDataArray } from "../../utils/storyMapUtils";
+import { addItemAtIndex } from "../../utils/utils";
 
-export function useStoryMapLists({ epicListRef, featureListRef }) {
+export function useLists({ epicListRef, featureListRef }) {
 
   const epicList = epicListRef.current;
   const featureList = featureListRef.current;

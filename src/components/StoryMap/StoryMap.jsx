@@ -1,5 +1,5 @@
 import { NOTE_TYPE } from "../../const";
-import { useStoryMap } from "../../hooks/useStoryMap";
+import { useStoryMap } from "../../hooks/useStoryMap/useStoryMap";
 import { isMobileOrTablet } from "../../utils/utils";
 import { ArrowKeys } from "../ArrowKeys/ArrowKeys";
 import { EmptyNotes } from "../EmptyNotes/EmptyNotes";
