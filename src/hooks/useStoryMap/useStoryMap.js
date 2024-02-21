@@ -57,14 +57,16 @@ export function useStoryMap() {
 
   async function addNewFeature(epicId, originFeatureId, addToRedo = false) {
     const feature = await storiesService.addNewFeature(storyMapId, epicId);
+    if (!feature) return;
 
     if (feature) {
-      addFeature(feature, originFeatureId);
+      const { newFeatures } = lists.addFeature(feature, originFeatureId);
+      setFeatures(newFeatures);
 
       if (addToRedo) {
         history.addToRedo({ id: HISTORY_ACTIONS.ADD_FEATURE, params: [feature, originFeatureId] });
       } else {
-        history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: [epicId, feature.id] });
+        history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: [feature.epicId, feature.id] });
       }
     }
   }
@@ -85,19 +87,19 @@ export function useStoryMap() {
 
   async function addNewStory(epicId, featureId, originStoryId, addToRedo = false) {
     const story = await storiesService.addNewStory(storyMapId, epicId, featureId);
+    if (!story) return;
 
-    if (story) {
-      const { newFeatures } = lists.addStory(story, originStoryId);
-      setFeatures(newFeatures);
+    const { newFeatures } = lists.addStory(story, originStoryId);
+    setFeatures(newFeatures);
 
-      if (addToRedo) {
-        history.addToRedo({ id: HISTORY_ACTIONS.ADD_STORY, params: [epicId, featureId, originStoryId] });
-      } else {
-        history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_STORY, params: [epicId, featureId, story.id] });
-      }
+    if (addToRedo) {
+      history.addToRedo({ id: HISTORY_ACTIONS.ADD_STORY, params: [epicId, featureId, originStoryId] });
+    } else {
+      history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_STORY, params: [epicId, featureId, story.id] });
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   async function addStory(story, originStoryId, addToRedo = false) {
     const storyId = await storiesService.addStory(storyMapId, story, originStoryId);
     if (!storyId) return;
@@ -243,6 +245,8 @@ export function useStoryMap() {
         return updateFeatureTitle;
       case HISTORY_ACTIONS.UPDATE_STORY_TITLE:
         return updateStoryTitle;
+      case HISTORY_ACTIONS.ADD_FEATURE:
+        return addFeature;
       case HISTORY_ACTIONS.ADD_STORY:
         return addStory;
       default:
