@@ -13,8 +13,9 @@ export const BUTTON_NAVIGATION = Object.freeze({
 });
 
 const NAV_BUTTONS = [
-  { id: 1, label: 'Map', iconCls: 'fa-map', route: ROUTES.MAPPING },
-  { id: 2, label: 'Iterations', iconCls: 'fa-stairs', route: ROUTES.ITERATIONS }
+  { id: 1, label: 'Roles', iconCls: 'fa-users', route: ROUTES.ROLES },
+  { id: 2, label: 'Map', iconCls: 'fa-map', route: ROUTES.MAPPING },
+  { id: 3, label: 'Iterations', iconCls: 'fa-stairs', route: ROUTES.ITERATIONS }
 ];
 
 export function Toolbar() {
