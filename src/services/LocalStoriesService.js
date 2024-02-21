@@ -99,7 +99,9 @@ export async function removeStory(epicId, featureId, storyId) {
 
 export async function addEpic(_storyMapId, epic, originEpicId) {
   const { epics } = _storyMap;
-  _storyMap.epics = addItemAtIndex(epics, epic, epics.indexOf(originEpicId) + 1);
+  const originEpic = epics.find(e => e.id === originEpicId);
+  const index = epics.indexOf(originEpic);
+  _storyMap.epics = addItemAtIndex(epics, epic, index + 1);
   save();
   return Promise.resolve(epic.id);
 }
@@ -107,7 +109,9 @@ export async function addEpic(_storyMapId, epic, originEpicId) {
 export async function addFeature(_storyMapId, feature, originFeatureId) {
   const { epics } = _storyMap;
   const epic = epics.find(e => e.id === feature.epicId);
-  epic.features = addItemAtIndex(epic.features, feature, epic.features.indexOf(originFeatureId) + 1);
+  const originFeature = epic.features.find(f => f.id === originFeatureId);
+  const index = epic.features.indexOf(originFeature);
+  epic.features = addItemAtIndex(epic.features, feature, index + 1);
   _storyMap.epics = epics;
   save();
   return Promise.resolve(feature.id);
@@ -117,7 +121,9 @@ export async function addStory(_storyMapId, story, originStoryId) {
   const { epics } = _storyMap;
   const epic = epics.find(e => e.id === story.epicId);
   const feature = epic.features.find(f => f.id === story.featureId);
-  feature.stories = addItemAtIndex(feature.stories, story, feature.stories.indexOf(originStoryId) + 1);
+  const originStory = feature.stories.find(s => s.id === originStoryId);
+  const index = feature.stories.indexOf(originStory);
+  feature.stories = addItemAtIndex(feature.stories, story, index + 1);
   _storyMap.epics = epics;
   save();
   return Promise.resolve(story.id);

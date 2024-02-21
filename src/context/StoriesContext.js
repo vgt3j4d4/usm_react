@@ -1,6 +1,6 @@
 import { List } from "linked-list";
 import { createContext, useEffect, useRef, useState } from "react";
-import * as storiesService from "../services/StoriesService";
+import * as storiesService from "../services/LocalStoriesService";
 import { buildItem, getFeatures } from "../utils/storyMapUtils";
 
 export const StoriesContext = createContext();

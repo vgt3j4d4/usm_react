@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { NOTE_TYPE } from "../../const";
 import { NoteContext } from "../../context/NoteContext";
 import { StoriesContext } from "../../context/StoriesContext";
-import * as storiesService from "../../services/StoriesService";
+import * as storiesService from "../../services/LocalStoriesService";
 import { HISTORY_ACTIONS, useHistory } from "./useHistory";
 import { useLists } from "./useLists";
 import { useNavigation } from "./useNavigation";
@@ -179,7 +179,9 @@ export function useStoryMap() {
     if (addToRedo) {
       history.addToRedo({ id: HISTORY_ACTIONS.ADD_EPIC, params: [epic, epicToFocus.id] });
     } else {
-      history.addToUndo({ id: HISTORY_ACTIONS.ADD_EPIC, params: [epic, epicToFocus.id] });
+      const epicToFocusIndex = newEpics.indexOf(epicToFocus);
+      const redoOriginEpicId = (epics[epicToFocusIndex - 1] || {}).id;
+      history.addToUndo({ id: HISTORY_ACTIONS.ADD_EPIC, params: [epic, redoOriginEpicId] });
     }
   }
 
@@ -201,7 +203,10 @@ export function useStoryMap() {
     if (addToRedo) {
       history.addToRedo({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: [epicId, featureId] });
     } else {
-      history.addToUndo({ id: HISTORY_ACTIONS.ADD_FEATURE, params: [feature, features.indexOf(feature)] });
+      // TODO: check if the following logic to calculate the originFeatureId is correct
+      const featureToFocusIndex = features.indexOf(featureToFocus);
+      const redoOriginFeatureId = (epics[featureToFocusIndex - 1] || {}).id;
+      history.addToUndo({ id: HISTORY_ACTIONS.ADD_FEATURE, params: [feature, redoOriginFeatureId] });
     }
   }
 
@@ -225,6 +230,7 @@ export function useStoryMap() {
     if (addToRedo) {
       history.addToRedo({ id: HISTORY_ACTIONS.REMOVE_STORY, params: [epicId, featureId, storyId] });
     } else {
+      // TODO: calculate the originStoryId for the next line
       history.addToUndo({ id: HISTORY_ACTIONS.ADD_STORY, params: [story, storyToFocus.id] });
     }
   }
