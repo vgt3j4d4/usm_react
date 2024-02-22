@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { selectTextWithin } from "../utils/utils";
 
-export function useNote() {
+export function useNote(defaultEditing = false) {
 
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(defaultEditing);
   const titleRef = useRef(null);
 
   useEffect(() => {

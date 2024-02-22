@@ -48,12 +48,12 @@ export function useLists({ epicListRef, featureListRef }) {
   function addStory(story, originStoryId) {
     const featureItem = featureList.toArray().find(i => i.data.id === story.featureId);
     const feature = featureItem.data;
-    if (originStoryId && feature.stories.length > 1) {
+    if (originStoryId) {
       const originStory = feature.stories.find(s => s.id === originStoryId);
       const index = feature.stories.indexOf(originStory);
       feature.stories = addItemAtIndex([...feature.stories], story, index + 1);
     } else {
-      feature.stories.push(story);
+      feature.stories = [story, ...feature.stories];
     }
 
     return {

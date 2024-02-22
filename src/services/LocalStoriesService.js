@@ -121,9 +121,13 @@ export async function addStory(_storyMapId, story, originStoryId) {
   const { epics } = _storyMap;
   const epic = epics.find(e => e.id === story.epicId);
   const feature = epic.features.find(f => f.id === story.featureId);
-  const originStory = feature.stories.find(s => s.id === originStoryId);
-  const index = feature.stories.indexOf(originStory);
-  feature.stories = addItemAtIndex(feature.stories, story, index + 1);
+  if (originStoryId) {
+    const originStory = feature.stories.find(s => s.id === originStoryId);
+    const index = feature.stories.indexOf(originStory);
+    feature.stories = addItemAtIndex(feature.stories, story, index + 1);
+  } else {
+    feature.stories = [story, ...feature.stories];
+  }
   _storyMap.epics = epics;
   save();
   return Promise.resolve(story.id);

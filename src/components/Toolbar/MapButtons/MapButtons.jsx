@@ -98,6 +98,16 @@ export function MapButtons() {
     }
   }
 
+  function doUndo() {
+    undo();
+    focus();
+  }
+
+  function doRedo() {
+    redo();
+    focus();
+  }
+
   function getToolbarButtons() {
     const noSelection = selected.id === undefined;
     const buttons = TOOLBAR_BUTTONS.map(b => {
@@ -141,9 +151,9 @@ export function MapButtons() {
         case 'REMOVE':
           return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={removeNote} />
         case 'UNDO':
-          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={undo} />
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={doUndo} />
         case 'REDO':
-          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={redo} />
+          return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={doRedo} />
         default:
           return <ActionButton key={b.id} id={index} button={b} selected={isActive} navigate={navigate} doAction={() => { }} />;
         // return null;

@@ -17,6 +17,12 @@ export const HISTORY_ACTIONS = Object.freeze({
   UPDATE_STORY_TITLE: 'updateStoryTitle',
 });
 
+export const HISTORY_OPERATION = Object.freeze({
+  NONE: 'none',
+  UNDO: 'undo',
+  REDO: 'redo',
+});
+
 export function useHistory({ storyMapHistoryRef }) {
   const { undoList, redoList } = storyMapHistoryRef.current;
 
