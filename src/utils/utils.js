@@ -19,13 +19,23 @@ export function selectTextWithin(textEl) {
   }
 }
 
+/**
+ * Clones an object by deep copying it using JSON.stringify and JSON.parse.
+ * 
+ * @param {any} object - The object to be cloned.
+ * @returns {any} - The cloned object.
+ */
 export function clone(object) {
   return JSON.parse(JSON.stringify(object));
 }
 
 export function addItemAtIndex(array = [], item, index = 0) {
-  array.splice(index, 0, item);
-  return array;
+  if (index === 0) {
+    return [item, ...array];
+  } else {
+    array.splice(index, 0, item);
+    return array;
+  }
 }
 
 export function isMobileOrTablet() {
