@@ -1,167 +1,27 @@
-import { id, clone } from "../utils/utils";
-import { addItemAtIndex } from "../utils/utils";
+import { DEFAULT_EPIC, DEFAULT_FEATURE, DEFAULT_STORY, VERSION } from "../const";
+import { addItemAtIndex, clone, id } from "../utils/utils";
 
-const LOCAL_STORAGE_KEY = 'STORY_MAP';
+const LOCAL_STORAGE_KEY = 'USM_' + VERSION;
 
-const DEFAULT_STORY = Object.freeze({ title: 'New Story' });
-const DEFAULT_FEATURE = Object.freeze({ title: 'New Feature', stories: [{ ...DEFAULT_STORY }] });
-const DEFAULT_EPIC = Object.freeze({ title: 'New Epic', features: [{ ...DEFAULT_FEATURE }] });
+function getDefaultStoryMap() {
+  return {
+    id: id(),
+    epics: [buildEpic()]
+  };
+}
 
-const _storyMap = { epics: [buildEpic()] };
+function getDataFromLocalStorage() {
+  const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+  return storedData ? JSON.parse(storedData) : null;
+}
 
-export async function getStoryDefaultMap() {
-  let storyMap = localStorage.getItem(LOCAL_STORAGE_KEY);
-
-  if (storyMap) {
-    storyMap = JSON.parse(storyMap);
-    _storyMap.epics = storyMap.epics;
+function saveOrUpdate(data) {
+  const storedData = getDataFromLocalStorage();
+  if (storedData) {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ ...storedData, ...data }));
   } else {
-    storyMap = { ..._storyMap };
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
   }
-
-  return Promise.resolve(clone(storyMap));
-}
-
-export async function addNewEpic(_storyMapId) {
-  const epic = buildEpic();
-  const { epics } = _storyMap;
-  epics.push(epic);
-  save();
-
-  return Promise.resolve(clone(epic));
-}
-
-export async function addNewFeature(_storyMapId, epicId) {
-  const epic = _storyMap.epics.find(e => e.id === epicId);
-  if (epic) {
-    const feature = buildFeature(epicId);
-    epic.features.push(feature);
-    save();
-
-    return Promise.resolve(clone(feature));
-  }
-  return Promise.resolve(null);
-}
-
-export async function addNewStory(_storyMapId, epicId, featureId) {
-  const epic = _storyMap.epics.find(e => e.id === epicId);
-  if (epic) {
-    const feature = epic.features.find(f => f.id === featureId);
-    if (feature) {
-      const story = buildStory(epicId, featureId);
-      feature.stories.push(story);
-      save();
-
-      return Promise.resolve(clone(story));
-    }
-  }
-  return Promise.resolve(null);
-}
-
-export async function removeEpic(epicId) {
-  const epic = _storyMap.epics.find(e => e.id === epicId);
-  if (epic) {
-    _storyMap.epics = _storyMap.epics.filter(e => e.id !== epicId);
-    save();
-    return Promise.resolve(epic);
-  }
-  return Promise.resolve(null);
-}
-
-export async function removeFeature(epicId, featureId) {
-  const epic = _storyMap.epics.find(e => e.id === epicId);
-  if (epic) {
-    const feature = epic.features.find(f => featureId);
-    if (feature) {
-      epic.features = epic.features.filter(f => f.id !== featureId);
-      save();
-      return Promise.resolve(feature);
-    }
-  }
-  return Promise.resolve(null);
-}
-
-export async function removeStory(epicId, featureId, storyId) {
-  const epic = _storyMap.epics.find(e => e.id === epicId);
-  if (epic) {
-    const feature = epic.features.find(f => featureId);
-    if (feature) {
-      const story = feature.stories.find(s => s.id === storyId);
-      if (story) {
-        feature.stories = feature.stories.filter(s => s.id !== storyId);
-        save();
-        return Promise.resolve(story);
-      }
-    }
-  }
-  return Promise.resolve(null);
-}
-
-export async function addEpic(_storyMapId, epic, originEpicId) {
-  const { epics } = _storyMap;
-  const originEpic = epics.find(e => e.id === originEpicId);
-  const index = epics.indexOf(originEpic);
-  _storyMap.epics = addItemAtIndex(epics, epic, index + 1);
-  save();
-  return Promise.resolve(epic.id);
-}
-
-export async function addFeature(_storyMapId, feature, originFeatureId) {
-  const { epics } = _storyMap;
-  const epic = epics.find(e => e.id === feature.epicId);
-  const originFeature = epic.features.find(f => f.id === originFeatureId);
-  const index = epic.features.indexOf(originFeature);
-  epic.features = addItemAtIndex(epic.features, feature, index + 1);
-  _storyMap.epics = epics;
-  save();
-  return Promise.resolve(feature.id);
-}
-
-export async function addStory(_storyMapId, story, originStoryId) {
-  const { epics } = _storyMap;
-  const epic = epics.find(e => e.id === story.epicId);
-  const feature = epic.features.find(f => f.id === story.featureId);
-  if (originStoryId) {
-    const originStory = feature.stories.find(s => s.id === originStoryId);
-    const index = feature.stories.indexOf(originStory);
-    feature.stories = addItemAtIndex(feature.stories, story, index + 1);
-  } else {
-    feature.stories = [story, ...feature.stories];
-  }
-  _storyMap.epics = epics;
-  save();
-  return Promise.resolve(story.id);
-
-}
-
-export async function updateEpic(epic) {
-  const { epics } = _storyMap;
-  _storyMap.epics = epics.map(e => e.id === epic.id ? { ...e, ...epic } : e);
-  save();
-  return Promise.resolve(epic.id);
-}
-
-export async function updateFeature(feature) {
-  const { epics } = _storyMap;
-  const epic = epics.find(e => e.id === feature.epicId);
-  epic.features = epic.features.map(f => f.id === feature.id ? { ...f, ...feature } : f);
-  _storyMap.epics = epics;
-  save();
-  return Promise.resolve(feature.id);
-}
-
-export async function updateStory(story) {
-  const { epics } = _storyMap;
-  const epic = epics.find(e => e.id === story.epicId);
-  const feature = epic.features.find(f => f.id === story.featureId);
-  feature.stories = feature.stories.map(s => s.id === story.id ? { ...s, ...story } : s);
-  _storyMap.epics = epics;
-  save();
-  return Promise.resolve(story.id);
-}
-
-function save() {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(_storyMap));
 }
 
 function buildEpic() {
@@ -191,4 +51,150 @@ function buildStory(epicId, featureId) {
     featureId,
     ...DEFAULT_STORY
   };
+}
+
+export function initialize() {
+  let data = getDataFromLocalStorage();
+  if (!data) {
+    data = { storyMap: getDefaultStoryMap() };
+    saveOrUpdate(data);
+  }
+}
+
+export function getStoryMap() {
+  const { storyMap } = getDataFromLocalStorage();
+  return clone(storyMap);
+}
+
+export async function addNewEpic(_storyMapId) {
+  const { storyMap } = getDataFromLocalStorage();
+  const epic = buildEpic();
+  storyMap.epics.push(epic);
+  saveOrUpdate({ storyMap });
+  return Promise.resolve(clone(epic));
+}
+
+export async function addEpic(_storyMapId, epic, originEpicId) {
+  const { storyMap } = getDataFromLocalStorage();
+  const index = storyMap.epics.findIndex(e => e.id === originEpicId);
+  storyMap.epics = addItemAtIndex(storyMap.epics, epic, index + 1);
+  saveOrUpdate({ storyMap });
+  return Promise.resolve(epic.id);
+}
+
+export async function addNewFeature(_storyMapId, epicId) {
+  const { storyMap } = getDataFromLocalStorage();
+  const epic = storyMap.epics.find(e => e.id === epicId);
+  if (epic) {
+    const feature = buildFeature(epicId);
+    epic.features.push(feature);
+    saveOrUpdate({ storyMap });
+    return Promise.resolve(clone(feature));
+  }
+  return Promise.resolve(null);
+}
+
+export async function addFeature(_storyMapId, feature, originFeatureId) {
+  const { storyMap } = getDataFromLocalStorage();
+  const epic = storyMap.epics.find(e => e.id === feature.epicId);
+  const index = epic.features.findIndex(f => f.id === originFeatureId);
+  epic.features = addItemAtIndex(epic.features, feature, index + 1);
+  saveOrUpdate({ storyMap });
+  return Promise.resolve(feature.id);
+}
+
+export async function addNewStory(_storyMapId, epicId, featureId) {
+  const { storyMap } = getDataFromLocalStorage();
+  const epic = storyMap.epics.find(e => e.id === epicId);
+  if (epic) {
+    const feature = epic.features.find(f => f.id === featureId);
+    if (feature) {
+      const story = buildStory(epicId, featureId);
+      feature.stories.push(story);
+      saveOrUpdate({ storyMap });
+      return Promise.resolve(clone(story));
+    }
+  }
+  return Promise.resolve(null);
+}
+
+export async function addStory(_storyMapId, story, originStoryId) {
+  const { storyMap } = getDataFromLocalStorage();
+  const epic = storyMap.epics.find(e => e.id === story.epicId);
+  const feature = epic.features.find(f => f.id === story.featureId);
+  if (originStoryId) {
+    const index = feature.stories.findIndex(s => s.id === originStoryId);
+    feature.stories = addItemAtIndex(feature.stories, story, index + 1);
+  } else {
+    feature.stories = [story, ...feature.stories];
+  }
+  saveOrUpdate({ storyMap });
+  return Promise.resolve(story.id);
+}
+
+export async function removeEpic(epicId) {
+  const { storyMap } = getDataFromLocalStorage();
+  const epic = storyMap.epics.find(e => e.id === epicId);
+  if (epic) {
+    storyMap.epics = storyMap.epics.filter(e => e.id !== epicId);
+    saveOrUpdate({ storyMap });
+    return Promise.resolve(clone(epic));
+  }
+  return Promise.resolve(null);
+}
+
+export async function removeFeature(epicId, featureId) {
+  const { storyMap } = getDataFromLocalStorage();
+  const epic = storyMap.epics.find(e => e.id === epicId);
+  if (epic) {
+    const feature = epic.features.find(f => f.id === featureId);
+    if (feature) {
+      epic.features = epic.features.filter(f => f.id !== featureId);
+      saveOrUpdate({ storyMap });
+      return Promise.resolve(clone(feature));
+    }
+  }
+  return Promise.resolve(null);
+}
+
+export async function removeStory(epicId, featureId, storyId) {
+  const { storyMap } = getDataFromLocalStorage();
+  const epic = storyMap.epics.find(e => e.id === epicId);
+  if (epic) {
+    const feature = epic.features.find(f => f.id === featureId);
+    if (feature) {
+      const storyIndex = feature.stories.findIndex(s => s.id === storyId);
+      const story = feature.stories[storyIndex];
+      if (storyIndex !== -1) {
+        feature.stories.splice(storyIndex, 1);
+        saveOrUpdate({ storyMap });
+        return Promise.resolve(clone(story));
+      }
+    }
+  }
+  return Promise.resolve(null);
+}
+
+export async function updateEpic(epic) {
+  const { storyMap } = getDataFromLocalStorage();
+  storyMap.epics = storyMap.epics.map(e => e.id === epic.id ? { ...e, ...epic } : e);
+  saveOrUpdate({ storyMap });
+  return Promise.resolve(epic.id);
+}
+
+export async function updateFeature(feature) {
+  const { storyMap } = getDataFromLocalStorage();
+  const epic = storyMap.epics.find(e => e.id === feature.epicId);
+  epic.features = epic.features.map(f => f.id === feature.id ? { ...f, ...feature } : f);
+  saveOrUpdate({ storyMap });
+  return Promise.resolve(feature.id);
+}
+
+export async function updateStory(story) {
+  const { storyMap } = getDataFromLocalStorage();
+  const epic = storyMap.epics.find(e => e.id === story.epicId);
+  const feature = epic.features.find(f => f.id === story.featureId);
+  feature.stories = feature.stories.map(s => s.id === story.id ? { ...s, ...story } : s);
+  saveOrUpdate({ storyMap });
+  return Promise.resolve(story.id);
 }

@@ -12,7 +12,8 @@ export function useStoryMap() {
     epicListRef, featureListRef,
     epics, features,
     setEpics, setFeatures,
-    storyMapHistoryRef
+    storyMapHistoryRef,
+    storyMapIdRef
   } = useContext(StoriesContext);
   const {
     selected, setSelected,
@@ -23,7 +24,7 @@ export function useStoryMap() {
   const lists = useLists({ epicListRef, featureListRef });
   const { maybeNavigate } = useNavigation({ epics, features, selected, setSelected });
 
-  const storyMapId = storyMapHistoryRef.current;
+  const storyMapId = storyMapIdRef.current;
 
   async function addNewEpic(originEpicId) {
     const epic = await storiesService.addNewEpic(storyMapId);
@@ -45,7 +46,6 @@ export function useStoryMap() {
 
     switch (historyOperation) {
       case HISTORY_OPERATION.UNDO:
-        // history.addToRedo({ id: HISTORY_ACTIONS.ADD_EPIC, params: [epic, originEpicId] });
         history.addToRedo({ id: HISTORY_ACTIONS.REMOVE_EPIC, params: [epicId] });
         break;
       case HISTORY_ACTIONS.REDO:
@@ -75,7 +75,6 @@ export function useStoryMap() {
 
     switch (historyOperation) {
       case HISTORY_OPERATION.UNDO:
-        // history.addToRedo({ id: HISTORY_ACTIONS.ADD_FEATURE, params: [feature, originFeatureId] });
         history.addToRedo({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: [feature.epicId, feature.id] });
         break;
       case HISTORY_ACTIONS.REDO:
@@ -94,7 +93,6 @@ export function useStoryMap() {
     history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_STORY, params: [epicId, featureId, story.id] });
   }
 
-  // eslint-disable-next-line no-unused-vars
   async function addStory(story, originStoryId, historyOperation = HISTORY_OPERATION.NONE) {
     const storyId = await storiesService.addStory(storyMapId, story, originStoryId);
     if (!storyId) return;
@@ -104,7 +102,6 @@ export function useStoryMap() {
 
     switch (historyOperation) {
       case HISTORY_OPERATION.UNDO:
-        // history.addToRedo({ id: HISTORY_ACTIONS.ADD_STORY, params: [story, originStoryId] });
         history.addToRedo({ id: HISTORY_ACTIONS.REMOVE_STORY, params: [story.epicId, story.featureId, story.id] });
         break;
       case HISTORY_ACTIONS.REDO:
@@ -123,7 +120,6 @@ export function useStoryMap() {
 
     switch (historyOperation) {
       case HISTORY_OPERATION.UNDO:
-        // history.addToRedo({ id: HISTORY_ACTIONS.UPDATE_EPIC_TITLE, params: [epic.id, epic.title] });
         history.addToRedo({ id: HISTORY_ACTIONS.UPDATE_EPIC_TITLE, params: [epic.id, epic.title] });
         break;
       case HISTORY_ACTIONS.REDO:
@@ -142,7 +138,6 @@ export function useStoryMap() {
 
     switch (historyOperation) {
       case HISTORY_OPERATION.UNDO:
-        // history.addToRedo({ id: HISTORY_ACTIONS.UPDATE_FEATURE_TITLE, params: [feature.id, feature.title] });
         history.addToRedo({ id: HISTORY_ACTIONS.UPDATE_FEATURE_TITLE, params: [feature.id, feature.title] });
         break;
       case HISTORY_ACTIONS.REDO:
@@ -166,7 +161,6 @@ export function useStoryMap() {
 
     switch (historyOperation) {
       case HISTORY_OPERATION.UNDO:
-        // history.addToRedo({ id: HISTORY_ACTIONS.UPDATE_STORY_TITLE, params: [epicId, featureId, storyId, title] });
         history.addToRedo({ id: HISTORY_ACTIONS.UPDATE_STORY_TITLE, params: [epicId, featureId, storyId, title] });
         break;
       case HISTORY_ACTIONS.REDO:
@@ -182,7 +176,7 @@ export function useStoryMap() {
     const epic = epics.find(e => e.id === epicId);
     if (!epic) return;
 
-    await storiesService.removeEpic(epicId);
+    const removed = await storiesService.removeEpic(epicId);
     const { newEpics, newFeatures } = lists.removeEpic(epic);
     setEpics(newEpics);
     setFeatures(newFeatures);
@@ -193,13 +187,11 @@ export function useStoryMap() {
     const originEpicId = (newEpics[oldIndex - 1] || {}).id;
     switch (historyOperation) {
       case HISTORY_OPERATION.UNDO:
-        // history.addToRedo({ id: HISTORY_ACTIONS.REMOVE_EPIC, params: [epicId] });
-        history.addToUndo({ id: HISTORY_ACTIONS.ADD_EPIC, params: [epic, originEpicId] });
+        history.addToRedo({ id: HISTORY_ACTIONS.ADD_EPIC, params: [removed, originEpicId] });
         break;
       case HISTORY_ACTIONS.REDO:
       default: // NONE
-        // const originEpicId = (newEpics[oldIndex - 1] || {}).id;
-        history.addToUndo({ id: HISTORY_ACTIONS.ADD_EPIC, params: [epic, originEpicId] });
+        history.addToUndo({ id: HISTORY_ACTIONS.ADD_EPIC, params: [removed, originEpicId] });
         break;
     }
   }
@@ -211,7 +203,7 @@ export function useStoryMap() {
     const feature = features.find(f => f.id === featureId);
     if (!feature) return;
 
-    await storiesService.removeFeature(epicId, featureId);
+    const removed = await storiesService.removeFeature(epicId, featureId);
     const { newEpics, newFeatures } = lists.removeFeature(feature);
     setEpics(newEpics);
     setFeatures(newFeatures);
@@ -222,12 +214,11 @@ export function useStoryMap() {
     const originFeatureId = (newFeatures[oldIndex - 1] || {}).id;
     switch (historyOperation) {
       case HISTORY_OPERATION.UNDO:
-        // history.addToRedo({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: [epicId, featureId] });
-        history.addToRedo({ id: HISTORY_ACTIONS.ADD_FEATURE, params: [feature, originFeatureId] });
+        history.addToRedo({ id: HISTORY_ACTIONS.ADD_FEATURE, params: [removed, originFeatureId] });
         break;
       case HISTORY_ACTIONS.REDO:
       default: // NONE
-        history.addToUndo({ id: HISTORY_ACTIONS.ADD_FEATURE, params: [feature, originFeatureId] });
+        history.addToUndo({ id: HISTORY_ACTIONS.ADD_FEATURE, params: [removed, originFeatureId] });
         break;
     }
   }
@@ -243,7 +234,7 @@ export function useStoryMap() {
     if (!story) return;
     const oldIndex = feature.stories.indexOf(story);
 
-    await storiesService.removeStory(epicId, featureId, storyId);
+    const removed = await storiesService.removeStory(epicId, featureId, storyId);
     const { newFeatures } = lists.removeStory(story);
     setFeatures(newFeatures);
     const storyToFocus = feature.stories[oldIndex] || feature.stories[oldIndex - 1];
@@ -252,12 +243,11 @@ export function useStoryMap() {
     const originStoryId = (feature.stories[oldIndex - 1] || {}).id;
     switch (historyOperation) {
       case HISTORY_OPERATION.UNDO:
-        // history.addToRedo({ id: HISTORY_ACTIONS.REMOVE_STORY, params: [epicId, featureId, storyId] });
-        history.addToRedo({ id: HISTORY_ACTIONS.ADD_STORY, params: [story, originStoryId] });
+        history.addToRedo({ id: HISTORY_ACTIONS.ADD_STORY, params: [removed, originStoryId] });
         break;
       case HISTORY_ACTIONS.REDO:
       default: // NONE
-        history.addToUndo({ id: HISTORY_ACTIONS.ADD_STORY, params: [story, originStoryId] });
+        history.addToUndo({ id: HISTORY_ACTIONS.ADD_STORY, params: [removed, originStoryId] });
         break;
     }
   }
@@ -285,7 +275,6 @@ export function useStoryMap() {
       case HISTORY_ACTIONS.UPDATE_STORY_TITLE:
         return updateStoryTitle;
       default:
-        console.log('Unknown actionId', actionId);
         return noop;
     }
   }
