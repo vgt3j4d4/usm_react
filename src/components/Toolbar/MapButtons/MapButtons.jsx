@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NOTE_TYPE } from "../../../const";
 import { useStoryMap } from "../../../hooks/useStoryMap/useStoryMap";
 import { isMobileOrTablet } from "../../../utils/utils";
@@ -24,6 +24,30 @@ export function MapButtons() {
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory
   } = useStoryMap();
   const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(function addUndoRedoListener() {
+    const undoRedoListener = (event) => {
+      if (!canUndo() && !canRedo()) return;
+
+      const undoButton = buttons.find(b => b.id === 'UNDO');
+      const redoButton = buttons.find(b => b.id === 'REDO');
+      if (!undoButton || !redoButton) return;
+
+      // TODO: check how to comply with Windows, Mac and Linux undo/redo shortcuts
+      if (undoButton && canUndo() && event.ctrlKey && event.key === 'z') {
+        doUndo();
+        return;
+      }
+      // TODO: check how to comply with Windows, Mac and Linux undo/redo shortcuts
+      if (redoButton && canRedo() && event.ctrlKey && event.key === 'y') {
+        doRedo();
+        return;
+      }
+    };
+
+    document.addEventListener('keydown', undoRedoListener);
+    return () => { document.removeEventListener('keydown', undoRedoListener); }
+  });
 
   const [buttons, activeButtons] = getToolbarButtons();
   if (buttons[activeIndex].disabled && activeButtons.length > 0) {

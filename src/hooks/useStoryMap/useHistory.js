@@ -1,6 +1,6 @@
 import { Item } from "linked-list";
 
-const MAX_HISTORY_LENGTH = 10;
+const MAX_HISTORY_LENGTH = 25;
 
 export const HISTORY_ACTIONS = Object.freeze({
   ADD_NEW_EPIC: 'addNewEpic',
