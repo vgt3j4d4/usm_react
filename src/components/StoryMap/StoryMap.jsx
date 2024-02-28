@@ -33,8 +33,7 @@ export function StoryMap() {
                 toggleFocus={(value) => { setIsFocused(value) }}
                 markAsSelected={() => setSelected({ id: e.id, type: NOTE_TYPE.EPIC })}
                 updateTitle={(editedTitle) => {
-                  updateEpicTitle(e.id, editedTitle);
-                  focus();
+                  if (updateEpicTitle(e.id, editedTitle)) focus();
                 }}
                 add={() => { addNewEpic(e.id) }}
                 remove={() => { maybeRemoveEpic(e.id) }}
@@ -57,8 +56,7 @@ export function StoryMap() {
               toggleFocus={(value) => { setIsFocused(value) }}
               markAsSelected={() => setSelected({ id: f.id, epicId: f.epicId, type: NOTE_TYPE.FEATURE })}
               updateTitle={(editedTitle) => {
-                updateFeatureTitle(f.id, editedTitle);
-                focus();
+                if (updateFeatureTitle(f.id, editedTitle)) focus();
               }}
               add={() => { addNewFeature(f.epicId, f.id) }}
               remove={() => { maybeRemoveFeature(f.epicId, f.id) }}
@@ -82,8 +80,7 @@ export function StoryMap() {
                     setSelected({ id: s.id, epicId: f.epicId, featureId: s.featureId, type: NOTE_TYPE.STORY })
                   }
                   updateTitle={(editedTitle) => {
-                    updateStoryTitle(f.epicId, f.id, s.id, editedTitle);
-                    focus();
+                    if (updateStoryTitle(f.epicId, f.id, s.id, editedTitle)) focus();
                   }}
                   add={() => { addNewStory(f.epicId, f.id, s.id) }}
                   remove={() => { maybeRemoveStory(f.epicId, f.id, s.id) }}
