@@ -1,5 +1,4 @@
 import { buildItem, getDataArray } from "../../utils/storyMapUtils";
-import { addItemAtIndex } from "../../utils/utils";
 
 export function useLists({ epicListRef, featureListRef }) {
 
@@ -45,22 +44,6 @@ export function useLists({ epicListRef, featureListRef }) {
     };
   }
 
-  function addStory(story, originStoryId) {
-    const featureItem = featureList.toArray().find(i => i.data.id === story.featureId);
-    const feature = featureItem.data;
-    if (originStoryId) {
-      const originStory = feature.stories.find(s => s.id === originStoryId);
-      const index = feature.stories.indexOf(originStory);
-      feature.stories = addItemAtIndex([...feature.stories], story, index + 1);
-    } else {
-      feature.stories = [story, ...feature.stories];
-    }
-
-    return {
-      newFeatures: getDataArray(featureList)
-    };
-  }
-
   function removeEpic(epic) {
     const epicItem = epicList.toArray().find(i => i.data.id === epic.id);
     epicItem.detach();
@@ -85,12 +68,6 @@ export function useLists({ epicListRef, featureListRef }) {
     };
   }
 
-  function removeStory(story) {
-    const { data: feature } = featureList.toArray().find(i => i.data.id === story.featureId);
-    feature.stories = feature.stories.filter(s => s.id !== story.id)
-    return { newFeatures: getDataArray(featureList) };
-  }
-
   function updateEpic(epicId, data) {
     const epicItem = epicList.toArray().find(i => i.data.id === epicId);
     epicItem.data = { ...epicItem.data, ...data };
@@ -103,15 +80,9 @@ export function useLists({ epicListRef, featureListRef }) {
     return { newFeatures: getDataArray(featureList) };
   }
 
-  function updateStory(featureId, storyId, data) {
-    const featureItem = featureList.toArray().find(i => i.data.id === featureId);
-    featureItem.data.stories = featureItem.data.stories.map(s => s.id === storyId ? { ...s, ...data } : s);
-    return { newFeatures: getDataArray(featureList) };
-  }
-
   return {
-    addEpic, addFeature, addStory,
-    removeEpic, removeFeature, removeStory,
-    updateEpic, updateFeature, updateStory
+    addEpic, addFeature,
+    removeEpic, removeFeature,
+    updateEpic, updateFeature,
   }
 }

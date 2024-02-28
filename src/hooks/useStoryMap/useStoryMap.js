@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { NOTE_TYPE } from "../../const";
 import { NoteContext } from "../../context/NoteContext";
 import { StoriesContext } from "../../context/StoriesContext";
 import * as storiesService from "../../services/LocalStoriesService";
+import { addItemAtIndex } from "../../utils/utils";
 import { HISTORY_ACTIONS, HISTORY_OPERATION, useHistory } from "./useHistory";
 import { useLists } from "./useLists";
 import { useNavigation } from "./useNavigation";
@@ -16,7 +16,7 @@ export function useStoryMap() {
     storyMapIdRef
   } = useContext(StoriesContext);
   const {
-    selected, setSelected,
+    selected, setSelected, reselect,
     isFocused, setIsFocused,
     focus
   } = useContext(NoteContext);
@@ -86,11 +86,25 @@ export function useStoryMap() {
     }
   }
 
+  const addStoryToFeatures = (features, featureId, originStoryId, story) => {
+    let newFeatures;
+    const feature = features.find(f => f.id === featureId);
+    if (originStoryId) {
+      const originStory = feature.stories.find(s => s.id === originStoryId);
+      const index = feature.stories.indexOf(originStory);
+      const newStories = addItemAtIndex([...feature.stories], story, index + 1);
+      newFeatures = features.map(f => f.id === featureId ? { ...f, stories: newStories } : f);
+    } else {
+      newFeatures = features.map(f => f.id === featureId ? { ...f, stories: [story, ...f.stories] } : f);
+    }
+    return newFeatures;
+  }
+
   async function addNewStory(epicId, featureId, originStoryId) {
     const story = await storiesService.addNewStory(storyMapId, epicId, featureId);
     if (!story) return;
 
-    const { newFeatures } = lists.addStory(story, originStoryId);
+    const newFeatures = addStoryToFeatures(features, featureId, originStoryId, story);
     setFeatures(newFeatures);
     history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_STORY, params: [epicId, featureId, story.id] });
   }
@@ -99,7 +113,7 @@ export function useStoryMap() {
     const storyId = await storiesService.addStory(storyMapId, story, originStoryId);
     if (!storyId) return;
 
-    const { newFeatures } = lists.addStory(story, originStoryId);
+    const newFeatures = addStoryToFeatures(features, story.featureId, originStoryId, story);
     setFeatures(newFeatures);
 
     switch (historyOperation) {
@@ -168,7 +182,7 @@ export function useStoryMap() {
     const updatedStoryId = await storiesService.updateStory({ ...story, title });
     if (!updatedStoryId) return null;
 
-    const { newFeatures } = lists.updateStory(featureId, storyId, { title });
+    const newFeatures = features.map(f => f.id === featureId ? { ...f, stories: f.stories.map(s => s.id === storyId ? { ...s, title } : s) } : f);
     setFeatures(newFeatures);
 
     switch (historyOperation) {
@@ -206,6 +220,8 @@ export function useStoryMap() {
         history.addToUndo({ id: HISTORY_ACTIONS.ADD_EPIC, params: [removed, originEpicId] });
         break;
     }
+
+    return removed;
   }
 
   async function maybeRemoveFeature(epicId, featureId, historyOperation = HISTORY_OPERATION.NONE) {
@@ -231,6 +247,8 @@ export function useStoryMap() {
         history.addToUndo({ id: HISTORY_ACTIONS.ADD_FEATURE, params: [removed, originFeatureId] });
         break;
     }
+
+    return removed;
   }
 
   async function maybeRemoveStory(epicId, featureId, storyId, historyOperation = HISTORY_OPERATION.NONE) {
@@ -245,7 +263,7 @@ export function useStoryMap() {
     const oldIndex = feature.stories.indexOf(story);
 
     const removed = await storiesService.removeStory(epicId, featureId, storyId);
-    const { newFeatures } = lists.removeStory(story);
+    const newFeatures = features.map(f => f.id === featureId ? { ...f, stories: f.stories.filter(s => s.id !== storyId) } : f);
     setFeatures(newFeatures);
 
     const originStoryId = (feature.stories[oldIndex - 1] || {}).id;
@@ -258,6 +276,8 @@ export function useStoryMap() {
         history.addToUndo({ id: HISTORY_ACTIONS.ADD_STORY, params: [removed, originStoryId] });
         break;
     }
+
+    return removed;
   }
 
   function getFnById(actionId) {
@@ -311,7 +331,7 @@ export function useStoryMap() {
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
     maybeNavigate,
-    selected, setSelected,
+    selected, setSelected, reselect,
     focus, isFocused, setIsFocused,
     canUndo: history.canUndo, canRedo: history.canRedo,
     undo, redo,
