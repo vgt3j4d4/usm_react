@@ -35,12 +35,12 @@ export function MapButtons() {
       if (!undoButton || !redoButton) return;
 
       // TODO: check how to comply with Windows, Mac and Linux undo/redo shortcuts
-      if (undoButton && canUndo() && event.ctrlKey && event.key === 'z') {
+      if (undoButton && canUndo() && event.ctrlKey && ['Z', 'z'].indexOf(event.key) !== -1) {
         doUndo();
         return;
       }
       // TODO: check how to comply with Windows, Mac and Linux undo/redo shortcuts
-      if (redoButton && canRedo() && event.ctrlKey && event.key === 'y') {
+      if (redoButton && canRedo() && event.ctrlKey && ['Y', 'y'].indexOf(event.key) !== -1) {
         doRedo();
         return;
       }
@@ -95,28 +95,53 @@ export function MapButtons() {
     switch (selected.type) {
       case NOTE_TYPE.EPIC:
         addNewEpic(selected.id);
+        reselect();
         break;
       case NOTE_TYPE.FEATURE:
         addNewFeature(selected.epicId, selected.id);
+        reselect();
         break;
       case NOTE_TYPE.STORY:
         addNewStory(selected.epicId, selected.featureId, selected.id);
+        reselect();
         break;
       default:
         break;
     }
   }
 
-  function removeNote() {
+  async function removeNote() {
     switch (selected.type) {
       case NOTE_TYPE.EPIC:
-        maybeRemoveEpic(selected.id);
+        const removedEpic = await maybeRemoveEpic(selected.id);
+        if (removedEpic) {
+          const index = epics.findIndex(e => e.id === removedEpic.id);
+          if (index !== -1) {
+            const epicToFocus = index === 0 ? epics[index + 1] : epics[index - 1];
+            setSelected({ id: epicToFocus.id, type: NOTE_TYPE.EPIC, focus: true });
+          }
+        }
         break;
       case NOTE_TYPE.FEATURE:
-        maybeRemoveFeature(selected.epicId, selected.id);
+        const removedFeature = await maybeRemoveFeature(selected.epicId, selected.id);
+        if (removedFeature) {
+          const index = features.findIndex(f => f.id === removedFeature.id);
+          if (index !== -1) {
+            const featureToFocus = index === 0 ? features[index + 1] : features[index - 1];
+            setSelected({ id: featureToFocus.id, epicId: selected.epicId, type: NOTE_TYPE.FEATURE, focus: true });
+          }
+        }
         break;
       case NOTE_TYPE.STORY:
-        maybeRemoveStory(selected.epicId, selected.featureId, selected.id);
+        const removedStory = await maybeRemoveStory(selected.epicId, selected.featureId, selected.id);
+        if (removedStory) {
+          const feature = features.find(f => f.id === removedStory.featureId);
+          const index = feature.stories.findIndex(s => s.id === removedStory.id);
+          if (index !== -1) {
+            const storyToFocus = index === 0 ? feature.stories[index + 1] : feature.stories[index - 1];
+            setSelected({ id: storyToFocus.id, epicId: selected.epicId, featureId: selected.featureId, type: NOTE_TYPE.STORY, focus: true });
+          }
+        }
         break;
       default:
         break;
