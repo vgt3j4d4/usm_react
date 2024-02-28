@@ -20,7 +20,8 @@ export function MapButtons() {
     addNewEpic, addNewFeature, addNewStory,
     canUndo, canRedo,
     undo, redo,
-    selected, isFocused, focus,
+    selected, setSelected, reselect,
+    isFocused, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory
   } = useStoryMap();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -57,36 +58,36 @@ export function MapButtons() {
   function navigate(buttonNav) {
     if (activeButtons.length === 0) return;
 
-    let _activeIndex = null;
+    let newIndex = null;
     switch (buttonNav) {
       case BUTTON_NAVIGATION.FIRST: {
-        _activeIndex = buttons.indexOf(activeButtons[0]);
+        newIndex = buttons.indexOf(activeButtons[0]);
         break;
       }
       case BUTTON_NAVIGATION.LAST: {
-        _activeIndex = buttons.indexOf(activeButtons[activeButtons.length - 1]);
+        newIndex = buttons.indexOf(activeButtons[activeButtons.length - 1]);
         break;
       }
       case BUTTON_NAVIGATION.NEXT: {
         const button = buttons[activeIndex];
         const index = activeButtons.indexOf(button);
-        if (index === (activeButtons.length - 1)) _activeIndex = buttons.indexOf(activeButtons[0]);
-        else _activeIndex = buttons.indexOf(activeButtons[index + 1]);
+        if (index === (activeButtons.length - 1)) newIndex = buttons.indexOf(activeButtons[0]);
+        else newIndex = buttons.indexOf(activeButtons[index + 1]);
         break;
       }
       case BUTTON_NAVIGATION.PREV: {
         const button = buttons[activeIndex];
         const index = activeButtons.indexOf(button);
-        if (index === 0) _activeIndex = buttons.indexOf(activeButtons[activeButtons.length - 1]);
-        else _activeIndex = buttons.indexOf(activeButtons[index - 1]);
+        if (index === 0) newIndex = buttons.indexOf(activeButtons[activeButtons.length - 1]);
+        else newIndex = buttons.indexOf(activeButtons[index - 1]);
         break;
       }
       default:
         return;
     }
 
-    setActiveIndex(() => _activeIndex);
-    const button = document.getElementById(`toolbar__button_${_activeIndex}`);
+    setActiveIndex(() => newIndex);
+    const button = document.getElementById(`toolbar__button_${newIndex}`);
     if (button) button.focus();
   }
 
