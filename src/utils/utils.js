@@ -29,12 +29,19 @@ export function clone(object) {
   return JSON.parse(JSON.stringify(object));
 }
 
-export function addItemAtIndex(array = [], item, index = 0) {
+/**
+ * Inserts an item at a specific index in an array.
+ *
+ * @param {Array} array - The array to insert the item into.
+ * @param {*} item - The item to insert.
+ * @param {number} index - The index at which to insert the item.
+ * @returns {Array} - The new array with the item inserted.
+ */
+export function insertItemAtIndex(array = [], item, index = 0) {
   if (index === 0) {
     return [item, ...array];
   } else {
-    array.splice(index, 0, item);
-    return array;
+    return array.toSpliced(index, 0, item);
   }
 }
 

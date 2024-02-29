@@ -1,5 +1,5 @@
 import { DEFAULT_EPIC, DEFAULT_FEATURE, DEFAULT_STORY, VERSION } from "../const";
-import { addItemAtIndex, clone, id } from "../utils/utils";
+import { insertItemAtIndex, clone, id } from "../utils/utils";
 
 const LOCAL_STORAGE_KEY = 'USM_' + VERSION;
 
@@ -77,7 +77,7 @@ export async function addNewEpic(_storyMapId) {
 export async function addEpic(_storyMapId, epic, originEpicId) {
   const { storyMap } = getData();
   const index = storyMap.epics.findIndex(e => e.id === originEpicId);
-  storyMap.epics = addItemAtIndex(storyMap.epics, epic, index + 1);
+  storyMap.epics = insertItemAtIndex(storyMap.epics, epic, index + 1);
   saveOrUpdate({ storyMap });
   return Promise.resolve(epic.id);
 }
@@ -98,7 +98,7 @@ export async function addFeature(_storyMapId, feature, originFeatureId) {
   const { storyMap } = getData();
   const epic = storyMap.epics.find(e => e.id === feature.epicId);
   const index = epic.features.findIndex(f => f.id === originFeatureId);
-  epic.features = addItemAtIndex(epic.features, feature, index + 1);
+  epic.features = insertItemAtIndex(epic.features, feature, index + 1);
   saveOrUpdate({ storyMap });
   return Promise.resolve(feature.id);
 }
@@ -124,7 +124,7 @@ export async function addStory(_storyMapId, story, originStoryId) {
   const feature = epic.features.find(f => f.id === story.featureId);
   if (originStoryId) {
     const index = feature.stories.findIndex(s => s.id === originStoryId);
-    feature.stories = addItemAtIndex(feature.stories, story, index + 1);
+    feature.stories = insertItemAtIndex(feature.stories, story, index + 1);
   } else {
     feature.stories = [story, ...feature.stories];
   }
