@@ -2,7 +2,6 @@ import { useContext } from "react";
 import { NoteContext } from "../../context/NoteContext";
 import { StoriesContext } from "../../context/StoriesContext";
 import * as storiesService from "../../services/LocalStoriesService";
-import { addItemAtIndex } from "../../utils/utils";
 import { HISTORY_ACTIONS, HISTORY_OPERATION, useHistory } from "./useHistory";
 import { useLists } from "./useLists";
 import { useNavigation } from "./useNavigation";
@@ -86,25 +85,11 @@ export function useStoryMap() {
     }
   }
 
-  const addStoryToFeatures = (features, featureId, originStoryId, story) => {
-    let newFeatures;
-    const feature = features.find(f => f.id === featureId);
-    if (originStoryId) {
-      const originStory = feature.stories.find(s => s.id === originStoryId);
-      const index = feature.stories.indexOf(originStory);
-      const newStories = addItemAtIndex([...feature.stories], story, index + 1);
-      newFeatures = features.map(f => f.id === featureId ? { ...f, stories: newStories } : f);
-    } else {
-      newFeatures = features.map(f => f.id === featureId ? { ...f, stories: [story, ...f.stories] } : f);
-    }
-    return newFeatures;
-  }
-
   async function addNewStory(epicId, featureId, originStoryId) {
     const story = await storiesService.addNewStory(storyMapId, epicId, featureId);
     if (!story) return;
 
-    const newFeatures = addStoryToFeatures(features, featureId, originStoryId, story);
+    const { newFeatures } = lists.addStory(story, originStoryId);
     setFeatures(newFeatures);
     history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_STORY, params: [epicId, featureId, story.id] });
   }
@@ -113,7 +98,7 @@ export function useStoryMap() {
     const storyId = await storiesService.addStory(storyMapId, story, originStoryId);
     if (!storyId) return;
 
-    const newFeatures = addStoryToFeatures(features, story.featureId, originStoryId, story);
+    const { newFeatures } = lists.addStory(story, originStoryId);
     setFeatures(newFeatures);
 
     switch (historyOperation) {

@@ -1,4 +1,5 @@
 import { buildItem, getDataArray } from "../../utils/storyMapUtils";
+import { insertItemAtIndex } from "../../utils/utils";
 
 export function useLists({ epicListRef, featureListRef }) {
 
@@ -44,6 +45,28 @@ export function useLists({ epicListRef, featureListRef }) {
     };
   }
 
+  const addStoryToFeatures = (features, featureId, originStoryId, story) => {
+    const feature = features.find(f => f.id === featureId);
+    if (originStoryId) {
+      const index = feature.stories.findIndex(s => s.id === originStoryId);
+      const newStories = insertItemAtIndex(feature.stories, story, index + 1);
+      const newFeatures = features.map(f => f.id === featureId ? { ...f, stories: newStories } : f);
+      return { newStories, newFeatures };
+    } else {
+      const newStories = [story, ...feature.stories];
+      const newFeatures = features.map(f => f.id === featureId ? { ...f, stories: newStories } : f);
+      return { newStories, newFeatures };
+    }
+  }
+
+  function addStory(story, originStoryId) {
+    const featureItem = featureList.toArray().find(i => i.data.id === story.featureId);
+    const features = getDataArray(featureList);
+    const { newStories, newFeatures } = addStoryToFeatures(features, story.featureId, originStoryId, story);
+    featureItem.data.stories = newStories;
+    return { newFeatures };
+  }
+
   function removeEpic(epic) {
     const epicItem = epicList.toArray().find(i => i.data.id === epic.id);
     epicItem.detach();
@@ -81,7 +104,7 @@ export function useLists({ epicListRef, featureListRef }) {
   }
 
   return {
-    addEpic, addFeature,
+    addEpic, addFeature, addStory,
     removeEpic, removeFeature,
     updateEpic, updateFeature,
   }
