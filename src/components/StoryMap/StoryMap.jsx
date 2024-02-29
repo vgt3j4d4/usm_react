@@ -35,8 +35,8 @@ export function StoryMap() {
                 selected={selected.id === e.id}
                 toggleFocus={(value) => { setIsFocused(value) }}
                 markAsSelected={() => setSelected({ id: e.id, type: NOTE_TYPE.EPIC })}
-                updateTitle={(editedTitle) => {
-                  if (updateEpicTitle(e.id, editedTitle)) focus();
+                updateTitle={(editedTitle, forceFocus = true) => {
+                  if (updateEpicTitle(e.id, editedTitle) && forceFocus) focus();
                 }}
                 add={() => { addNewEpic(e.id) }}
                 remove={async () => {
@@ -61,8 +61,8 @@ export function StoryMap() {
               selected={selected.id === f.id}
               toggleFocus={(value) => { setIsFocused(value) }}
               markAsSelected={() => setSelected({ id: f.id, epicId: f.epicId, type: NOTE_TYPE.FEATURE })}
-              updateTitle={(editedTitle) => {
-                if (updateFeatureTitle(f.id, editedTitle)) focus();
+              updateTitle={(editedTitle, forceFocus = true) => {
+                if (updateFeatureTitle(f.id, editedTitle) && forceFocus) focus();
               }}
               add={() => { addNewFeature(f.epicId, f.id) }}
               remove={async () => {
@@ -88,8 +88,8 @@ export function StoryMap() {
                   markAsSelected={() =>
                     setSelected({ id: s.id, epicId: f.epicId, featureId: s.featureId, type: NOTE_TYPE.STORY })
                   }
-                  updateTitle={(editedTitle) => {
-                    if (updateStoryTitle(f.epicId, f.id, s.id, editedTitle)) focus();
+                  updateTitle={(editedTitle, forceFocus = true) => {
+                    if (updateStoryTitle(f.epicId, f.id, s.id, editedTitle) && forceFocus) focus();
                   }}
                   add={() => { addNewStory(f.epicId, f.id, s.id) }}
                   remove={async () => {

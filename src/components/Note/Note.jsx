@@ -66,9 +66,10 @@ export function Note({
 
   function stopEditing(e) {
     setEditing(false);
-    if (titleRef.current.innerText !== title) updateTitle(titleRef.current.innerText);
+    const focusWithinSameNote = e.relatedTarget && e.relatedTarget.contains(titleRef.current);
+    if (titleRef.current.innerText !== title) updateTitle(titleRef.current.innerText, false);
     // if focus is moving to somewhere within the same note, then focus
-    if (e.relatedTarget && e.relatedTarget.contains(titleRef.current)) focusNoteById(id);
+    if (focusWithinSameNote) focusNoteById(id);
   }
 
   function getClassName(type, selected) {
