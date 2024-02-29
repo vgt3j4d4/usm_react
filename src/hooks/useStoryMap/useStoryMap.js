@@ -319,11 +319,13 @@ export function useStoryMap() {
     }
   }
 
-  // BUG: if removing the first feature from an epic it will focus the last feature of the previous epic
   function focusFeatureAfterRemoval(removedFeature) {
     const index = features.findIndex(feature => feature.id === removedFeature.id);
     if (index !== -1) {
-      const featureToFocus = index === 0 ? features[index + 1] : features[index - 1];
+      let featureToFocus = index === 0 ? features[index + 1] : features[index - 1];
+      if (featureToFocus.epicId !== removedFeature.epicId) {
+        featureToFocus = features.find(f => f.epicId === removedFeature.epicId && f.id !== removedFeature.id);
+      }
       setSelected({
         id: featureToFocus.id,
         epicId: removedFeature.epicId,
