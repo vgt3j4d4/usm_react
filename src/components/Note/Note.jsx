@@ -8,7 +8,7 @@ export function Note({
   focusable = false, selected = false,
   toggleFocus, markAsSelected, updateTitle, add, remove, navigate
 }) {
-  const { editing, setEditing, titleRef } = useNote();
+  const { editing, setEditing, titleRef } = useNote(false);
 
   function focusNote(e) {
     toggleFocus(e.target !== titleRef.current);
@@ -29,57 +29,46 @@ export function Note({
     toggleFocus(false);
   }
 
-  function stopEditing(e, revert = false) {
-    setEditing(false);
+  function maybeDoAction(e) {
+    if (!e || !e.key) return;
 
-    let editedTitle;
-    if (revert) {
-      editedTitle = title;
-      titleRef.current.innerText = title;
-    } else {
-      editedTitle = titleRef.current.innerText;
-    }
-    if (editedTitle !== title) updateTitle(editedTitle);
-
-    if (!e.relatedTarget) { // onKeyDown
-      focusNoteById(id)
-    } else { // onBlur
-      // only refocus if e.relatedTarget is within the current note
-      if (e.relatedTarget.contains(titleRef.current)) {
-        focusNoteById(id);
-      }
+    switch (e.key) {
+      case 'F2':
+        startEditing(e);
+        break;
+      case '+':
+        add();
+        break;
+      case 'Delete':
+        remove();
+        break;
+      case ARROW_KEYS.UP:
+      case ARROW_KEYS.DOWN:
+      case ARROW_KEYS.LEFT:
+      case ARROW_KEYS.RIGHT:
+        if (!editing) navigate(e.key);
+        break;
+      default:
+        break;
     }
   }
 
-  function maybeTriggerKeyboardAction(e) {
+  function maybeStopEditingDueToKeyStroke(e) {
     if (!e || !e.key) return;
 
-    if (editing) {
-      if (e.key === 'Enter' || e.key === 'Escape' || e.key === 'Tab') {
-        e.preventDefault();
-        stopEditing(e, e.key === 'Escape');
-        return;
-      }
-    } else {
-      if (e.key === 'F2') {
-        e.preventDefault();
-        startEditing(e);
-        return;
-      }
-      if (e.key === '+') {
-        add();
-        return;
-      }
-      if (e.key === 'Delete') {
-        remove();
-        return;
-      }
+    if (e.key === 'Enter' || e.key === 'Escape' || e.key === 'Tab') {
+      e.preventDefault(); // prevent default behavior of Enter and Tab
+      setEditing(false);
+      if (e.key === 'Escape') titleRef.current.innerText = title;
+      focusNoteById(id);
     }
+  }
 
-    if (Object.values(ARROW_KEYS).includes(e.key)) {
-      if (!editing) navigate(e.key);
-      return;
-    }
+  function stopEditing(e) {
+    setEditing(false);
+    if (titleRef.current.innerText !== title) updateTitle(titleRef.current.innerText);
+    // if focus is moving to somewhere within the same note, then focus
+    if (e.relatedTarget && e.relatedTarget.contains(titleRef.current)) focusNoteById(id);
   }
 
   function getClassName(type, selected) {
@@ -113,14 +102,14 @@ export function Note({
       onFocus={focusNote}
       onBlur={defocusNote}
       onClick={maybeMarkAsSelected}
-      onKeyDown={maybeTriggerKeyboardAction}
+      onKeyDown={maybeDoAction}
       aria-selected={selected}>
       <span className="note__content">
         <span className={editing ? 'outline-none' : 'hidden'}
           ref={titleRef}
           contentEditable={editing} suppressContentEditableWarning={true}
           tabIndex={editing ? '0' : '-1'}
-          onKeyDown={maybeTriggerKeyboardAction}
+          onKeyDown={maybeStopEditingDueToKeyStroke}
           onBlur={stopEditing}>
           {title}
         </span>

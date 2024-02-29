@@ -1,5 +1,5 @@
 import { NOTE_TYPE } from "../../const";
-import { useStoryMap } from "../../hooks/useStoryMap";
+import { useStoryMap } from "../../hooks/useStoryMap/useStoryMap";
 import { isMobileOrTablet } from "../../utils/utils";
 import { ArrowKeys } from "../ArrowKeys/ArrowKeys";
 import { EmptyNotes } from "../EmptyNotes/EmptyNotes";
@@ -12,8 +12,9 @@ export function StoryMap() {
     addNewEpic, addNewFeature, addNewStory,
     selected, setSelected, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
+    focusEpicAfterRemoval, focusFeatureAfterRemoval, focusStoryAfterRemoval,
     maybeNavigate,
-    isFocused, setIsFocused
+    isFocused, setIsFocused,
   } = useStoryMap();
 
   return (
@@ -33,11 +34,13 @@ export function StoryMap() {
                 toggleFocus={(value) => { setIsFocused(value) }}
                 markAsSelected={() => setSelected({ id: e.id, type: NOTE_TYPE.EPIC })}
                 updateTitle={(editedTitle) => {
-                  updateEpicTitle(e.id, editedTitle);
-                  focus();
+                  if (updateEpicTitle(e.id, editedTitle)) focus();
                 }}
                 add={() => { addNewEpic(e.id) }}
-                remove={() => { maybeRemoveEpic(e.id) }}
+                remove={async () => {
+                  const removedEpic = await maybeRemoveEpic(e.id);
+                  if (removedEpic) focusEpicAfterRemoval(removedEpic);
+                }}
                 navigate={maybeNavigate}>
               </Note>
               {/* to create some space between epics */}
@@ -57,11 +60,13 @@ export function StoryMap() {
               toggleFocus={(value) => { setIsFocused(value) }}
               markAsSelected={() => setSelected({ id: f.id, epicId: f.epicId, type: NOTE_TYPE.FEATURE })}
               updateTitle={(editedTitle) => {
-                updateFeatureTitle(f.id, editedTitle);
-                focus();
+                if (updateFeatureTitle(f.id, editedTitle)) focus();
               }}
               add={() => { addNewFeature(f.epicId, f.id) }}
-              remove={() => { maybeRemoveFeature(f.epicId, f.id) }}
+              remove={async () => {
+                const removedFeature = await maybeRemoveFeature(f.epicId, f.id);
+                if (removedFeature) focusFeatureAfterRemoval(removedFeature);
+              }}
               navigate={maybeNavigate}>
             </Note>
           ))}
@@ -82,11 +87,13 @@ export function StoryMap() {
                     setSelected({ id: s.id, epicId: f.epicId, featureId: s.featureId, type: NOTE_TYPE.STORY })
                   }
                   updateTitle={(editedTitle) => {
-                    updateStoryTitle(f.epicId, f.id, s.id, editedTitle);
-                    focus();
+                    if (updateStoryTitle(f.epicId, f.id, s.id, editedTitle)) focus();
                   }}
                   add={() => { addNewStory(f.epicId, f.id, s.id) }}
-                  remove={() => { maybeRemoveStory(f.epicId, f.id, s.id) }}
+                  remove={async () => {
+                    const removedStory = await maybeRemoveStory(f.epicId, f.id, s.id);
+                    if (removedStory) focusStoryAfterRemoval(removedStory);
+                  }}
                   navigate={maybeNavigate}>
                 </Note>
               ))}
