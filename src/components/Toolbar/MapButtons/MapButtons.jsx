@@ -22,7 +22,8 @@ export function MapButtons() {
     undo, redo,
     selected, setSelected, reselect,
     isFocused, focus,
-    maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory
+    maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
+    focusEpicAfterRemoval, focusFeatureAfterRemoval, focusStoryAfterRemoval
   } = useStoryMap();
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -114,34 +115,15 @@ export function MapButtons() {
     switch (selected.type) {
       case NOTE_TYPE.EPIC:
         const removedEpic = await maybeRemoveEpic(selected.id);
-        if (removedEpic) {
-          const index = epics.findIndex(e => e.id === removedEpic.id);
-          if (index !== -1) {
-            const epicToFocus = index === 0 ? epics[index + 1] : epics[index - 1];
-            setSelected({ id: epicToFocus.id, type: NOTE_TYPE.EPIC, focus: true });
-          }
-        }
+        if (removedEpic) focusEpicAfterRemoval(removedEpic);
         break;
       case NOTE_TYPE.FEATURE:
         const removedFeature = await maybeRemoveFeature(selected.epicId, selected.id);
-        if (removedFeature) {
-          const index = features.findIndex(f => f.id === removedFeature.id);
-          if (index !== -1) {
-            const featureToFocus = index === 0 ? features[index + 1] : features[index - 1];
-            setSelected({ id: featureToFocus.id, epicId: selected.epicId, type: NOTE_TYPE.FEATURE, focus: true });
-          }
-        }
+        if (removedFeature) focusFeatureAfterRemoval(removedFeature);
         break;
       case NOTE_TYPE.STORY:
         const removedStory = await maybeRemoveStory(selected.epicId, selected.featureId, selected.id);
-        if (removedStory) {
-          const feature = features.find(f => f.id === removedStory.featureId);
-          const index = feature.stories.findIndex(s => s.id === removedStory.id);
-          if (index !== -1) {
-            const storyToFocus = index === 0 ? feature.stories[index + 1] : feature.stories[index - 1];
-            setSelected({ id: storyToFocus.id, epicId: selected.epicId, featureId: selected.featureId, type: NOTE_TYPE.STORY, focus: true });
-          }
-        }
+        if (removedStory) focusStoryAfterRemoval(removedStory);
         break;
       default:
         break;

@@ -12,8 +12,9 @@ export function StoryMap() {
     addNewEpic, addNewFeature, addNewStory,
     selected, setSelected, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
+    focusEpicAfterRemoval, focusFeatureAfterRemoval, focusStoryAfterRemoval,
     maybeNavigate,
-    isFocused, setIsFocused
+    isFocused, setIsFocused,
   } = useStoryMap();
 
   return (
@@ -36,7 +37,10 @@ export function StoryMap() {
                   if (updateEpicTitle(e.id, editedTitle)) focus();
                 }}
                 add={() => { addNewEpic(e.id) }}
-                remove={() => { maybeRemoveEpic(e.id) }}
+                remove={async () => {
+                  const removedEpic = await maybeRemoveEpic(e.id);
+                  if (removedEpic) focusEpicAfterRemoval(removedEpic);
+                }}
                 navigate={maybeNavigate}>
               </Note>
               {/* to create some space between epics */}
@@ -59,7 +63,10 @@ export function StoryMap() {
                 if (updateFeatureTitle(f.id, editedTitle)) focus();
               }}
               add={() => { addNewFeature(f.epicId, f.id) }}
-              remove={() => { maybeRemoveFeature(f.epicId, f.id) }}
+              remove={async () => {
+                const removedFeature = await maybeRemoveFeature(f.epicId, f.id);
+                if (removedFeature) focusFeatureAfterRemoval(removedFeature);
+              }}
               navigate={maybeNavigate}>
             </Note>
           ))}
@@ -83,7 +90,10 @@ export function StoryMap() {
                     if (updateStoryTitle(f.epicId, f.id, s.id, editedTitle)) focus();
                   }}
                   add={() => { addNewStory(f.epicId, f.id, s.id) }}
-                  remove={() => { maybeRemoveStory(f.epicId, f.id, s.id) }}
+                  remove={async () => {
+                    const removedStory = await maybeRemoveStory(f.epicId, f.id, s.id);
+                    if (removedStory) focusStoryAfterRemoval(removedStory);
+                  }}
                   navigate={maybeNavigate}>
                 </Note>
               ))}
