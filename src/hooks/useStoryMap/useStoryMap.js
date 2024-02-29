@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { NOTE_TYPE } from "../../const";
 import { NoteContext } from "../../context/NoteContext";
 import { StoriesContext } from "../../context/StoriesContext";
 import * as storiesService from "../../services/LocalStoriesService";
@@ -167,7 +168,7 @@ export function useStoryMap() {
     const updatedStoryId = await storiesService.updateStory({ ...story, title });
     if (!updatedStoryId) return null;
 
-    const newFeatures = features.map(f => f.id === featureId ? { ...f, stories: f.stories.map(s => s.id === storyId ? { ...s, title } : s) } : f);
+    const { newFeatures } = lists.updateStory(storyId, featureId, { title });
     setFeatures(newFeatures);
 
     switch (historyOperation) {
@@ -248,7 +249,7 @@ export function useStoryMap() {
     const oldIndex = feature.stories.indexOf(story);
 
     const removed = await storiesService.removeStory(epicId, featureId, storyId);
-    const newFeatures = features.map(f => f.id === featureId ? { ...f, stories: f.stories.filter(s => s.id !== storyId) } : f);
+    const { newFeatures } = lists.removeStory(story);
     setFeatures(newFeatures);
 
     const originStoryId = (feature.stories[oldIndex - 1] || {}).id;
@@ -310,6 +311,43 @@ export function useStoryMap() {
     history.redo();
   }
 
+  function focusEpicAfterRemoval(removedEpic) {
+    const index = epics.findIndex(e => e.id === removedEpic.id);
+    if (index !== -1) {
+      const epicToFocus = index === 0 ? epics[index + 1] : epics[index - 1];
+      setSelected({ id: epicToFocus.id, type: NOTE_TYPE.EPIC, focus: true });
+    }
+  }
+
+  // BUG: if removing the first feature from an epic it will focus the last feature of the previous epic
+  function focusFeatureAfterRemoval(removedFeature) {
+    const index = features.findIndex(feature => feature.id === removedFeature.id);
+    if (index !== -1) {
+      const featureToFocus = index === 0 ? features[index + 1] : features[index - 1];
+      setSelected({
+        id: featureToFocus.id,
+        epicId: removedFeature.epicId,
+        type: NOTE_TYPE.FEATURE,
+        focus: true
+      });
+    }
+  }
+
+  function focusStoryAfterRemoval(removedStory) {
+    const feature = features.find(f => f.id === removedStory.featureId);
+    const index = feature.stories.findIndex(story => story.id === removedStory.id);
+    if (index !== -1) {
+      const storyToFocus = index === 0 ? feature.stories[index + 1] : feature.stories[index - 1];
+      setSelected({
+        id: storyToFocus.id,
+        epicId: removedStory.epicId,
+        featureId: removedStory.featureId,
+        type: NOTE_TYPE.STORY,
+        focus: true
+      });
+    }
+  }
+
   return {
     epics, features,
     addNewEpic, addNewFeature, addNewStory,
@@ -320,5 +358,6 @@ export function useStoryMap() {
     focus, isFocused, setIsFocused,
     canUndo: history.canUndo, canRedo: history.canRedo,
     undo, redo,
+    focusEpicAfterRemoval, focusFeatureAfterRemoval, focusStoryAfterRemoval
   }
 };

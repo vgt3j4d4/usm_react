@@ -91,6 +91,15 @@ export function useLists({ epicListRef, featureListRef }) {
     };
   }
 
+  function removeStory(story) {
+    const featureItem = featureList.toArray().find(i => i.data.id === story.featureId);
+    const newStories = featureItem.data.stories.filter(s => s.id !== story.id);
+    const features = getDataArray(featureList);
+    const newFeatures = features.map(f => f.id === story.featureId ? { ...f, stories: newStories } : f);
+    featureItem.data.stories = newStories;
+    return { newFeatures };
+  }
+
   function updateEpic(epicId, data) {
     const epicItem = epicList.toArray().find(i => i.data.id === epicId);
     epicItem.data = { ...epicItem.data, ...data };
@@ -103,9 +112,16 @@ export function useLists({ epicListRef, featureListRef }) {
     return { newFeatures: getDataArray(featureList) };
   }
 
+  function updateStory(storyId, featureId, data) {
+    const featureItem = featureList.toArray().find(i => i.data.id === featureId);
+    const newStories = featureItem.data.stories.map(s => s.id === storyId ? { ...s, ...data } : s);
+    featureItem.data.stories = newStories;
+    return { newFeatures: getDataArray(featureList) };
+  }
+
   return {
     addEpic, addFeature, addStory,
-    removeEpic, removeFeature,
-    updateEpic, updateFeature,
+    removeEpic, removeFeature, removeStory,
+    updateEpic, updateFeature, updateStory,
   }
 }
