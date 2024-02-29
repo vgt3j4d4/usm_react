@@ -17,6 +17,8 @@ export function StoryMap() {
     isFocused, setIsFocused,
   } = useStoryMap();
 
+  const noSelectionFound = Object.keys(selected).length === 0;
+
   return (
     <>
       <div role="grid" className="min-w-max divide-y-2 divide-gray-400">
@@ -29,7 +31,7 @@ export function StoryMap() {
                 id={e.id}
                 title={e.title}
                 type={NOTE_TYPE.EPIC}
-                focusable={index === 0 && Object.keys(selected).length === 0}
+                focusable={index === 0 && noSelectionFound}
                 selected={selected.id === e.id}
                 toggleFocus={(value) => { setIsFocused(value) }}
                 markAsSelected={() => setSelected({ id: e.id, type: NOTE_TYPE.EPIC })}
