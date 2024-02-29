@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NOTE_TYPE } from "../../../const";
 import { useStoryMap } from "../../../hooks/useStoryMap/useStoryMap";
+import * as keyboardUtils from "../../../utils/keyboardUtils";
 import { isMobileOrTablet } from "../../../utils/utils";
 import { ActionButton } from "../ActionButton";
 import { BUTTON_NAVIGATION } from "../Toolbar";
@@ -20,7 +21,7 @@ export function MapButtons() {
     addNewEpic, addNewFeature, addNewStory,
     canUndo, canRedo,
     undo, redo,
-    selected, setSelected, reselect,
+    selected, reselect,
     isFocused, focus,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
     focusEpicAfterRemoval, focusFeatureAfterRemoval, focusStoryAfterRemoval
@@ -36,12 +37,12 @@ export function MapButtons() {
       if (!undoButton || !redoButton) return;
 
       // TODO: check how to comply with Windows, Mac and Linux undo/redo shortcuts
-      if (undoButton && canUndo() && event.ctrlKey && ['Z', 'z'].indexOf(event.key) !== -1) {
+      if (undoButton && canUndo() && keyboardUtils.isUndo(event)) {
         doUndo();
         return;
       }
       // TODO: check how to comply with Windows, Mac and Linux undo/redo shortcuts
-      if (redoButton && canRedo() && event.ctrlKey && ['Y', 'y'].indexOf(event.key) !== -1) {
+      if (redoButton && canRedo() && keyboardUtils.isRedo(event)) {
         doRedo();
         return;
       }
