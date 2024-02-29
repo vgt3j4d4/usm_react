@@ -35,9 +35,7 @@ export function StoryMap() {
                 selected={selected.id === e.id}
                 toggleFocus={(value) => { setIsFocused(value) }}
                 markAsSelected={() => setSelected({ id: e.id, type: NOTE_TYPE.EPIC })}
-                updateTitle={(editedTitle, forceFocus = true) => {
-                  if (updateEpicTitle(e.id, editedTitle) && forceFocus) focus();
-                }}
+                updateTitle={editedTitle => { updateEpicTitle(e.id, editedTitle) }}
                 add={() => { addNewEpic(e.id) }}
                 remove={async () => {
                   const removedEpic = await maybeRemoveEpic(e.id);
@@ -61,9 +59,7 @@ export function StoryMap() {
               selected={selected.id === f.id}
               toggleFocus={(value) => { setIsFocused(value) }}
               markAsSelected={() => setSelected({ id: f.id, epicId: f.epicId, type: NOTE_TYPE.FEATURE })}
-              updateTitle={(editedTitle, forceFocus = true) => {
-                if (updateFeatureTitle(f.id, editedTitle) && forceFocus) focus();
-              }}
+              updateTitle={editedTitle => { updateFeatureTitle(f.id, editedTitle) }}
               add={() => { addNewFeature(f.epicId, f.id) }}
               remove={async () => {
                 const removedFeature = await maybeRemoveFeature(f.epicId, f.id);
@@ -88,9 +84,7 @@ export function StoryMap() {
                   markAsSelected={() =>
                     setSelected({ id: s.id, epicId: f.epicId, featureId: s.featureId, type: NOTE_TYPE.STORY })
                   }
-                  updateTitle={(editedTitle, forceFocus = true) => {
-                    if (updateStoryTitle(f.epicId, f.id, s.id, editedTitle) && forceFocus) focus();
-                  }}
+                  updateTitle={editedTitle => { updateStoryTitle(f.epicId, f.id, s.id, editedTitle) }}
                   add={() => { addNewStory(f.epicId, f.id, s.id) }}
                   remove={async () => {
                     const removedStory = await maybeRemoveStory(f.epicId, f.id, s.id);
