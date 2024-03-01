@@ -15,7 +15,7 @@ const TOOLBAR_BUTTONS = [
   // { id: 'MOVE', label: 'Move', title: 'Move', iconCls: 'fa-up-down-left-right', disabled: false, action: 'move' },
 ];
 
-export function MapButtons() {
+export function StoryMapButtons() {
   const {
     epics, features,
     addNewEpic, addNewFeature, addNewStory,

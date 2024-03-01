@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ROUTES } from "../../routes";
-import { MapButtons } from "./MapButtons/MapButtons";
-import NavButton from "./NavButton";
 import { IterationsButtons } from "./IterationsButtons";
+import NavButton from "./NavButton";
+import { RolesButtons } from "./RolesButtons";
+import { StoryMapButtons } from "./StoryMapButtons/StoryMapButtons";
 
 export const BUTTON_NAVIGATION = Object.freeze({
   NEXT: 'next',
@@ -27,7 +28,20 @@ export function Toolbar() {
     if (button) button.focus();
   }, [activeIndex]);
 
-  const isMappingView = pathname === ROUTES.MAPPING;
+  const getToolbarButtons = () => {
+    switch (pathname) {
+      case ROUTES.ROLES:
+        return <RolesButtons />;
+      case ROUTES.MAPPING:
+        return <StoryMapButtons />;
+      case ROUTES.ITERATIONS:
+        return <IterationsButtons />;
+      default:
+        return null;
+    }
+  };
+
+  const toolbarButtons = getToolbarButtons(); // TODO: memoize this
 
   return (
     <div role="toolbar" className="fixed top-0 z-10 min-w-full w-full flex justify-between items-center gap-2 p-2 bg-black text-white">
@@ -48,7 +62,7 @@ export function Toolbar() {
       </nav>
 
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex gap-2">
-        {isMappingView ? <MapButtons /> : <IterationsButtons />}
+        {toolbarButtons}
       </div>
 
       <div>
