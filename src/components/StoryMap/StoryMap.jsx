@@ -10,7 +10,7 @@ export function StoryMap() {
     epics, features,
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
     addNewEpic, addNewFeature, addNewStory,
-    selected, setSelected, focus,
+    selected, setSelected,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
     focusEpicAfterRemoval, focusFeatureAfterRemoval, focusStoryAfterRemoval,
     maybeNavigate,
