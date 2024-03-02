@@ -6,17 +6,12 @@ import { focusNoteById } from "../../utils/storyMapUtils";
 export function Note({
   id, title, type,
   focusable = false, selected = false,
-  toggleFocus, markAsSelected, updateTitle, add, remove, navigate
+  markAsSelected, updateTitle, add, remove, navigate
 }) {
   const { editing, setEditing, titleRef } = useNote(false);
 
   function focusNote(e) {
-    toggleFocus(e.target !== titleRef.current);
     markAsSelected();
-  }
-
-  function defocusNote() {
-    toggleFocus(false);
   }
 
   function maybeMarkAsSelected() {
@@ -26,7 +21,6 @@ export function Note({
   function startEditing(e) {
     e.stopPropagation();
     setEditing(true);
-    toggleFocus(false);
   }
 
   function maybeDoAction(e) {
@@ -101,7 +95,6 @@ export function Note({
       data-note-id={id}
       className={className}
       onFocus={focusNote}
-      onBlur={defocusNote}
       onClick={maybeMarkAsSelected}
       onKeyDown={maybeDoAction}
       aria-selected={selected}>
