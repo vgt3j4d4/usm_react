@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { NOTE_TYPE } from "../../const";
 import { useStoryMap } from "../../hooks/useStoryMap/useStoryMap";
 import { isMobileOrTablet } from "../../utils/utils";
@@ -19,8 +19,13 @@ export function StoryMap() {
   } = useStoryMap();
 
   useEffect(function toggleFocus() {
-    function handleFocusIn(event) { setIsFocused(event.target.className.includes('note')); }
-    function handleFocusOut() { setIsFocused(false); }
+    function handleFocusIn(event) {
+      const classNames = (event.target.className || '').split(' ');
+      setIsFocused(classNames.includes('note'));
+    }
+    function handleFocusOut() {
+      setIsFocused(false);
+    }
 
     document.addEventListener('focusin', handleFocusIn);
     document.addEventListener('focusout', handleFocusOut);
@@ -29,6 +34,8 @@ export function StoryMap() {
       document.removeEventListener('focusout', handleFocusOut);
     }
   });
+
+  const displayArrowKeys = useMemo(() => !isMobileOrTablet(), []);
 
   const noSelectionFound = Object.keys(selected).length === 0;
 
@@ -109,7 +116,7 @@ export function StoryMap() {
 
       </div >
 
-      {isFocused && !isMobileOrTablet() ? <ArrowKeys /> : null}
+      {displayArrowKeys && isFocused ? <ArrowKeys /> : null}
     </>
   )
 }
