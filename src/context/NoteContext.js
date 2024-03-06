@@ -7,18 +7,22 @@ export default function NoteProvider({ children }) {
   const [selected, setSelected] = useState({});
   const [isFocused, setIsFocused] = useState(false);
 
+  useEffect(() => {
+    if (selected.id && selected.focus === true) focusNoteById(selected.id);
+  }, [selected]);
+
   function focus() {
     if (!selected || !selected.id) return;
     focusNoteById(selected.id);
   };
 
-  useEffect(() => {
-    if (selected.id && selected.focus === true) focusNoteById(selected.id);
-  }, [selected]);
+  function reselect() {
+    setSelected({ ...selected, focus: true });
+  }
 
   return (
     <NoteContext.Provider value={{
-      selected, setSelected,
+      selected, setSelected, reselect,
       isFocused, setIsFocused,
       focus
     }}>

@@ -1,5 +1,6 @@
+import { useEffect, useMemo } from "react";
 import { NOTE_TYPE } from "../../const";
-import { useStoryMap } from "../../hooks/useStoryMap";
+import { useStoryMap } from "../../hooks/useStoryMap/useStoryMap";
 import { isMobileOrTablet } from "../../utils/utils";
 import { ArrowKeys } from "../ArrowKeys/ArrowKeys";
 import { EmptyNotes } from "../EmptyNotes/EmptyNotes";
@@ -10,11 +11,33 @@ export function StoryMap() {
     epics, features,
     updateEpicTitle, updateFeatureTitle, updateStoryTitle,
     addNewEpic, addNewFeature, addNewStory,
-    selected, setSelected, focus,
+    selected, setSelected,
     maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
+    focusEpicAfterRemoval, focusFeatureAfterRemoval, focusStoryAfterRemoval,
     maybeNavigate,
-    isFocused, setIsFocused
+    isFocused, setIsFocused,
   } = useStoryMap();
+
+  useEffect(function toggleFocus() {
+    function handleFocusIn(event) {
+      const classNames = (event.target.className || '').split(' ');
+      setIsFocused(classNames.includes('note'));
+    }
+    function handleFocusOut() {
+      setIsFocused(false);
+    }
+
+    document.addEventListener('focusin', handleFocusIn);
+    document.addEventListener('focusout', handleFocusOut);
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('focusout', handleFocusOut);
+    }
+  });
+
+  const displayArrowKeys = useMemo(() => !isMobileOrTablet(), []);
+
+  const noSelectionFound = Object.keys(selected).length === 0;
 
   return (
     <>
@@ -28,16 +51,15 @@ export function StoryMap() {
                 id={e.id}
                 title={e.title}
                 type={NOTE_TYPE.EPIC}
-                focusable={index === 0 && Object.keys(selected).length === 0}
+                focusable={index === 0 && noSelectionFound}
                 selected={selected.id === e.id}
-                toggleFocus={(value) => { setIsFocused(value) }}
                 markAsSelected={() => setSelected({ id: e.id, type: NOTE_TYPE.EPIC })}
-                updateTitle={(editedTitle) => {
-                  updateEpicTitle(e.id, editedTitle);
-                  focus();
-                }}
+                updateTitle={editedTitle => { updateEpicTitle(e.id, editedTitle) }}
                 add={() => { addNewEpic(e.id) }}
-                remove={() => { maybeRemoveEpic(e.id) }}
+                remove={async () => {
+                  const removedEpic = await maybeRemoveEpic(e.id);
+                  if (removedEpic) focusEpicAfterRemoval(removedEpic);
+                }}
                 navigate={maybeNavigate}>
               </Note>
               {/* to create some space between epics */}
@@ -54,14 +76,13 @@ export function StoryMap() {
               title={f.title}
               type={NOTE_TYPE.FEATURE}
               selected={selected.id === f.id}
-              toggleFocus={(value) => { setIsFocused(value) }}
               markAsSelected={() => setSelected({ id: f.id, epicId: f.epicId, type: NOTE_TYPE.FEATURE })}
-              updateTitle={(editedTitle) => {
-                updateFeatureTitle(f.id, editedTitle);
-                focus();
-              }}
+              updateTitle={editedTitle => { updateFeatureTitle(f.id, editedTitle) }}
               add={() => { addNewFeature(f.epicId, f.id) }}
-              remove={() => { maybeRemoveFeature(f.epicId, f.id) }}
+              remove={async () => {
+                const removedFeature = await maybeRemoveFeature(f.epicId, f.id);
+                if (removedFeature) focusFeatureAfterRemoval(removedFeature);
+              }}
               navigate={maybeNavigate}>
             </Note>
           ))}
@@ -77,16 +98,15 @@ export function StoryMap() {
                   title={s.title}
                   type={NOTE_TYPE.STORY}
                   selected={selected.id === s.id}
-                  toggleFocus={(value) => { setIsFocused(value) }}
                   markAsSelected={() =>
                     setSelected({ id: s.id, epicId: f.epicId, featureId: s.featureId, type: NOTE_TYPE.STORY })
                   }
-                  updateTitle={(editedTitle) => {
-                    updateStoryTitle(f.epicId, f.id, s.id, editedTitle);
-                    focus();
-                  }}
+                  updateTitle={editedTitle => { updateStoryTitle(f.epicId, f.id, s.id, editedTitle) }}
                   add={() => { addNewStory(f.epicId, f.id, s.id) }}
-                  remove={() => { maybeRemoveStory(f.epicId, f.id, s.id) }}
+                  remove={async () => {
+                    const removedStory = await maybeRemoveStory(f.epicId, f.id, s.id);
+                    if (removedStory) focusStoryAfterRemoval(removedStory);
+                  }}
                   navigate={maybeNavigate}>
                 </Note>
               ))}
@@ -96,7 +116,7 @@ export function StoryMap() {
 
       </div >
 
-      {isFocused && !isMobileOrTablet() ? <ArrowKeys /> : null}
+      {displayArrowKeys && isFocused ? <ArrowKeys /> : null}
     </>
   )
 }

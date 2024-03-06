@@ -1,9 +1,9 @@
-import { NAVIGATION_KEYS } from "../../const";
+import { ARROW_KEYS } from "../../const";
 import { BUTTON_NAVIGATION } from "./Toolbar";
 
 export function ActionButton({ id, button, selected = false, navigate, doAction, children }) {
   function focusOtherButton(e) {
-    if (!NAVIGATION_KEYS.includes(e.key)) return;
+    if (!Object.values(ARROW_KEYS).includes(e.key)) return;
     e.preventDefault();
 
     if (e.key === 'Home') {

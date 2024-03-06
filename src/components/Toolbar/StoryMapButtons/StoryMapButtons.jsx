@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NOTE_TYPE } from "../../../const";
-import { useStoryMap } from "../../../hooks/useStoryMap";
+import { useStoryMap } from "../../../hooks/useStoryMap/useStoryMap";
+import * as keyboardUtils from "../../../utils/keyboardUtils";
 import { isMobileOrTablet } from "../../../utils/utils";
 import { ActionButton } from "../ActionButton";
 import { BUTTON_NAVIGATION } from "../Toolbar";
@@ -14,16 +15,42 @@ const TOOLBAR_BUTTONS = [
   // { id: 'MOVE', label: 'Move', title: 'Move', iconCls: 'fa-up-down-left-right', disabled: false, action: 'move' },
 ];
 
-export function MapButtons() {
+export function StoryMapButtons() {
   const {
     epics, features,
     addNewEpic, addNewFeature, addNewStory,
     canUndo, canRedo,
-    doUndo, doRedo,
-    selected, isFocused, focus,
-    maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory
+    undo, redo,
+    selected, reselect,
+    isFocused, focus,
+    maybeRemoveEpic, maybeRemoveFeature, maybeRemoveStory,
+    focusEpicAfterRemoval, focusFeatureAfterRemoval, focusStoryAfterRemoval
   } = useStoryMap();
   const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(function addUndoRedoListener() {
+    const undoRedoListener = (event) => {
+      if (!canUndo() && !canRedo()) return;
+
+      const undoButton = buttons.find(b => b.id === 'UNDO');
+      const redoButton = buttons.find(b => b.id === 'REDO');
+      if (!undoButton || !redoButton) return;
+
+      // TODO: check how to comply with Windows, Mac and Linux undo/redo shortcuts
+      if (undoButton && canUndo() && keyboardUtils.isUndo(event)) {
+        doUndo();
+        return;
+      }
+      // TODO: check how to comply with Windows, Mac and Linux undo/redo shortcuts
+      if (redoButton && canRedo() && keyboardUtils.isRedo(event)) {
+        doRedo();
+        return;
+      }
+    };
+
+    document.addEventListener('keydown', undoRedoListener);
+    return () => { document.removeEventListener('keydown', undoRedoListener); }
+  });
 
   const [buttons, activeButtons] = getToolbarButtons();
   if (buttons[activeIndex].disabled && activeButtons.length > 0) {
@@ -33,36 +60,36 @@ export function MapButtons() {
   function navigate(buttonNav) {
     if (activeButtons.length === 0) return;
 
-    let _activeIndex = null;
+    let newIndex = null;
     switch (buttonNav) {
       case BUTTON_NAVIGATION.FIRST: {
-        _activeIndex = buttons.indexOf(activeButtons[0]);
+        newIndex = buttons.indexOf(activeButtons[0]);
         break;
       }
       case BUTTON_NAVIGATION.LAST: {
-        _activeIndex = buttons.indexOf(activeButtons[activeButtons.length - 1]);
+        newIndex = buttons.indexOf(activeButtons[activeButtons.length - 1]);
         break;
       }
       case BUTTON_NAVIGATION.NEXT: {
         const button = buttons[activeIndex];
         const index = activeButtons.indexOf(button);
-        if (index === (activeButtons.length - 1)) _activeIndex = buttons.indexOf(activeButtons[0]);
-        else _activeIndex = buttons.indexOf(activeButtons[index + 1]);
+        if (index === (activeButtons.length - 1)) newIndex = buttons.indexOf(activeButtons[0]);
+        else newIndex = buttons.indexOf(activeButtons[index + 1]);
         break;
       }
       case BUTTON_NAVIGATION.PREV: {
         const button = buttons[activeIndex];
         const index = activeButtons.indexOf(button);
-        if (index === 0) _activeIndex = buttons.indexOf(activeButtons[activeButtons.length - 1]);
-        else _activeIndex = buttons.indexOf(activeButtons[index - 1]);
+        if (index === 0) newIndex = buttons.indexOf(activeButtons[activeButtons.length - 1]);
+        else newIndex = buttons.indexOf(activeButtons[index - 1]);
         break;
       }
       default:
         return;
     }
 
-    setActiveIndex(() => _activeIndex);
-    const button = document.getElementById(`toolbar__button_${_activeIndex}`);
+    setActiveIndex(() => newIndex);
+    const button = document.getElementById(`toolbar__button_${newIndex}`);
     if (button) button.focus();
   }
 
@@ -70,32 +97,48 @@ export function MapButtons() {
     switch (selected.type) {
       case NOTE_TYPE.EPIC:
         addNewEpic(selected.id);
+        reselect();
         break;
       case NOTE_TYPE.FEATURE:
         addNewFeature(selected.epicId, selected.id);
+        reselect();
         break;
       case NOTE_TYPE.STORY:
         addNewStory(selected.epicId, selected.featureId, selected.id);
+        reselect();
         break;
       default:
         break;
     }
   }
 
-  function removeNote() {
+  async function removeNote() {
     switch (selected.type) {
       case NOTE_TYPE.EPIC:
-        maybeRemoveEpic(selected.id);
+        const removedEpic = await maybeRemoveEpic(selected.id);
+        if (removedEpic) focusEpicAfterRemoval(removedEpic);
         break;
       case NOTE_TYPE.FEATURE:
-        maybeRemoveFeature(selected.epicId, selected.id);
+        const removedFeature = await maybeRemoveFeature(selected.epicId, selected.id);
+        if (removedFeature) focusFeatureAfterRemoval(removedFeature);
         break;
       case NOTE_TYPE.STORY:
-        maybeRemoveStory(selected.epicId, selected.featureId, selected.id);
+        const removedStory = await maybeRemoveStory(selected.epicId, selected.featureId, selected.id);
+        if (removedStory) focusStoryAfterRemoval(removedStory);
         break;
       default:
         break;
     }
+  }
+
+  function doUndo() {
+    undo();
+    focus();
+  }
+
+  function doRedo() {
+    redo();
+    focus();
   }
 
   function getToolbarButtons() {
