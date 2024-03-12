@@ -1,13 +1,12 @@
-import { List } from "linked-list";
 import { createContext, useEffect, useRef, useState } from "react";
+import { LinkedList as List } from "../classes/linked-list/LinkedList.ts";
 import * as storiesService from "../services/LocalStoriesService";
-import { buildItem, getFeatures } from "../utils/storyMapUtils";
 
 export const StoriesContext = createContext();
 
 export default function StoriesProvider({ children }) {
-  const epicListRef = useRef(new List()); // parallel double linked list to epics
-  const featureListRef = useRef(new List()); // parallel double linked list to features
+  const epicListRef = useRef(null); // parallel double linked list to epics
+  const featureListRef = useRef(null); // parallel double linked list to features
   const [epics, setEpics] = useState([]);
   const [features, setFeatures] = useState([]);
   const storyMapHistoryRef = useRef({ undoList: new List(), redoList: new List() });
@@ -18,11 +17,11 @@ export default function StoriesProvider({ children }) {
       storiesService.initialize();
       const storyMap = storiesService.getStoryMap();
       const epics = storyMap.epics;
-      const features = getFeatures(epics);
+      const features = epics.flatMap(e => e.features);
       setEpics(epics);
       setFeatures(features);
-      epicListRef.current = List.from(epics.map(e => buildItem(e)));
-      featureListRef.current = List.from(features.map(f => buildItem(f)));
+      epicListRef.current = List.fromArray(epics.map(e => e));
+      featureListRef.current = List.fromArray(features.map(f => f));
     }
     retrieveState();
   }, []);
