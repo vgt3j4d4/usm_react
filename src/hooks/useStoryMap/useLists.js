@@ -1,4 +1,3 @@
-import { LinkedList as List } from "../../classes/linked-list/LinkedList.ts";
 import { ListItem as Item } from "../../classes/linked-list/ListItem.ts";
 import { insertItemAtIndex } from "../../utils/utils";
 
@@ -23,8 +22,8 @@ export function useLists({ epicListRef, featureListRef }) {
     }
 
     return {
-      newEpics: List.toDataArray(epicList),
-      newFeatures: List.toDataArray(featureList)
+      newEpics: epicList.toDataArray(),
+      newFeatures: featureList.toDataArray()
     };
   }
 
@@ -41,8 +40,8 @@ export function useLists({ epicListRef, featureListRef }) {
     epicItem.data.features.push(feature);
 
     return {
-      newEpics: List.toDataArray(epicList),
-      newFeatures: List.toDataArray(featureList)
+      newEpics: epicList.toDataArray(),
+      newFeatures: featureList.toDataArray()
     };
   }
 
@@ -62,7 +61,7 @@ export function useLists({ epicListRef, featureListRef }) {
 
   function addStory(story, originStoryId) {
     const featureItem = featureList.find(i => i.data.id === story.featureId);
-    const features = List.toDataArray(featureList);
+    const features = featureList.toDataArray();
     const { newStories, newFeatures } = addStoryToFeatures(features, story.featureId, originStoryId, story);
     featureItem.data.stories = newStories;
     return { newFeatures };
@@ -75,8 +74,8 @@ export function useLists({ epicListRef, featureListRef }) {
     featureItems.every(i => i.detach());
 
     return {
-      newEpics: List.toDataArray(epicList),
-      newFeatures: List.toDataArray(featureList)
+      newEpics: epicList.toDataArray(),
+      newFeatures: featureList.toDataArray()
     };
   }
 
@@ -87,15 +86,15 @@ export function useLists({ epicListRef, featureListRef }) {
     featureItem.detach();
 
     return {
-      newEpics: List.toDataArray(epicList),
-      newFeatures: List.toDataArray(featureList)
+      newEpics: epicList.toDataArray(),
+      newFeatures: featureList.toDataArray()
     };
   }
 
   function removeStory(story) {
     const featureItem = featureList.find(i => i.data.id === story.featureId);
     const newStories = featureItem.data.stories.filter(s => s.id !== story.id);
-    const features = List.toDataArray(featureList);
+    const features = featureList.toDataArray();
     const newFeatures = features.map(f => f.id === story.featureId ? { ...f, stories: newStories } : f);
     featureItem.data.stories = newStories;
     return { newFeatures };
@@ -104,20 +103,20 @@ export function useLists({ epicListRef, featureListRef }) {
   function updateEpic(epicId, data) {
     const epicItem = epicList.find(i => i.data.id === epicId);
     epicItem.data = { ...epicItem.data, ...data };
-    return { newEpics: List.toDataArray(epicList) };
+    return { newEpics: epicList.toDataArray() };
   }
 
   function updateFeature(featureId, data) {
     const featureItem = featureList.find(i => i.data.id === featureId);
     featureItem.data = { ...featureItem.data, ...data };
-    return { newFeatures: List.toDataArray(featureList) };
+    return { newFeatures: featureList.toDataArray() };
   }
 
   function updateStory(storyId, featureId, data) {
     const featureItem = featureList.find(i => i.data.id === featureId);
     const newStories = featureItem.data.stories.map(s => s.id === storyId ? { ...s, ...data } : s);
     featureItem.data.stories = newStories;
-    return { newFeatures: List.toDataArray(featureList) };
+    return { newFeatures: featureList.toDataArray() };
   }
 
   return {

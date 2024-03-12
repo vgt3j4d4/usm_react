@@ -55,6 +55,10 @@ export class LinkedList<T> {
     return array;
   }
 
+  toDataArray(): Array<any> {
+    return this.toArray().map(item => item.data);
+  }
+
   static fromArray(array: Array<any>): LinkedList<any> {
     const list = new LinkedList<any>();
     array.forEach((data) => {
@@ -63,9 +67,5 @@ export class LinkedList<T> {
       list.append(item);
     });
     return list;
-  }
-
-  static toDataArray(list: LinkedList<any>): Array<any> {
-    return list.toArray().map(item => item.data);
   }
 }
