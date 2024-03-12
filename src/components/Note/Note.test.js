@@ -25,7 +25,16 @@ describe('Note', () => {
     expect(noteEl).toHaveClass("note--selected");
   });
 
-  it('should be focusable when selected', () => {
+  it('should be focusable', () => {
+    const { container } = render(<Note id="1" focusable={true} toggleFocus={noop} markAsSelected={noop} />);
+    expect(container).toBeDefined();
+
+    const noteEl = container.children[0];
+    noteEl.focus();
+    expect(noteEl).toHaveFocus();
+  });
+
+  it('should be get focus when selected', () => {
     const { container } = render(<Note id="1" title="random title" selected={true} toggleFocus={noop} markAsSelected={noop} />);
     expect(container).toBeDefined();
 
@@ -34,17 +43,8 @@ describe('Note', () => {
     expect(noteEl).toHaveFocus();
   });
 
-  it('should be focusable if is first note', () => {
-    const { container } = render(<Note id="1" isFirst={true} toggleFocus={noop} markAsSelected={noop} />);
-    expect(container).toBeDefined();
-
-    const noteEl = container.children[0];
-    noteEl.focus();
-    expect(noteEl).toHaveFocus();
-  });
-
-  it('should not focusable if not selected or not is first note', () => {
-    const { container } = render(<Note id="1" selected={false} isFirst={false} />);
+  it('should not get focus if not selected or not focusable', () => {
+    const { container } = render(<Note id="1" selected={false} focusable={false} />);
     expect(container).toBeDefined();
 
     const noteEl = container.children[0];
