@@ -28,7 +28,7 @@ export function useHistory({ storyMapHistoryRef }) {
 
   function addToUndo(action) {
     undoList.prepend(new Item(action));
-    if (undoList.size > MAX_HISTORY_LENGTH) undoList.tail.detach();
+    if (undoList.size() > MAX_HISTORY_LENGTH) undoList.tail.detach();
   }
 
   function addToRedo(action) {
@@ -36,11 +36,11 @@ export function useHistory({ storyMapHistoryRef }) {
   }
 
   function canUndo() {
-    return undoList.size > 0;
+    return undoList.size() > 0;
   }
 
   function canRedo() {
-    return redoList.size > 0;
+    return redoList.size() > 0;
   }
 
   function getUndoItem() {
@@ -57,7 +57,7 @@ export function useHistory({ storyMapHistoryRef }) {
       console.error('List is empty');
       return null;
     }
-    return item.value;
+    return item.data;
   }
 
   function getUndo() {
