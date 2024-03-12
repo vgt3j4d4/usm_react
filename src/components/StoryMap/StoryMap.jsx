@@ -4,7 +4,7 @@ import { useStoryMap } from "../../hooks/useStoryMap/useStoryMap";
 import { isMobileOrTablet } from "../../utils/utils";
 import { ArrowKeys } from "../ArrowKeys/ArrowKeys";
 import { EmptyNotes } from "../EmptyNotes/EmptyNotes";
-import { Note } from "../Note/Note";
+import { Note } from "../Note/Note.tsx";
 
 export function StoryMap() {
   const {
