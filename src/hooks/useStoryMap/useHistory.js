@@ -1,4 +1,4 @@
-import { Item } from "linked-list";
+import { ListItem as Item } from "../../classes/linked-list/ListItem.ts";
 
 const MAX_HISTORY_LENGTH = 25;
 
@@ -27,16 +27,12 @@ export function useHistory({ storyMapHistoryRef }) {
   const { undoList, redoList } = storyMapHistoryRef.current;
 
   function addToUndo(action) {
-    const item = new Item();
-    item.value = action;
-    undoList.prepend(item);
+    undoList.prepend(new Item(action));
     if (undoList.size > MAX_HISTORY_LENGTH) undoList.tail.detach();
   }
 
   function addToRedo(action) {
-    const item = new Item();
-    item.value = action;
-    redoList.prepend(item);
+    redoList.prepend(new Item(action));
   }
 
   function canUndo() {
