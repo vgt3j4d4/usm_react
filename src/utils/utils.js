@@ -41,7 +41,9 @@ export function insertItemAtIndex(array = [], item, index = 0) {
   if (index === 0) {
     return [item, ...array];
   } else {
-    return array.toSpliced(index, 0, item);
+    const newArray = [...array];
+    newArray.splice(index, 0, item);
+    return newArray;
   }
 }
 
