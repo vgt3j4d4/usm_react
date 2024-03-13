@@ -71,7 +71,7 @@ export function useLists({ epicListRef, featureListRef }) {
     const epicItem = epicList.findFirst(i => i.data.id === epic.id);
     epicItem.detach();
     const featureItems = featureList.findAll(i => i.data.epicId === epic.id);
-    featureItems.every(i => i.detach());
+    featureItems.forEach(i => i.detach());
 
     return {
       newEpics: epicList.toDataArray(),
