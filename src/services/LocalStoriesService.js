@@ -1,5 +1,5 @@
 import { DEFAULT_EPIC, DEFAULT_FEATURE, DEFAULT_STORY, VERSION } from "../const";
-import { insertItemAtIndex, clone, id } from "../utils/utils";
+import { id, insertItemAtIndex } from "../utils/utils";
 
 const LOCAL_STORAGE_KEY = 'USM_' + VERSION;
 
@@ -24,7 +24,7 @@ function saveOrUpdate(data) {
   }
 }
 
-function buildEpic() {
+export function buildEpic() {
   const epicId = id();
   return {
     id: epicId,
@@ -33,7 +33,7 @@ function buildEpic() {
   }
 }
 
-function buildFeature(epicId) {
+export function buildFeature(epicId) {
   const featureId = id();
   return {
     id: featureId,
@@ -43,7 +43,7 @@ function buildFeature(epicId) {
   }
 }
 
-function buildStory(epicId, featureId) {
+export function buildStory(epicId, featureId) {
   const storyId = id();
   return {
     id: storyId,
@@ -63,7 +63,7 @@ export function initialize() {
 
 export function getStoryMap() {
   const { storyMap } = getData();
-  return clone(storyMap);
+  return storyMap;
 }
 
 export async function addNewEpic(_storyMapId) {
@@ -71,7 +71,7 @@ export async function addNewEpic(_storyMapId) {
   const epic = buildEpic();
   storyMap.epics.push(epic);
   saveOrUpdate({ storyMap });
-  return Promise.resolve(clone(epic));
+  return Promise.resolve(epic);
 }
 
 export async function addEpic(_storyMapId, epic, originEpicId) {
@@ -89,7 +89,7 @@ export async function addNewFeature(_storyMapId, epicId) {
     const feature = buildFeature(epicId);
     epic.features.push(feature);
     saveOrUpdate({ storyMap });
-    return Promise.resolve(clone(feature));
+    return Promise.resolve(feature);
   }
   return Promise.resolve(null);
 }
@@ -112,7 +112,7 @@ export async function addNewStory(_storyMapId, epicId, featureId) {
       const story = buildStory(epicId, featureId);
       feature.stories.push(story);
       saveOrUpdate({ storyMap });
-      return Promise.resolve(clone(story));
+      return Promise.resolve(story);
     }
   }
   return Promise.resolve(null);
@@ -138,7 +138,7 @@ export async function removeEpic(epicId) {
   if (epic) {
     storyMap.epics = storyMap.epics.filter(e => e.id !== epicId);
     saveOrUpdate({ storyMap });
-    return Promise.resolve(clone(epic));
+    return Promise.resolve(epic);
   }
   return Promise.resolve(null);
 }
@@ -151,7 +151,7 @@ export async function removeFeature(epicId, featureId) {
     if (feature) {
       epic.features = epic.features.filter(f => f.id !== featureId);
       saveOrUpdate({ storyMap });
-      return Promise.resolve(clone(feature));
+      return Promise.resolve(feature);
     }
   }
   return Promise.resolve(null);
@@ -168,7 +168,7 @@ export async function removeStory(epicId, featureId, storyId) {
       if (storyIndex !== -1) {
         feature.stories.splice(storyIndex, 1);
         saveOrUpdate({ storyMap });
-        return Promise.resolve(clone(story));
+        return Promise.resolve(story);
       }
     }
   }
