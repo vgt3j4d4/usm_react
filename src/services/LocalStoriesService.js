@@ -24,7 +24,7 @@ function saveOrUpdate(data) {
   }
 }
 
-function buildEpic() {
+export function buildEpic() {
   const epicId = id();
   return {
     id: epicId,
@@ -33,7 +33,7 @@ function buildEpic() {
   }
 }
 
-function buildFeature(epicId) {
+export function buildFeature(epicId) {
   const featureId = id();
   return {
     id: featureId,
@@ -43,7 +43,7 @@ function buildFeature(epicId) {
   }
 }
 
-function buildStory(epicId, featureId) {
+export function buildStory(epicId, featureId) {
   const storyId = id();
   return {
     id: storyId,
