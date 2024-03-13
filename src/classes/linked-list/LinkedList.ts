@@ -36,13 +36,32 @@ export class LinkedList<T> {
     return size;
   }
 
-  find(predicateFn: (item: ListItem<T>) => boolean): ListItem<T> | null {
+  findFirst(predicateFn: (item: ListItem<T>) => boolean): ListItem<T> | null {
     let current = this.head;
     while (current) {
       if (predicateFn(current)) return current;
       current = current.next;
     }
     return null;
+  }
+
+  findLast(predicateFn: (item: ListItem<T>) => boolean): ListItem<T> | null {
+    let current = this.tail;
+    while (current) {
+      if (predicateFn(current)) return current;
+      current = current.prev;
+    }
+    return null;
+  }
+
+  findAll(predicateFn: (item: ListItem<T>) => boolean): Array<ListItem<T>> {
+    const items: Array<ListItem<T>> = [];
+    let current = this.head;
+    while (current) {
+      if (predicateFn(current)) items.push(current);
+      current = current.next;
+    }
+    return items;
   }
 
   toArray(): Array<ListItem<T>> {

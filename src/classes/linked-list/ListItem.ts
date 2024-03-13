@@ -27,15 +27,10 @@ export class ListItem<T> {
   };
 
   detach() {
-    if (this.prev) {
-      this.prev.next = this.next;
-    } else {
-      if (this.list.head === this) this.list.head = this.next;
-    }
-    if (this.next) {
-      this.next.prev = this.prev;
-    } else {
-      if (this.list.tail === this) this.list.tail = this.prev;
-    }
+    if (this.prev) this.prev.next = this.next;
+    if (this.next) this.next.prev = this.prev;
+    if (this.list.head === this) this.list.head = this.next;
+    if (this.list.tail === this) this.list.tail = this.prev;
   };
+
 }
