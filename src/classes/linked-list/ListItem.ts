@@ -1,4 +1,4 @@
-import { LinkedList } from "./LinkedList";
+import { LinkedList } from "./LinkedList.ts";
 
 export class ListItem<T> {
   data: T;
@@ -6,8 +6,10 @@ export class ListItem<T> {
   prev: ListItem<T> | null = null;
   list: LinkedList<T>;
 
-  constructor(data: T) {
+  constructor(data: T, list?: LinkedList<T>) {
     this.data = data;
+    this.list = list ? list : new LinkedList<T>();
+    this.list.append(this);
   }
 
   prepend(item: ListItem<T>) {

@@ -4,6 +4,11 @@ export function id() {
   return uuidv4().split('-').join('');
 }
 
+/**
+ * Selects the text within a given element.
+ *
+ * @param {HTMLElement} textEl - The element containing the text to be selected.
+ */
 export function selectTextWithin(textEl) {
   let range, selection;
   if (document.body.createTextRange) {

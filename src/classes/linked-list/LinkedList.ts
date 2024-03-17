@@ -78,13 +78,13 @@ export class LinkedList<T> {
     return this.toArray().map(item => item.data);
   }
 
+  toString(): string {
+    return this.toDataArray().join(",");
+  }
+
   static fromArray(array: Array<any>): LinkedList<any> {
     const list = new LinkedList<any>();
-    array.forEach((data) => {
-      const item = new ListItem(data);
-      item.list = list;
-      list.append(item);
-    });
+    array.forEach(data => new ListItem(data, list));
     return list;
   }
 }
