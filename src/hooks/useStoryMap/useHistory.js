@@ -18,9 +18,9 @@ export const HISTORY_ACTIONS = Object.freeze({
 });
 
 export const HISTORY_OPERATION = Object.freeze({
-  NONE: 'none',
-  UNDO: 'undo',
-  REDO: 'redo',
+  NONE: 0,
+  UNDO: 1,
+  REDO: 2,
 });
 
 export function useHistory({ storyMapHistoryRef }) {

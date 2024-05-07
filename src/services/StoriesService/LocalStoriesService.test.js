@@ -1,10 +1,12 @@
-import * as localStoriesService from "../services/LocalStoriesService";
-import { VERSION } from "../const";
+import { VERSION } from "../../const";
+import { ModelBuilder } from "../../utils/modelBuilder.ts";
+import { LocalStoriesService } from "./LocalStoriesService.ts";
 
 describe('LocalStoriesService', () => {
 
   const USM_ID = `USM_${VERSION}`;
   const localStorage = window.localStorage;
+  const storiesService = LocalStoriesService.getInstance();
 
   function getStoryMap() {
     const data = localStorage.getItem(USM_ID);
@@ -13,7 +15,7 @@ describe('LocalStoriesService', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    localStoriesService.initialize();
+    storiesService.initialize();
   });
 
   it('should get empty Story Map', () => {
@@ -23,27 +25,23 @@ describe('LocalStoriesService', () => {
 
   it('should initialize with Default Story Map', () => {
     const storyMap = getStoryMap();
-    expect(storyMap).not.toBeNull();
     expect(storyMap.epics).toHaveLength(1);
     expect(storyMap.epics[0].features).toHaveLength(1);
     expect(storyMap.epics[0].features[0].stories).toHaveLength(1);
   });
 
   it('should add new epic', async () => {
-    await localStoriesService.addNewEpic();
+    await storiesService.addNewEpic();
 
     const storyMap = getStoryMap();
-    expect(storyMap).not.toBeNull();
     expect(storyMap.epics).toHaveLength(2);
   });
 
   it('should add new feature', async () => {
     const storyMap = getStoryMap();
-    expect(storyMap).not.toBeNull();
-    const storyMapId = storyMap.id;
     const epicId = storyMap.epics[0].id;
 
-    await localStoriesService.addNewFeature(storyMapId, epicId);
+    await storiesService.addNewFeature(epicId);
 
     const updatedStoryMap = getStoryMap();
     expect(updatedStoryMap).not.toBeNull();
@@ -54,12 +52,10 @@ describe('LocalStoriesService', () => {
 
   it('should add new story', async () => {
     const storyMap = getStoryMap();
-    expect(storyMap).not.toBeNull();
-    const storyMapId = storyMap.id;
     const epicId = storyMap.epics[0].id;
     const featureId = storyMap.epics[0].features[0].id;
 
-    await localStoriesService.addNewStory(storyMapId, epicId, featureId);
+    await storiesService.addNewStory(epicId, featureId);
 
     const updatedStoryMap = getStoryMap();
     expect(updatedStoryMap).not.toBeNull();
@@ -73,11 +69,9 @@ describe('LocalStoriesService', () => {
 
   it('should add epic', async () => {
     const storyMap = getStoryMap();
-    expect(storyMap).not.toBeNull();
-    const storyMapId = storyMap.id;
-    const epic = localStoriesService.buildEpic();
+    const epic = ModelBuilder.buildEpic();
 
-    await localStoriesService.addEpic(storyMapId, epic, storyMap.epics[0].id);
+    await storiesService.addEpic(epic, storyMap.epics[0].id);
 
     const updatedStoryMap = getStoryMap();
     expect(updatedStoryMap).not.toBeNull();
@@ -86,11 +80,9 @@ describe('LocalStoriesService', () => {
 
   it('should remove epic', async () => {
     const storyMap = getStoryMap();
-    expect(storyMap).not.toBeNull();
-    const storyMapId = storyMap.id;
     const epicId = storyMap.epics[0].id;
 
-    await localStoriesService.removeEpic(epicId);
+    await storiesService.removeEpic(epicId);
 
     const updatedStoryMap = getStoryMap();
     expect(updatedStoryMap).not.toBeNull();
@@ -99,12 +91,10 @@ describe('LocalStoriesService', () => {
 
   it('should remove feature', async () => {
     const storyMap = getStoryMap();
-    expect(storyMap).not.toBeNull();
-    const storyMapId = storyMap.id;
     const epicId = storyMap.epics[0].id;
     const featureId = storyMap.epics[0].features[0].id;
 
-    await localStoriesService.removeFeature(epicId, featureId);
+    await storiesService.removeFeature(epicId, featureId);
 
     const updatedStoryMap = getStoryMap();
     expect(updatedStoryMap).not.toBeNull();
@@ -115,13 +105,11 @@ describe('LocalStoriesService', () => {
 
   it('should remove story', async () => {
     const storyMap = getStoryMap();
-    expect(storyMap).not.toBeNull();
-    const storyMapId = storyMap.id;
     const epicId = storyMap.epics[0].id;
     const featureId = storyMap.epics[0].features[0].id;
     const storyId = storyMap.epics[0].features[0].stories[0].id;
 
-    await localStoriesService.removeStory(epicId, featureId, storyId);
+    await storiesService.removeStory(epicId, featureId, storyId);
 
     const updatedStoryMap = getStoryMap();
     expect(updatedStoryMap).not.toBeNull();
@@ -134,10 +122,9 @@ describe('LocalStoriesService', () => {
 
   it('should update epic', async () => {
     const storyMap = getStoryMap();
-    expect(storyMap).not.toBeNull();
     const epic = storyMap.epics[0];
 
-    await localStoriesService.updateEpic({ ...epic, title: 'Updated Epic' });
+    await storiesService.updateEpic({ ...epic, title: 'Updated Epic' });
 
     const updatedStoryMap = getStoryMap();
     expect(updatedStoryMap).not.toBeNull();
@@ -148,11 +135,10 @@ describe('LocalStoriesService', () => {
 
   it('should update feature', async () => {
     const storyMap = getStoryMap();
-    expect(storyMap).not.toBeNull();
     const epic = storyMap.epics[0];
     const feature = epic.features[0];
 
-    await localStoriesService.updateFeature({ ...feature, title: 'Updated Feature' });
+    await storiesService.updateFeature({ ...feature, title: 'Updated Feature' });
 
     const updatedStoryMap = getStoryMap();
     expect(updatedStoryMap).not.toBeNull();
@@ -165,12 +151,11 @@ describe('LocalStoriesService', () => {
 
   it('should update story', async () => {
     const storyMap = getStoryMap();
-    expect(storyMap).not.toBeNull();
     const epic = storyMap.epics[0];
     const feature = epic.features[0];
     const story = feature.stories[0];
 
-    await localStoriesService.updateStory({ ...story, title: 'Updated Story' });
+    await storiesService.updateStory({ ...story, title: 'Updated Story' });
 
     const updatedStoryMap = getStoryMap();
     expect(updatedStoryMap).not.toBeNull();

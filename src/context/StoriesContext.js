@@ -1,6 +1,6 @@
 import { createContext, useEffect, useRef, useState } from "react";
 import { LinkedList as List } from "../classes/linked-list/LinkedList.ts";
-import * as storiesService from "../services/LocalStoriesService";
+import { StoriesServiceFactory } from "../services/StoriesService/StoriesServiceFactory.ts";
 
 export const StoriesContext = createContext();
 
@@ -14,7 +14,7 @@ export default function StoriesProvider({ children }) {
 
   useEffect(() => {
     const retrieveState = async () => {
-      storiesService.initialize();
+      const storiesService = StoriesServiceFactory.getStoriesService();
       const storyMap = storiesService.getStoryMap();
       const epics = storyMap.epics;
       const features = epics.flatMap(e => e.features);

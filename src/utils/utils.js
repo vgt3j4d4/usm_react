@@ -52,6 +52,10 @@ export function insertItemAtIndex(array = [], item, index = 0) {
   }
 }
 
+/**
+ * Checks if the current device is a mobile or tablet device.
+ * @returns {boolean} Returns true if the device is a mobile or tablet, false otherwise.
+ */
 export function isMobileOrTablet() {
   const param = navigator.userAgent || navigator.vendor || window.opera;
   // eslint-disable-next-line

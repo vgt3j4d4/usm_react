@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { NOTE_TYPE } from "../../const";
 import { NoteContext } from "../../context/NoteContext";
 import { StoriesContext } from "../../context/StoriesContext";
-import * as storiesService from "../../services/LocalStoriesService";
+import { StoriesServiceFactory } from "../../services/StoriesService/StoriesServiceFactory.ts";
 import { HISTORY_ACTIONS, HISTORY_OPERATION, useHistory } from "./useHistory";
 import { useLists } from "./useLists";
 import { useNavigation } from "./useNavigation";
@@ -13,7 +13,6 @@ export function useStoryMap() {
     epics, features,
     setEpics, setFeatures,
     storyMapHistoryRef,
-    storyMapIdRef
   } = useContext(StoriesContext);
   const {
     selected, setSelected, reselect,
@@ -24,10 +23,10 @@ export function useStoryMap() {
   const lists = useLists({ epicListRef, featureListRef });
   const { maybeNavigate } = useNavigation({ epics, features, selected, setSelected });
 
-  const storyMapId = storyMapIdRef.current;
+  const storiesService = StoriesServiceFactory.getStoriesService();
 
   async function addNewEpic(originEpicId) {
-    const epic = await storiesService.addNewEpic(storyMapId);
+    const epic = await storiesService.addNewEpic();
     if (!epic) return;
 
     const { newEpics, newFeatures } = lists.addEpic(epic, originEpicId);
@@ -39,7 +38,7 @@ export function useStoryMap() {
   }
 
   async function addEpic(epic, originEpicId, historyOperation = HISTORY_OPERATION.NONE) {
-    const epicId = await storiesService.addEpic(storyMapId, epic, originEpicId);
+    const epicId = await storiesService.addEpic(epic, originEpicId);
     if (!epicId) return;
 
     const { newEpics, newFeatures } = lists.addEpic(epic, originEpicId);
@@ -58,7 +57,7 @@ export function useStoryMap() {
   }
 
   async function addNewFeature(epicId, originFeatureId) {
-    const feature = await storiesService.addNewFeature(storyMapId, epicId);
+    const feature = await storiesService.addNewFeature(epicId);
     if (!feature) return;
 
     const { newFeatures } = lists.addFeature(feature, originFeatureId);
@@ -69,7 +68,7 @@ export function useStoryMap() {
   }
 
   function addFeature(feature, originFeatureId, historyOperation = HISTORY_OPERATION.NONE) {
-    const featureId = storiesService.addFeature(storyMapId, feature, originFeatureId);
+    const featureId = storiesService.addFeature(feature, originFeatureId);
     if (!featureId) return;
 
     const { newFeatures } = lists.addFeature(feature, originFeatureId);
@@ -87,7 +86,7 @@ export function useStoryMap() {
   }
 
   async function addNewStory(epicId, featureId, originStoryId) {
-    const story = await storiesService.addNewStory(storyMapId, epicId, featureId);
+    const story = await storiesService.addNewStory(epicId, featureId);
     if (!story) return;
 
     const { newFeatures } = lists.addStory(story, originStoryId);
@@ -96,7 +95,7 @@ export function useStoryMap() {
   }
 
   async function addStory(story, originStoryId, historyOperation = HISTORY_OPERATION.NONE) {
-    const storyId = await storiesService.addStory(storyMapId, story, originStoryId);
+    const storyId = await storiesService.addStory(story, originStoryId);
     if (!storyId) return;
 
     const { newFeatures } = lists.addStory(story, originStoryId);
