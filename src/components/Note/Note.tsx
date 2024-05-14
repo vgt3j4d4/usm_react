@@ -21,6 +21,7 @@ interface NoteComponentProps {
 }
 
 class NoteComponent extends React.Component<NoteComponentProps> {
+
   constructor(props: NoteComponentProps) {
     super(props);
     this.focusNote = this.focusNote.bind(this);
@@ -100,15 +101,13 @@ class NoteComponent extends React.Component<NoteComponentProps> {
 
     return (
       <div
-        role="gridcell"
         tabIndex={focusable || selected ? 0 : -1}
         data-note-id={id}
         className={className}
         onFocus={this.focusNote}
         onClick={this.maybeMarkAsSelected}
         onKeyDown={this.maybeDoAction}
-        aria-selected={selected}
-      >
+        aria-selected={selected}>
         <span className="note__content">
           <span
             className={editing ? "outline-none" : "hidden"}
@@ -117,14 +116,12 @@ class NoteComponent extends React.Component<NoteComponentProps> {
             suppressContentEditableWarning={true}
             tabIndex={editing ? 0 : -1}
             onKeyDown={this.maybeStopEditing}
-            onBlur={this.stopEditing}
-          >
+            onBlur={this.stopEditing}>
             {title}
           </span>
           <span
             className={editing ? "hidden" : "select-none hover:cursor-text"}
-            onClick={this.startEditing}
-          >
+            onClick={this.startEditing}>
             {title}
           </span>
         </span>

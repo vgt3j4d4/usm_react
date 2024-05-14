@@ -54,6 +54,17 @@ export class LinkedList<T> {
     return null;
   }
 
+  findIndex(predicateFn: (item: ListItem<T>) => boolean): number {
+    let index = 0;
+    let current = this.head;
+    while (current) {
+      if (predicateFn(current)) return index;
+      index++;
+      current = current.next;
+    }
+    return -1;
+  }
+
   findAll(predicateFn: (item: ListItem<T>) => boolean): Array<ListItem<T>> {
     const items: Array<ListItem<T>> = [];
     let current = this.head;

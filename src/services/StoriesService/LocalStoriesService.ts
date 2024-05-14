@@ -99,16 +99,21 @@ export class LocalStoriesService implements StoriesService {
   }
 
   /**
-   * Adds a new feature to the specified epic.
-   * @param epicId - The ID of the epic.
-   * @returns A promise that resolves with the newly created feature, or null if the epic doesn't exist.
+   * Adds a new feature to an epic.
+   * 
+   * @param epicId - The ID of the epic to add the feature to.
+   * @param originFeatureId - (Optional) The ID of the feature after which the new feature should be inserted.
+   * @returns A Promise that resolves to the newly added Feature, or null if the epic does not exist.
    */
-  async addNewFeature(epicId: string): Promise<Feature | null> {
+  async addNewFeature(epicId: string, originFeatureId?: string): Promise<Feature | null> {
     const { storyMap } = this.getData()!;
     const epic = storyMap.epics.find(e => e.id === epicId);
     if (epic) {
       const feature = ModelBuilder.buildFeature(epic.id);
-      epic.features.push(feature);
+      if (originFeatureId) {
+        const index = epic.features.findIndex(f => f.id === originFeatureId);
+        epic.features = insertItemAtIndex(epic.features, feature, index + 1);
+      } else epic.features.push(feature);
       this.saveOrUpdate({ storyMap });
       return Promise.resolve(feature);
     }
@@ -117,18 +122,23 @@ export class LocalStoriesService implements StoriesService {
 
   /**
    * Adds a new story to the specified epic and feature.
+   * 
    * @param epicId - The ID of the epic.
    * @param featureId - The ID of the feature.
-   * @returns A promise that resolves with the newly created story, or null if the epic or feature doesn't exist.
+   * @param originStoryId - (Optional) The ID of the origin story.
+   * @returns A Promise that resolves to the newly added story, or null if the epic or feature is not found.
    */
-  async addNewStory(epicId: string, featureId: string): Promise<Story | null> {
+  async addNewStory(epicId: string, featureId: string, originStoryId?: string): Promise<Story | null> {
     const { storyMap } = this.getData()!;
     const epic = storyMap.epics.find(e => e.id === epicId);
     if (epic) {
       const feature = epic.features.find(f => f.id === featureId);
       if (feature) {
         const story = ModelBuilder.buildStory(epic.id, feature.id);
-        feature.stories.push(story);
+        if (originStoryId) {
+          const index = feature.stories.findIndex(s => s.id === originStoryId);
+          feature.stories = insertItemAtIndex(feature.stories, story, index + 1);
+        } else feature.stories.push(story);
         this.saveOrUpdate({ storyMap });
         return Promise.resolve(story);
       }

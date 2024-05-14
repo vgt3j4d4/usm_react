@@ -30,14 +30,12 @@ export function useLists({ epicListRef, featureListRef }) {
   function addFeature(feature, originFeatureId) {
     const featureItem = new Item(feature);
     const originFeatureItem = featureList.findFirst(i => i.data.id === originFeatureId);
-    if (originFeatureItem) {
-      originFeatureItem.append(featureItem);
-    } else {
-      featureList.prepend(featureItem);
-    }
+    if (originFeatureItem) { originFeatureItem.append(featureItem); }
+    else { featureList.prepend(featureItem); }
 
     const epicItem = epicList.findFirst(i => i.data.id === feature.epicId);
-    epicItem.data.features.push(feature);
+    const featureIndex = epicItem.data.features.findIndex(f => f.id === originFeatureId);
+    epicItem.data.features = insertItemAtIndex(epicItem.data.features, feature, featureIndex + 1);
 
     return {
       newEpics: epicList.toDataArray(),

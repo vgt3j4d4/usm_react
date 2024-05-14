@@ -57,11 +57,12 @@ export function useStoryMap() {
   }
 
   async function addNewFeature(epicId, originFeatureId) {
-    const feature = await storiesService.addNewFeature(epicId);
+    const feature = await storiesService.addNewFeature(epicId, originFeatureId);
     if (!feature) return;
 
     const { newFeatures } = lists.addFeature(feature, originFeatureId);
     setFeatures(newFeatures);
+
     history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_FEATURE, params: [feature.epicId, feature.id] });
 
     return feature;
@@ -86,11 +87,12 @@ export function useStoryMap() {
   }
 
   async function addNewStory(epicId, featureId, originStoryId) {
-    const story = await storiesService.addNewStory(epicId, featureId);
+    const story = await storiesService.addNewStory(epicId, featureId, originStoryId);
     if (!story) return;
 
     const { newFeatures } = lists.addStory(story, originStoryId);
     setFeatures(newFeatures);
+
     history.addToUndo({ id: HISTORY_ACTIONS.REMOVE_STORY, params: [epicId, featureId, story.id] });
   }
 

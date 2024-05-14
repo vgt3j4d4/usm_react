@@ -14,9 +14,9 @@ export interface StoriesService {
 
   addNewEpic(): Promise<Epic>;
 
-  addNewFeature(epicId: string): Promise<Feature | null>;
+  addNewFeature(epicId: string, originFeatureId?: string): Promise<Feature | null>;
 
-  addNewStory(epicId: string, featureId: string): Promise<Story | null>;
+  addNewStory(epicId: string, featureId: string, originStoryId?: string): Promise<Story | null>;
 
   addEpic(epic: Epic, originEpicId: string): Promise<string>;
 
