@@ -7,6 +7,7 @@ import { Note } from "../Note.tsx";
 
 interface EpicNoteComponentProps {
   epic: Epic;
+  showFeatures?: boolean;
   focusable: boolean;
   selected: { id: string };
   setSelected: (selected: any) => void;
@@ -55,7 +56,7 @@ class EpicNoteComponent extends React.Component<EpicNoteComponentProps> {
   }
 
   render() {
-    const { epic, selected, focusable } = this.props;
+    const { epic, showFeatures, selected, focusable } = this.props;
 
     return (
       <div className="p-2">
@@ -71,14 +72,16 @@ class EpicNoteComponent extends React.Component<EpicNoteComponentProps> {
           remove={this.remove}
           navigate={this.navigate}
         />
-        <div className="flex flex-row gap-4">
-          {epic.features.map(f => <FeatureNote key={f.id} feature={f} />)}
-        </div>
+        {showFeatures && (
+          <div className="flex flex-row gap-4">
+            {epic.features.map(f => <FeatureNote key={f.id} feature={f} />)}
+          </div>
+        )}
       </div>);
   }
 }
 
-export function EpicNote({ epic, focusable }) {
+export function EpicNote({ epic, showFeatures = true, focusable }) {
   const {
     addNewEpic, updateEpicTitle,
     maybeRemoveEpic, focusEpicAfterRemoval,
@@ -89,6 +92,7 @@ export function EpicNote({ epic, focusable }) {
   return (
     <EpicNoteComponent
       epic={epic}
+      showFeatures={showFeatures}
       focusable={focusable}
       selected={selected}
       setSelected={setSelected}

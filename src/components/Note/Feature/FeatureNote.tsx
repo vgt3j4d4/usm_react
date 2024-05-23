@@ -7,6 +7,7 @@ import { StoryNote } from "../Story/StoryNote.tsx";
 
 interface FeatureNoteComponentProps {
   feature: Feature;
+  showStories?: boolean;
   selected: { id: string };
   setSelected: (selected: any) => void;
   updateFeatureTitle: (featureId: string, title: string) => void;
@@ -58,7 +59,7 @@ class FeatureNoteComponent extends React.Component<FeatureNoteComponentProps> {
   }
 
   render() {
-    const { feature, selected } = this.props;
+    const { feature, showStories, selected } = this.props;
 
     return (
       <div className="pt-4">
@@ -74,16 +75,18 @@ class FeatureNoteComponent extends React.Component<FeatureNoteComponentProps> {
           remove={this.remove}
           navigate={this.navigate}
         />
-        <div className="py-4 flex flex-col gap-4">
-          {feature.stories.map(story => <StoryNote key={story.id} story={story} />)}
-        </div>
+        {showStories && (
+          <div className="py-4 flex flex-col gap-4">
+            {feature.stories.map(story => <StoryNote key={story.id} story={story} />)}
+          </div>
+        )}
       </div>
     )
   }
 
 }
 
-export function FeatureNote({ feature }) {
+export function FeatureNote({ feature, showStories = true }) {
 
   const {
     addNewFeature, updateFeatureTitle,
@@ -95,6 +98,7 @@ export function FeatureNote({ feature }) {
   return (
     <FeatureNoteComponent
       feature={feature}
+      showStories={showStories}
       selected={selected}
       setSelected={setSelected}
       updateFeatureTitle={updateFeatureTitle}
