@@ -2,12 +2,11 @@ import { useEffect, useMemo } from "react";
 import { useStoryMap } from "../../hooks/useStoryMap/useStoryMap";
 import { isMobileOrTablet } from "../../utils/utils";
 import { ArrowKeys } from "../ArrowKeys/ArrowKeys";
-import { EpicNote } from "../Note/Epic/EpicNote.tsx";
+import { EpicSwimlane } from "./Swimlane/EpicSwimlane";
 
 export function StoryMap() {
   const {
     epics,
-    selected,
     isFocused, setIsFocused,
   } = useStoryMap();
 
@@ -24,20 +23,12 @@ export function StoryMap() {
   });
 
   const displayArrowKeys = useMemo(() => !isMobileOrTablet(), []);
-  const noSelectionFound = Object.keys(selected).length === 0;
 
   return (
     <>
       <div className="w-full min-w-max">
-
         <div className="flex p-2">
-          {epics.map((e, index) => (
-            <EpicNote
-              key={e.id}
-              epic={e}
-              focusable={index === 0 && noSelectionFound}
-            />
-          ))}
+          <EpicSwimlane epics={epics} />
         </div>
       </div >
 

@@ -117,9 +117,17 @@ export function useLists({ epicListRef, featureListRef }) {
     return { newFeatures: featureList.toDataArray() };
   }
 
+  function swapEpics(epicId1, epicId2) {
+    const epic1 = epicList.findFirst(i => i.data.id === epicId1);
+    const epic2 = epicList.findFirst(i => i.data.id === epicId2);
+    epic1.swap(epic2);
+    return { newEpics: epicList.toDataArray() };
+  }
+
   return {
     addEpic, addFeature, addStory,
     removeEpic, removeFeature, removeStory,
     updateEpic, updateFeature, updateStory,
+    swapEpics
   }
 }

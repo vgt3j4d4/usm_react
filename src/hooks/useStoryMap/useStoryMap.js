@@ -351,6 +351,19 @@ export function useStoryMap() {
     }
   }
 
+  async function swapEpics(epicId, targetEpicId) {
+    const epic = epics.find(e => e.id === epicId);
+    const targetEpic = epics.find(e => e.id === targetEpicId);
+
+    if (!epic || !targetEpic) return;
+
+    const success = await storiesService.swapEpics(epicId, targetEpicId);
+    if (success) {
+      const { newEpics } = lists.swapEpics(epicId, targetEpicId);
+      setEpics(newEpics);
+    }
+  }
+
   return {
     epics, features,
     addNewEpic, addNewFeature, addNewStory,
@@ -361,6 +374,7 @@ export function useStoryMap() {
     focus, isFocused, setIsFocused,
     canUndo: history.canUndo, canRedo: history.canRedo,
     undo, redo,
-    focusEpicAfterRemoval, focusFeatureAfterRemoval, focusStoryAfterRemoval
+    focusEpicAfterRemoval, focusFeatureAfterRemoval, focusStoryAfterRemoval,
+    swapEpics
   }
 };
