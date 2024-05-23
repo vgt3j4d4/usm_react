@@ -92,6 +92,7 @@ describe('LinkedList', () => {
 
     const array = list.toArray();
 
+    expect(array).toBeInstanceOf(Array);
     expect(array.length).toBe(6);
   });
 
@@ -109,7 +110,7 @@ describe('LinkedList', () => {
     const array = list.toDataArray();
 
     expect(array.length).toBe(6);
-    expect(array.toString()).toBe('X,Y,X,X,Y,X');
+    expect(array).toStrictEqual(["X", "Y", "X", "X", "Y", "X"]);
   });
 
 });

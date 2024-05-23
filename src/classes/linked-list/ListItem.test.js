@@ -60,4 +60,16 @@ describe('ListItem', () => {
     expect(third.prev).toBe(first);
   });
 
+  it('should swap', () => {
+    const list = LinkedList.fromArray(['first', 'second', 'third']);
+    const first = list.findFirst((item) => item.data === 'first');
+    const third = list.findFirst((item) => item.data === 'third');
+
+    first.swap(third);
+
+    expect(list.size()).toBe(3);
+    expect(list.findIndex((item) => item.data === 'first')).toBe(2);
+    expect(list.findIndex((item) => item.data === 'third')).toBe(0);
+  });
+
 });

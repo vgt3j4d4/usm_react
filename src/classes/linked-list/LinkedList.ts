@@ -4,6 +4,11 @@ export class LinkedList<T> {
   head: ListItem<T> | null = null;
   tail: ListItem<T> | null = null;
 
+  constructor(initialItems?: T[]) {
+    if (!initialItems || initialItems.length === 0) return;
+    initialItems.forEach(item => this.append(new ListItem(item)));
+  }
+
   prepend(item: ListItem<T>) {
     item.list = this;
     if (this.head) {
@@ -85,7 +90,7 @@ export class LinkedList<T> {
     return array;
   }
 
-  toDataArray(): Array<any> {
+  toDataArray(): Array<T> {
     return this.toArray().map(item => item.data);
   }
 
@@ -94,8 +99,6 @@ export class LinkedList<T> {
   }
 
   static fromArray(array: Array<any>): LinkedList<any> {
-    const list = new LinkedList<any>();
-    array.forEach(data => new ListItem(data, list));
-    return list;
+    return new LinkedList<any>(array);
   }
 }
