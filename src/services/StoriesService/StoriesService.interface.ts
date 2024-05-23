@@ -36,4 +36,6 @@ export interface StoriesService {
 
   removeStory(epicId: string, featureId: string, storyId: string): Promise<Story | null>;
 
+  swapEpics(epic1Id: string, epic2Id: string): Promise<boolean>;
+
 }
