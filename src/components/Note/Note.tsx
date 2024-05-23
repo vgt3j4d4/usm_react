@@ -6,7 +6,7 @@ import { focusNoteById } from "../../utils/storyMapUtils";
 interface NoteComponentProps {
   id: string;
   title: string;
-  type: string;
+  type: number;
   focusable: boolean;
   selected: boolean;
   markAsSelected: () => void;
@@ -144,7 +144,7 @@ export function Note({
 }) {
   const { editing, setEditing, titleRef } = useNote(false);
 
-  function getClassName(type: string, selected: boolean) {
+  function getClassName(type: number, selected: boolean) {
     let classNames = ["note"];
 
     switch (type) {
@@ -166,10 +166,7 @@ export function Note({
     return classNames.join(" ");
   }
 
-  const className = useMemo(
-    () => getClassName(type, selected),
-    [type, selected]
-  );
+  const className = useMemo(() => getClassName(type, selected), [type, selected]);
 
   return (
     <NoteComponent
