@@ -3,10 +3,11 @@ import { useStoryMap } from "../../hooks/useStoryMap/useStoryMap";
 import { isMobileOrTablet } from "../../utils/utils";
 import { ArrowKeys } from "../ArrowKeys/ArrowKeys";
 import { EpicSwimlane } from "./Swimlane/EpicSwimlane";
+import { FeatureSwimlane } from "./Swimlane/FeatureSwimlane";
 
 export function StoryMap() {
   const {
-    epics,
+    epics, features,
     isFocused, setIsFocused,
   } = useStoryMap();
 
@@ -26,10 +27,9 @@ export function StoryMap() {
 
   return (
     <>
-      <div className="w-full min-w-max">
-        <div className="flex p-2">
-          <EpicSwimlane epics={epics} />
-        </div>
+      <div className="w-full min-w-max [&>*]:flex [&>*]:m-4 [&>*]:gap-4">
+        <EpicSwimlane epics={epics} />
+        <FeatureSwimlane features={features} />
       </div >
 
       {displayArrowKeys && isFocused ? <ArrowKeys /> : null}
