@@ -351,16 +351,33 @@ export function useStoryMap() {
     }
   }
 
-  async function swapEpics(epicId, targetEpicId) {
-    const epic = epics.find(e => e.id === epicId);
-    const targetEpic = epics.find(e => e.id === targetEpicId);
+  async function swapEpics(epicId1, epicId2) {
+    const epic1 = epics.find(e => e.id === epicId1);
+    const epic2 = epics.find(e => e.id === epicId2);
 
-    if (!epic || !targetEpic) return;
+    if (!epic1 || !epic2) return;
 
-    const success = await storiesService.swapEpics(epicId, targetEpicId);
+    const success = await storiesService.swapEpics(epicId1, epicId2);
     if (success) {
-      const { newEpics } = lists.swapEpics(epicId, targetEpicId);
+      const { newEpics, newFeatures } = lists.swapEpics(epicId1, epicId2);
       setEpics(newEpics);
+      setFeatures(newFeatures);
+    }
+  }
+
+  async function swapFeatures(epicId1, featureId1, epicId2, featureId2) {
+    const feature1 = features.find(f => f.id === featureId1);
+    const feature2 = features.find(f => f.id === featureId2);
+
+    if (!feature1 || !feature2) return;
+
+    const success = await storiesService.swapFeatures(epicId1, featureId1, epicId2, featureId2);
+    if (success) {
+      const { newFeatures } = lists.swapFeatures(epicId1, featureId1, epicId2, featureId2);
+      setFeatures(newFeatures);
+      if (epicId1 !== epicId2) {
+        // TODO
+      }
     }
   }
 
@@ -375,6 +392,6 @@ export function useStoryMap() {
     canUndo: history.canUndo, canRedo: history.canRedo,
     undo, redo,
     focusEpicAfterRemoval, focusFeatureAfterRemoval, focusStoryAfterRemoval,
-    swapEpics
+    swapEpics, swapFeatures
   }
 };

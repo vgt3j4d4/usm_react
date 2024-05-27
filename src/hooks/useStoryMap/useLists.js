@@ -1,4 +1,5 @@
 import { ListItem as Item } from "../../classes/linked-list/ListItem.ts";
+import { LinkedList as List } from "../../classes/linked-list/LinkedList.ts";
 import { insertItemAtIndex } from "../../utils/utils";
 
 export function useLists({ epicListRef, featureListRef }) {
@@ -121,13 +122,34 @@ export function useLists({ epicListRef, featureListRef }) {
     const epic1 = epicList.findFirst(i => i.data.id === epicId1);
     const epic2 = epicList.findFirst(i => i.data.id === epicId2);
     epic1.swap(epic2);
-    return { newEpics: epicList.toDataArray() };
+    const newEpics = epicList.toDataArray();
+    const newFeatures = newEpics.flatMap(e => e.features);
+    featureListRef.current = List.fromArray(newFeatures);
+    return { newEpics, newFeatures };
+  }
+
+  function swapFeatures(epicId1, featureId1, epicId2, featureId2) {
+    const feature1 = featureList.findFirst(i => i.data.id === featureId1);
+    const feature2 = featureList.findFirst(i => i.data.id === featureId2);
+
+    if (epicId1 === epicId2) {
+      feature1.swap(feature2);
+      return {
+        newEpics: epicList.toDataArray(),
+        newFeatures: featureList.toDataArray()
+      };
+    } else {
+      return {
+        newEpics: epicList.toDataArray(),
+        newFeatures: featureList.toDataArray()
+      };
+    }
   }
 
   return {
     addEpic, addFeature, addStory,
     removeEpic, removeFeature, removeStory,
     updateEpic, updateFeature, updateStory,
-    swapEpics
+    swapEpics, swapFeatures
   }
 }
