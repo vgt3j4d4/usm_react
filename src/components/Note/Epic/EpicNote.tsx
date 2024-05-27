@@ -59,7 +59,7 @@ class EpicNoteComponent extends React.Component<EpicNoteComponentProps> {
     const { epic, showFeatures, selected, focusable } = this.props;
 
     return (
-      <div className="p-2">
+      <>
         <Note
           id={epic.id}
           title={epic.title}
@@ -73,11 +73,11 @@ class EpicNoteComponent extends React.Component<EpicNoteComponentProps> {
           navigate={this.navigate}
         />
         {showFeatures && (
-          <div className="flex flex-row gap-4">
+          <div className="flex gap-4">
             {epic.features.map(f => <FeatureNote key={f.id} feature={f} />)}
           </div>
         )}
-      </div>);
+      </>);
   }
 }
 

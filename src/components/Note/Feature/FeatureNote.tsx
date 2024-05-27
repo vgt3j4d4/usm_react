@@ -62,7 +62,7 @@ class FeatureNoteComponent extends React.Component<FeatureNoteComponentProps> {
     const { feature, showStories, selected } = this.props;
 
     return (
-      <div className="pt-4">
+      <>
         <Note
           id={feature.id}
           title={feature.title}
@@ -80,7 +80,7 @@ class FeatureNoteComponent extends React.Component<FeatureNoteComponentProps> {
             {feature.stories.map(story => <StoryNote key={story.id} story={story} />)}
           </div>
         )}
-      </div>
+      </>
     )
   }
 
