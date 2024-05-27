@@ -38,4 +38,6 @@ export interface StoriesService {
 
   swapEpics(epic1Id: string, epic2Id: string): Promise<boolean>;
 
+  swapFeatures(epicId1: string, feature1Id: string, epicId2: string, feature2Id: string): Promise<boolean>;
+
 }

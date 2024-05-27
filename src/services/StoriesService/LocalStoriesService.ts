@@ -328,4 +328,22 @@ export class LocalStoriesService implements StoriesService {
     return Promise.resolve(false);
   }
 
+  async swapFeatures(epicId1: string, feature1Id: string, epicId2: string, feature2Id: string): Promise<boolean> {
+    const { storyMap } = this.getData()!;
+    const epic1 = storyMap.epics.find(e => e.id === epicId1);
+    const epic2 = storyMap.epics.find(e => e.id === epicId2);
+    if (epic1 && epic2) {
+      const feature1Index = epic1.features.findIndex(f => f.id === feature1Id);
+      const feature2Index = epic2.features.findIndex(f => f.id === feature2Id);
+      if (feature1Index !== -1 && feature2Index !== -1) {
+        const temp = epic1.features[feature1Index];
+        epic1.features[feature1Index] = epic2.features[feature2Index];
+        epic2.features[feature2Index] = temp;
+        this.saveOrUpdate({ storyMap });
+        return Promise.resolve(true);
+      }
+    }
+    return Promise.resolve(false);
+  }
+
 }
