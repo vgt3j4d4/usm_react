@@ -20,8 +20,8 @@ export default function StoriesProvider({ children }) {
       const features = epics.flatMap(e => e.features);
       setEpics(epics);
       setFeatures(features);
-      epicListRef.current = List.fromArray(epics.map(e => e));
-      featureListRef.current = List.fromArray(features.map(f => f));
+      epicListRef.current = List.fromArray(epics);
+      featureListRef.current = List.fromArray(features);
     }
     retrieveState();
   }, []);
