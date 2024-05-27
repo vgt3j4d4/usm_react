@@ -7,7 +7,7 @@ export function Droppable({ id, type, children }) {
   let className = '';
   if (active && over) {
     if (isOver && active.id !== over.id) {
-      className = '-top-2 -pt-2 z-1 border-2 border-dashed border-gray-600';
+      className = 'p-2 border-2 border-dashed border-gray-500';
     }
   }
 
