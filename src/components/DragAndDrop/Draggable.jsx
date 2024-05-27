@@ -6,7 +6,7 @@ export function Draggable({ id, type, children }) {
     listeners,
     setNodeRef,
     transform
-  } = useDraggable({ id, data: { type } });
+  } = useDraggable({ id, data: { type }, attributes: { role: 'none', tabIndex: -1 } });
 
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
